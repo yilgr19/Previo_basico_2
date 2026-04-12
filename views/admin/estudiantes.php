@@ -1,8 +1,4 @@
 <?php
-/**
- * Vista: registro de estudiantes (formulario ampliado).
- * Variables: $mensaje, $tipoMsg, $estudiantes, $editar
- */
 $defaults = [
     'tipo_identificacion' => '',
     'documento' => '',

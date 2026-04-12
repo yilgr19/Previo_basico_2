@@ -1,7 +1,3 @@
-<?php
-declare(strict_types=1);
-/** Vista: panel principal del administrador. */
-?>
 <main class="flex-1 w-full mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
   <section class="mb-8 rounded-xl border-l-4 border-academic bg-gradient-to-r from-blue-50 to-white p-6 shadow-sm">
     <h1 class="text-xl font-semibold text-academic">Bienvenido al Sistema Académico</h1>
@@ -12,7 +8,7 @@ declare(strict_types=1);
     <div class="relative h-64 md:h-72">
       <div data-carousel-track class="flex h-full transition-transform duration-500 ease-out">
         <div data-carousel-slide class="relative min-w-full shrink-0">
-          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80" class="h-full w-full object-cover" alt="">
+          <img src="<?= h(url('imagen/1.jpg')) ?>" class="h-full w-full object-cover" alt="">
           <div class="absolute inset-0 hidden flex-col justify-end bg-academic/45 p-6 md:flex">
             <div class="max-w-lg rounded-lg bg-black/25 px-4 py-3 text-white backdrop-blur-sm">
               <h2 class="text-lg font-semibold">Gestión integral académica</h2>
@@ -21,11 +17,11 @@ declare(strict_types=1);
           </div>
         </div>
         <div data-carousel-slide class="relative min-w-full shrink-0">
-          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80" class="h-full w-full object-cover" alt="">
+          <img src="<?= h(url('imagen/2.jpg')) ?>" class="h-full w-full object-cover" alt="">
           <div class="absolute inset-0 hidden flex-col justify-end bg-academic/45 p-6 md:flex">
             <div class="max-w-lg rounded-lg bg-black/25 px-4 py-3 text-white backdrop-blur-sm">
               <h2 class="text-lg font-semibold">Estudiantes y matrículas</h2>
-              <p class="text-sm opacity-95">Registro alineado al diccionario de datos</p>
+              <p class="text-sm opacity-95">Registra y matricula asignaturas</p>
             </div>
           </div>
         </div>

@@ -1,5 +1,4 @@
 <?php
-/** Vista: CRUD docentes. Variables: $mensaje, $docentes, $editar */
 $ef = $editar ?? [];
 $idSedeForm = isset($ef['id_sede']) && (int) $ef['id_sede'] > 0 ? (int) $ef['id_sede'] : docente_sede_efectiva($ef);
 $msgWarn = (strpos($mensaje ?? '', 'No se puede') !== false || strpos($mensaje ?? '', 'Seleccione la carrera') !== false || strpos($mensaje ?? '', 'Seleccione la sede') !== false || strpos($mensaje ?? '', 'no corresponde a la sede') !== false);

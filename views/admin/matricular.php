@@ -1,5 +1,4 @@
 <?php
-/** Vista: matrícula por estudiante. Variables: $mensaje, $tipoMsg, $cargado, $materiasOrdenadas */
 $show = $cargado ?? null;
 $alertMsg = match ($tipoMsg ?? '') {
     'success' => 'border-green-200 bg-green-50 text-green-900',

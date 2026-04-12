@@ -1,6 +1,3 @@
-<?php
-/** Vista: formulario de inicio de sesión. Variables: $error */
-?>
 <main class="flex w-full flex-1 flex-col justify-center px-4 py-10">
   <div class="mx-auto w-full max-w-md">
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
@@ -32,10 +29,6 @@
           </div>
           <button type="submit" class="mt-2 w-full rounded-lg bg-academic py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-academic-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Entrar</button>
         </form>
-        <p class="mt-4 text-xs text-gray-500">
-          El inicio de sesión usa los datos de <code class="rounded bg-gray-100 px-1">data/administradores.json</code>, <code class="rounded bg-gray-100 px-1">data/docentes.json</code> y <code class="rounded bg-gray-100 px-1">data/estudiantes.json</code>.
-          Opcionalmente hay una semilla demo en <code class="rounded bg-gray-100 px-1">localStorage</code> (<code class="rounded bg-gray-100 px-1">academic_credentials</code>).
-        </p>
       </div>
     </div>
   </div>

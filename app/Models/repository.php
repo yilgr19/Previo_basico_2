@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/** @return array<string,mixed>|null */
 function repo_estudiante_por_id(int $id): ?array
 {
     foreach (load_data('estudiantes') as $e) {
@@ -12,7 +11,6 @@ function repo_estudiante_por_id(int $id): ?array
     return null;
 }
 
-/** @return array<string,mixed>|null */
 function repo_estudiante_por_documento(string $doc): ?array
 {
     $doc = trim($doc);
@@ -24,7 +22,6 @@ function repo_estudiante_por_documento(string $doc): ?array
     return null;
 }
 
-/** @return array<string,mixed>|null */
 function repo_docente_por_id(int $id): ?array
 {
     foreach (load_data('docentes') as $d) {
@@ -35,23 +32,11 @@ function repo_docente_por_id(int $id): ?array
     return null;
 }
 
-/** @return array<string,mixed>|null */
 function repo_materia_por_id(int $id): ?array
 {
     foreach (load_data('materias') as $m) {
         if ((int) ($m['id_materia'] ?? 0) === $id) {
             return $m;
-        }
-    }
-    return null;
-}
-
-/** @return array<string,mixed>|null */
-function repo_matricula_por_id(int $id): ?array
-{
-    foreach (load_data('matriculas') as $x) {
-        if ((int) ($x['id_matricula'] ?? 0) === $id) {
-            return $x;
         }
     }
     return null;
@@ -67,7 +52,6 @@ function repo_existe_matricula(int $idEst, int $idMat): bool
     return false;
 }
 
-/** @return list<array<string,mixed>> */
 function repo_matriculas_de_estudiante(int $idEst): array
 {
     $out = [];
@@ -79,7 +63,6 @@ function repo_matriculas_de_estudiante(int $idEst): array
     return $out;
 }
 
-/** @return list<array<string,mixed>> */
 function repo_matriculas_de_materia(int $idMat): array
 {
     $out = [];
@@ -91,7 +74,6 @@ function repo_matriculas_de_materia(int $idMat): array
     return $out;
 }
 
-/** @return list<array<string,mixed>> */
 function repo_materias_por_docente(int $idDoc): array
 {
     $out = [];
@@ -121,17 +103,12 @@ function materia_nombre(int $idMat): string
     return (string) (($m['codigo'] ?? '') . ' — ' . ($m['nombre'] ?? ''));
 }
 
-/** @param array<string,mixed> $m */
 function materia_modalidad_etiqueta(array $m): string
 {
     $mod = (string) ($m['modalidad'] ?? 'virtual');
     return $mod === 'presencial' ? 'Presencial' : 'Virtual';
 }
 
-/**
- * @param list<array<string,mixed>> $materias
- * @return list<array<string,mixed>>
- */
 function repo_materias_ordenadas_por_codigo(array $materias): array
 {
     usort($materias, static function ($a, $b) {
@@ -140,7 +117,6 @@ function repo_materias_ordenadas_por_codigo(array $materias): array
     return $materias;
 }
 
-/** @return array<string,string> código interno => etiqueta */
 function materia_dias_clase_opciones(): array
 {
     return [
@@ -174,7 +150,6 @@ function materia_dia_etiqueta(?string $cod): string
     return $op[$cod ?? ''] ?? ($cod ?: '—');
 }
 
-/** Resumen de horario para tablas y listas. */
 function materia_horario_resumen(array $m): string
 {
     $d = materia_dia_corto((string) ($m['dia_clase'] ?? ''));
@@ -186,7 +161,6 @@ function materia_horario_resumen(array $m): string
     return $d . ' ' . $a . '–' . $b;
 }
 
-/** Carrera/programa según diccionario. */
 function materia_programa_label(array $m): string
 {
     $id = (int) ($m['id_programa'] ?? 0);

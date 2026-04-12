@@ -1,6 +1,3 @@
-<?php
-/** Vista: reportes consolidados. Variables: $mensaje, $estudiantes, $docentes, $materiasOrdenadas, $matriculas */
-?>
 <main class="flex-1 w-full mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-xl font-semibold text-academic">Reportes y gestión de registros</h1>

@@ -1,6 +1,3 @@
-/**
- * Carrusel simple (panel admin): desplazamiento en px según ancho del contenedor.
- */
 (function () {
   var root = document.getElementById('admin-carousel');
   if (!root) return;

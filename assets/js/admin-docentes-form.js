@@ -1,7 +1,3 @@
-/**
- * Docentes: filtra carreras según sede (Cúcuta / Ocaña).
- * Requiere #fld-sede-docente y #fld-programa-docente con opciones data-sede="1|2".
- */
 (function () {
   var sedeSel = document.getElementById('fld-sede-docente');
   var progSel = document.getElementById('fld-programa-docente');

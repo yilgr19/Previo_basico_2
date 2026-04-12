@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/** @return array<int, array{id:int,codigo:string,nombre:string,id_sede:int}> id_sede: 1 Cúcuta, 2 Ocaña */
 function diccionario_programas(): array
 {
     return [
@@ -30,7 +29,6 @@ function diccionario_programas(): array
     ];
 }
 
-/** @return array<int, array{id:int,nombre:string}> */
 function diccionario_tipos_solicitud(): array
 {
     return [
@@ -50,7 +48,6 @@ function diccionario_tipos_solicitud(): array
     ];
 }
 
-/** @return array<int, array{id:int,nombre:string}> */
 function diccionario_sedes(): array
 {
     return [
@@ -59,7 +56,6 @@ function diccionario_sedes(): array
     ];
 }
 
-/** @return array<int, array{id:int,nombre:string}> */
 function diccionario_jornadas(): array
 {
     return [
@@ -70,7 +66,6 @@ function diccionario_jornadas(): array
     ];
 }
 
-/** @return list<array{codigo:string,nombre:string}> */
 function diccionario_tipos_identificacion(): array
 {
     return [
@@ -82,7 +77,6 @@ function diccionario_tipos_identificacion(): array
     ];
 }
 
-/** @return list<array{codigo:string,nombre:string}> */
 function diccionario_sexo(): array
 {
     return [
@@ -128,7 +122,6 @@ function programa_label_by_id(int $id): string
     return 'Programa ID ' . $id;
 }
 
-/** Sede del programa según diccionario: 1 Cúcuta, 2 Ocaña. */
 function programa_id_sede(int $idPrograma): int
 {
     foreach (diccionario_programas() as $p) {
@@ -139,11 +132,6 @@ function programa_id_sede(int $idPrograma): int
     return 1;
 }
 
-/**
- * Sede del docente: campo explícito o inferida por la carrera (registros antiguos).
- *
- * @param array<string, mixed> $docente
- */
 function docente_sede_efectiva(array $docente): int
 {
     if (isset($docente['id_sede']) && (int) $docente['id_sede'] > 0) {

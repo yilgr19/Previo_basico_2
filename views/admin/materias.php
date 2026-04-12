@@ -1,7 +1,4 @@
 <?php
-/**
- * Vista: registro y listado de asignaturas.
- */
 $mWarn = ($mensaje ?? '') !== '' && (
     strpos($mensaje, 'No se puede') !== false || strpos($mensaje, 'debe indicar') !== false || strpos($mensaje, 'Seleccione') !== false
     || strpos($mensaje, 'Busque') !== false || strpos($mensaje, 'Indique') !== false || strpos($mensaje, 'misma carrera') !== false

@@ -57,7 +57,6 @@ function logout_user(): void
     session_destroy();
 }
 
-/** Acepta documento o correo (si existe en el registro). */
 function usuario_coincide_docente_o_estudiante(array $registro, string $usuario): bool
 {
     $u = trim($usuario);

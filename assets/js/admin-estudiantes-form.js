@@ -1,6 +1,3 @@
-/**
- * Formulario registro estudiante: calcula edad desde fecha de nacimiento.
- */
 (function () {
   function calcEdad(ymd) {
     if (!ymd || ymd.length < 8) return '';

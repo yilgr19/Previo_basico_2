@@ -6,10 +6,6 @@ function h(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-/**
- * Prefijo de URL cuando el proyecto vive en un subdirectorio de htdocs (p. ej. /Parcial2DeBa).
- * Vacío si el document root coincide con la carpeta del proyecto (p. ej. php -S).
- */
 function app_base_path(): string
 {
     static $cached = null;
@@ -81,9 +77,6 @@ function get(string $key, ?string $default = null): ?string
     return isset($_GET[$key]) ? trim((string) $_GET[$key]) : $default;
 }
 
-/**
- * Ruta relativa a `assets/` desde el script actual (funciona con `php -S` y subcarpetas del proyecto).
- */
 function asset_url(string $path): string
 {
     $p = ltrim($path, '/');

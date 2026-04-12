@@ -1,7 +1,3 @@
-/**
- * Formulario admin: asignaturas — modalidad/salón, búsqueda de docente, validación envío.
- * Requiere window.DOCENTES_MATERIAS (JSON desde la vista).
- */
 (function () {
   function syncSalon() {
     var m = document.getElementById('fld-modalidad');

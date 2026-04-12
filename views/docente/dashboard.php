@@ -1,6 +1,3 @@
-<?php
-/** Vista: panel docente. Variables: $d (docente), $materias (lista de materias del docente) */
-?>
 <main class="flex-1 w-full mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
   <section class="mb-8 rounded-xl border-l-4 border-academic bg-gradient-to-r from-blue-50 to-white p-6 shadow-sm">
     <h1 class="text-xl font-semibold text-academic">Bienvenido, <?= h($d['nombre'] ?? 'Docente') ?></h1>

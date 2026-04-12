@@ -1,4 +1,3 @@
-/** Matrícula admin: muestra semestre de la asignatura al elegir curso. */
 (function () {
   var sel = document.getElementById('selMateria');
   var out = document.getElementById('semestreMateria');
