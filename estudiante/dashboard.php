@@ -32,6 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solic
 
 $solicitudes = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));
 $matriculas = repo_matriculas_de_estudiante($idEst);
+$matsEst = [];
+foreach ($matriculas as $x) {
+    $mid = (int) ($x['id_materia'] ?? 0);
+    $m = repo_materia_por_id($mid);
+    $matsEst[] = ['matricula' => $x, 'materia' => $m];
+}
+usort($matsEst, static function ($a, $b) {
+    $ca = $a['materia'] ? (string) ($a['materia']['codigo'] ?? '') : '';
+    $cb = $b['materia'] ? (string) ($b['materia']['codigo'] ?? '') : '';
+    return strcmp($ca, $cb);
+});
 
 $pageTitle = 'Panel estudiante';
 require PARTIALS_PATH . '/header.php';
@@ -64,13 +75,29 @@ require PARTIALS_PATH . '/header.php';
       <div class="card shadow-sm h-100">
         <div class="card-body">
           <h2 class="h6 form-section-title">Asignaturas matriculadas</h2>
-          <?php if (!$matriculas): ?>
+          <?php if (!$matsEst): ?>
             <p class="text-muted mb-0">Aún no tiene matrículas registradas por administración.</p>
           <?php else: ?>
             <ul class="list-group list-group-flush">
-              <?php foreach ($matriculas as $x): ?>
-                <li class="list-group-item px-0"><?= h(materia_nombre((int) ($x['id_materia'] ?? 0))) ?>
-                  <span class="text-muted small">— <?= h($x['fecha'] ?? '') ?></span>
+              <?php foreach ($matsEst as $row): ?>
+                <?php
+                $x = $row['matricula'];
+                $mat = $row['materia'];
+                ?>
+                <li class="list-group-item px-0 border-0 border-bottom">
+                  <?php if ($mat): ?>
+                    <div class="fw-semibold"><?= h(materia_nombre((int) ($mat['id_materia'] ?? 0))) ?></div>
+                    <div class="small text-muted">
+                      <span class="badge bg-secondary"><?= h(materia_modalidad_etiqueta($mat)) ?></span>
+                      <?php if (($mat['modalidad'] ?? '') === 'presencial' && trim((string) ($mat['salon'] ?? '')) !== ''): ?>
+                        · Salón <?= h($mat['salon']) ?>
+                      <?php endif; ?>
+                      · Matrícula: <?= h($x['fecha'] ?? '') ?>
+                    </div>
+                  <?php else: ?>
+                    <div class="fw-semibold text-warning">Asignatura no encontrada (ID <?= (int) ($x['id_materia'] ?? 0) ?>)</div>
+                    <div class="small text-muted">Matrícula: <?= h($x['fecha'] ?? '') ?></div>
+                  <?php endif; ?>
                 </li>
               <?php endforeach; ?>
             </ul>

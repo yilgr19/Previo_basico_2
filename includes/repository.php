@@ -121,6 +121,25 @@ function materia_nombre(int $idMat): string
     return (string) (($m['codigo'] ?? '') . ' — ' . ($m['nombre'] ?? ''));
 }
 
+/** @param array<string,mixed> $m */
+function materia_modalidad_etiqueta(array $m): string
+{
+    $mod = (string) ($m['modalidad'] ?? 'virtual');
+    return $mod === 'presencial' ? 'Presencial' : 'Virtual';
+}
+
+/**
+ * @param list<array<string,mixed>> $materias
+ * @return list<array<string,mixed>>
+ */
+function repo_materias_ordenadas_por_codigo(array $materias): array
+{
+    usort($materias, static function ($a, $b) {
+        return strcmp((string) ($a['codigo'] ?? ''), (string) ($b['codigo'] ?? ''));
+    });
+    return $materias;
+}
+
 function estudiante_nombre_completo(int $idEst): string
 {
     $e = repo_estudiante_por_id($idEst);

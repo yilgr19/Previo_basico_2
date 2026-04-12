@@ -5,6 +5,28 @@
         "creditos": 3,
         "semestre": 2,
         "id_docente": 1,
-        "id_materia": 1
+        "id_materia": 1,
+        "modalidad": "presencial",
+        "salon": "A208"
+    },
+    {
+        "codigo": "002",
+        "nombre": "Desarrollo Basico",
+        "creditos": 3,
+        "semestre": 6,
+        "id_docente": 1,
+        "modalidad": "presencial",
+        "salon": "B204",
+        "id_materia": 2
+    },
+    {
+        "codigo": "003",
+        "nombre": "Base de Datos",
+        "creditos": 3,
+        "semestre": 4,
+        "id_docente": 2,
+        "modalidad": "presencial",
+        "salon": "A301",
+        "id_materia": 3
     }
 ]

@@ -7,6 +7,7 @@ $mensaje = '';
 $tipoMsg = 'success';
 $cargado = null;
 $materias = load_data('materias');
+$materiasOrdenadas = repo_materias_ordenadas_por_codigo($materias);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = post('accion', '');
@@ -110,9 +111,16 @@ require PARTIALS_PATH . '/header.php';
           <label class="form-label">Asignatura</label>
           <select name="id_materia" id="selMateria" class="form-select" required>
             <option value="">Seleccione...</option>
-            <?php foreach ($materias as $m): ?>
+            <?php foreach ($materiasOrdenadas as $m): ?>
               <option value="<?= (int) $m['id_materia'] ?>" data-semestre="<?= (int) ($m['semestre'] ?? 0) ?>">
-                <?= h(($m['codigo'] ?? '') . ' — ' . ($m['nombre'] ?? '')) ?>
+                <?php
+                $lbl = ($m['codigo'] ?? '') . ' — ' . ($m['nombre'] ?? '');
+                $lbl .= ' · ' . materia_modalidad_etiqueta($m);
+                if (($m['modalidad'] ?? '') === 'presencial' && trim((string) ($m['salon'] ?? '')) !== '') {
+                    $lbl .= ' · Salón ' . $m['salon'];
+                }
+                ?>
+                <?= h($lbl) ?>
               </option>
             <?php endforeach; ?>
           </select>

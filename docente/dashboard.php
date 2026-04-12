@@ -8,7 +8,7 @@ if (!$idDoc) {
     redirect('/login.php');
 }
 $d = repo_docente_por_id($idDoc);
-$materias = repo_materias_por_docente($idDoc);
+$materias = repo_materias_ordenadas_por_codigo(repo_materias_por_docente($idDoc));
 
 $pageTitle = 'Panel docente';
 require PARTIALS_PATH . '/header.php';
@@ -30,10 +30,18 @@ require PARTIALS_PATH . '/header.php';
     ?>
     <div class="card shadow-sm mb-4">
       <div class="card-body">
-        <h2 class="h6 form-section-title mb-3">
+        <h2 class="h6 form-section-title mb-2">
           <?= h(($m['codigo'] ?? '') . ' — ' . ($m['nombre'] ?? '')) ?>
-          <span class="text-muted fw-normal small">Semestre materia: <?= (int) ($m['semestre'] ?? 0) ?> · Créditos: <?= (int) ($m['creditos'] ?? 0) ?></span>
         </h2>
+        <p class="small text-muted mb-3">
+          Semestre: <?= (int) ($m['semestre'] ?? 0) ?> · Créditos: <?= (int) ($m['creditos'] ?? 0) ?>
+          · <span class="badge bg-secondary"><?= h(materia_modalidad_etiqueta($m)) ?></span>
+          <?php if (($m['modalidad'] ?? 'virtual') === 'presencial' && trim((string) ($m['salon'] ?? '')) !== ''): ?>
+            · Salón: <strong><?= h($m['salon']) ?></strong>
+          <?php elseif (($m['modalidad'] ?? 'virtual') === 'presencial'): ?>
+            · <span class="text-warning">Salón no indicado</span>
+          <?php endif; ?>
+        </p>
         <?php if (!$inscritos): ?>
           <p class="text-muted mb-0 small">Sin estudiantes matriculados en esta asignatura.</p>
         <?php else: ?>

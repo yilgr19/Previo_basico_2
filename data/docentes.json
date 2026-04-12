@@ -7,5 +7,14 @@
         "telefono": "1231231231",
         "id_docente": 1,
         "clave": "1234"
+    },
+    {
+        "nombre": "Jose",
+        "apellido": "Mantilla",
+        "documento": "11111111",
+        "correo": "jose111@gmail.com",
+        "telefono": "123456",
+        "id_docente": 2,
+        "clave": "12345"
     }
 ]
