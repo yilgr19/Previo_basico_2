@@ -1,0 +1,9 @@
+[
+    {
+        "id_admin": 1,
+        "nombre": "Administrador Principal",
+        "correo": "admin@academico.edu",
+        "rol": "Administrador",
+        "clave": "admin123"
+    }
+]

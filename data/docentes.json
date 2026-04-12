@@ -1,0 +1,11 @@
+[
+    {
+        "nombre": "Juan Esteban",
+        "apellido": "Garcia Daza",
+        "documento": "123456789",
+        "correo": "juan123@gmail.com",
+        "telefono": "1231231231",
+        "id_docente": 1,
+        "clave": "1234"
+    }
+]

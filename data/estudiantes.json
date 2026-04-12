@@ -1,0 +1,9 @@
+[
+    {
+        "id_estudiante": 1,
+        "nombre": "María",
+        "apellido": "García",
+        "documento": "87654321",
+        "clave": "estudiante123"
+    }
+]

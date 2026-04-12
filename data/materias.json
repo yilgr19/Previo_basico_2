@@ -1,0 +1,10 @@
+[
+    {
+        "codigo": "001",
+        "nombre": "Calculo 1",
+        "creditos": 3,
+        "semestre": 2,
+        "id_docente": 1,
+        "id_materia": 1
+    }
+]

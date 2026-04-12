@@ -1,0 +1,2 @@
+# Evitar acceso directo a los JSON desde el navegador (Apache)
+Require all denied
