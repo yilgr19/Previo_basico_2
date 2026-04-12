@@ -1,9 +1,22 @@
 [
     {
         "id_estudiante": 1,
+        "tipo_identificacion": "CC",
+        "documento": "87654321",
         "nombre": "María",
         "apellido": "García",
-        "documento": "87654321",
+        "correo": "maria@correo.edu",
+        "sexo": "F",
+        "id_programa": 124,
+        "programa": "[107860] Tecnología en Desarrollo de Software",
+        "semestre": 4,
+        "fecha_nacimiento": "2002-05-15",
+        "edad": 23,
+        "direccion": "Calle 10 #5-20",
+        "barrio": "Centro",
+        "telefono": "3001234567",
+        "id_sede": 1,
+        "id_jornada": 1,
         "clave": "estudiante123"
     }
 ]

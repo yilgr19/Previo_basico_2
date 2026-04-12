@@ -5,6 +5,9 @@
         "documento": "123456789",
         "correo": "juan123@gmail.com",
         "telefono": "1231231231",
+        "id_sede": 1,
+        "id_programa": 124,
+        "programa": "[107860] Tecnología en Desarrollo de Software",
         "id_docente": 1,
         "clave": "1234"
     },
@@ -14,7 +17,34 @@
         "documento": "11111111",
         "correo": "jose111@gmail.com",
         "telefono": "123456",
+        "id_sede": 1,
+        "id_programa": 124,
+        "programa": "[107860] Tecnología en Desarrollo de Software",
         "id_docente": 2,
+        "clave": "12345"
+    },
+    {
+        "nombre": "Maria",
+        "apellido": "Cuadros",
+        "documento": "2222222",
+        "correo": "maria@gmail.com",
+        "telefono": "2222222",
+        "id_sede": 1,
+        "id_programa": 176,
+        "programa": "[91388] Profesional en Diseño Gráfico",
+        "id_docente": 3,
+        "clave": "12345"
+    },
+    {
+        "nombre": "Andrea",
+        "apellido": "Yañez",
+        "documento": "444444",
+        "correo": "andrea@gmail.com",
+        "telefono": "444444",
+        "id_sede": 2,
+        "id_programa": 127,
+        "programa": "[108788] Tecn. en Gestión de Contenidos Gráficos Public. Ocaña",
+        "id_docente": 4,
         "clave": "12345"
     }
 ]

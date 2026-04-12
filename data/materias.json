@@ -7,7 +7,11 @@
         "id_docente": 1,
         "id_materia": 1,
         "modalidad": "presencial",
-        "salon": "A208"
+        "salon": "A208",
+        "id_programa": 124,
+        "dia_clase": "lunes",
+        "hora_inicio": "08:00",
+        "hora_fin": "11:00"
     },
     {
         "codigo": "002",
@@ -17,7 +21,11 @@
         "id_docente": 1,
         "modalidad": "presencial",
         "salon": "B204",
-        "id_materia": 2
+        "id_materia": 2,
+        "id_programa": 124,
+        "dia_clase": "martes",
+        "hora_inicio": "10:00",
+        "hora_fin": "12:00"
     },
     {
         "codigo": "003",
@@ -27,6 +35,10 @@
         "id_docente": 2,
         "modalidad": "presencial",
         "salon": "A301",
-        "id_materia": 3
+        "id_materia": 3,
+        "id_programa": 125,
+        "dia_clase": "miercoles",
+        "hora_inicio": "14:00",
+        "hora_fin": "16:00"
     }
 ]

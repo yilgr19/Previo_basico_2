@@ -140,6 +140,62 @@ function repo_materias_ordenadas_por_codigo(array $materias): array
     return $materias;
 }
 
+/** @return array<string,string> código interno => etiqueta */
+function materia_dias_clase_opciones(): array
+{
+    return [
+        'lunes' => 'Lunes',
+        'martes' => 'Martes',
+        'miercoles' => 'Miércoles',
+        'jueves' => 'Jueves',
+        'viernes' => 'Viernes',
+        'sabado' => 'Sábado',
+        'domingo' => 'Domingo',
+    ];
+}
+
+function materia_dia_corto(?string $cod): string
+{
+    $map = [
+        'lunes' => 'Lun',
+        'martes' => 'Mar',
+        'miercoles' => 'Mié',
+        'jueves' => 'Jue',
+        'viernes' => 'Vie',
+        'sabado' => 'Sáb',
+        'domingo' => 'Dom',
+    ];
+    return $map[$cod ?? ''] ?? '—';
+}
+
+function materia_dia_etiqueta(?string $cod): string
+{
+    $op = materia_dias_clase_opciones();
+    return $op[$cod ?? ''] ?? ($cod ?: '—');
+}
+
+/** Resumen de horario para tablas y listas. */
+function materia_horario_resumen(array $m): string
+{
+    $d = materia_dia_corto((string) ($m['dia_clase'] ?? ''));
+    $a = trim((string) ($m['hora_inicio'] ?? ''));
+    $b = trim((string) ($m['hora_fin'] ?? ''));
+    if ($a === '' && $b === '') {
+        return '—';
+    }
+    return $d . ' ' . $a . '–' . $b;
+}
+
+/** Carrera/programa según diccionario. */
+function materia_programa_label(array $m): string
+{
+    $id = (int) ($m['id_programa'] ?? 0);
+    if ($id <= 0) {
+        return '—';
+    }
+    return programa_label_by_id($id);
+}
+
 function estudiante_nombre_completo(int $idEst): string
 {
     $e = repo_estudiante_por_id($idEst);

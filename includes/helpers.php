@@ -56,6 +56,21 @@ function redirect(string $url): void
     exit;
 }
 
+function calcular_edad_desde_fecha_ymd(string $fechaYmd): ?int
+{
+    $fechaYmd = trim($fechaYmd);
+    if ($fechaYmd === '') {
+        return null;
+    }
+    try {
+        $dob = new DateTimeImmutable($fechaYmd);
+        $now = new DateTimeImmutable('today');
+        return $dob->diff($now)->y;
+    } catch (Throwable $e) {
+        return null;
+    }
+}
+
 function post(string $key, ?string $default = null): ?string
 {
     return isset($_POST[$key]) ? trim((string) $_POST[$key]) : $default;

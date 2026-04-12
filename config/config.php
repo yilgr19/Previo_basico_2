@@ -9,6 +9,7 @@ define('ROOT_PATH', dirname(__DIR__));
 define('DATA_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'data');
 define('INCLUDES_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'includes');
 define('PARTIALS_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'partials');
+define('VIEWS_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'views');
 define('ASSETS_URL', 'assets');
 
 require_once INCLUDES_PATH . '/helpers.php';
