@@ -124,6 +124,46 @@ function docente_sede_efectiva(array $docente): int
     return 1;
 }
 
+function estudiante_sede_efectiva(array $estudiante): int
+{
+    if (isset($estudiante['id_sede']) && (int) $estudiante['id_sede'] > 0) {
+        return (int) $estudiante['id_sede'];
+    }
+    if (!empty($estudiante['id_programa'])) {
+        return programa_id_sede((int) $estudiante['id_programa']);
+    }
+
+    return 1;
+}
+
+/**
+ * Sede de gestión de una solicitud: petición estudiantil (sede del trámite o matrícula), o sede del docente radicante.
+ */
+function solicitud_sede_para_bandera_gestion(array $solicitud, ?array $estudiante, ?array $docenteSolicitante): int
+{
+    $idEst = (int) ($solicitud['id_estudiante'] ?? 0);
+    if ($idEst > 0 && $estudiante) {
+        $det = $solicitud['detalle_estudiante'] ?? null;
+        if (is_array($det)) {
+            $cl = $det['clasificacion'] ?? null;
+            if (is_array($cl) && isset($cl['id_sede_solicitud']) && (int) $cl['id_sede_solicitud'] > 0) {
+                return (int) $cl['id_sede_solicitud'];
+            }
+            $perfil = $det['perfil_snapshot'] ?? null;
+            if (is_array($perfil) && isset($perfil['id_sede_matricula']) && (int) $perfil['id_sede_matricula'] > 0) {
+                return (int) $perfil['id_sede_matricula'];
+            }
+        }
+
+        return estudiante_sede_efectiva($estudiante);
+    }
+    if ($docenteSolicitante) {
+        return docente_sede_efectiva($docenteSolicitante);
+    }
+
+    return 1;
+}
+
 function sede_nombre(?int $id): string
 {
     if ($id === null) {

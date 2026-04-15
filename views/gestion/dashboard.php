@@ -30,12 +30,16 @@ if (count($parts) >= 2) {
             <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Panel de gestión</h1>
             <p class="mt-1 text-base font-medium text-slate-700">Hola, <?= h($primer) ?></p>
             <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-600">
-              Coordine el registro de <strong class="font-semibold text-slate-800">estudiantes</strong> y <strong class="font-semibold text-slate-800">docentes</strong>, y atienda la <strong class="font-semibold text-slate-800">bandeja de solicitudes</strong> institucionales desde un solo lugar.
+              Coordine el registro de <strong class="font-semibold text-slate-800">estudiantes</strong> y <strong class="font-semibold text-slate-800">docentes</strong>, y atienda las <strong class="font-semibold text-slate-800">bandejas de solicitudes por sede</strong> (Cúcuta y Ocaña) desde un solo lugar.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
               <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                Bandeja de solicitudes
+                Bandeja sede Cúcuta
+              </a>
+              <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:bg-sky-100">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Bandeja sede Ocaña
               </a>
               <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -112,13 +116,20 @@ if (count($parts) >= 2) {
   </div>
 
   <h2 class="mb-4 text-lg font-semibold tracking-tight text-slate-800">Accesos rápidos</h2>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
     <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-academic/25 bg-gradient-to-b from-blue-50/90 to-white p-6 text-center shadow-sm ring-1 ring-academic/10 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
-      <strong class="block text-gray-900">Bandeja de solicitudes</strong>
-      <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder trámites</span>
+      <strong class="block text-gray-900">Bandeja de solicitudes sede Cúcuta</strong>
+      <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder trámites de esta sede</span>
+    </a>
+    <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-sky-200/80 bg-gradient-to-b from-sky-50/90 to-white p-6 text-center shadow-sm ring-1 ring-sky-100 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-sky-700 transition group-hover:scale-105">
+        <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      </div>
+      <strong class="block text-gray-900">Bandeja de solicitudes por sedes — Ocaña</strong>
+      <span class="mt-1 block text-xs text-gray-600">Mismos filtros que la bandeja de Cúcuta</span>
     </a>
     <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-amber-600 transition group-hover:scale-105">

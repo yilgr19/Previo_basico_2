@@ -146,18 +146,18 @@
         "id_tipo_solicitud_docente": 3,
         "codigo_tipo": "DOC_COM_EST",
         "fecha_registro": "2026-04-14",
-        "estado": "aprobada",
+        "estado": "pendiente",
         "descripcion": "Comisión de estudios; coordinación mencionada con docente Sergio Iván Delgado.",
         "documento_docente_relacionado": "201004",
-        "respuesta": "si",
-        "fecha_respuesta": "2026-04-15",
-        "respondido_en": "2026-04-15 18:54:25",
+        "respuesta": "",
+        "fecha_respuesta": "",
+        "respondido_en": "",
         "anexos_archivos": [],
         "detalle_estudiante": null,
         "detalle_docente": {
             "perfil_snapshot": {
-                "id_empleado": "EMP-5001",
-                "unidad_academica": "Facultad de Ingeniería — Departamento de Sistemas",
+                "id_empleado": "EMP-CC-5001",
+                "unidad_academica": "Cúcuta — Facultad de Diseño",
                 "categoria_docente": "asociado",
                 "categoria_docente_label": "Asociado",
                 "tipo_contrato": "tiempo_completo",
@@ -188,7 +188,6 @@
         },
         "formulario_version": 2,
         "notif_pendiente_est": false,
-        "notif_pendiente_doc": false,
-        "respuesta_elaborada": null
+        "notif_pendiente_doc": false
     }
 ]

@@ -318,8 +318,9 @@ final class SolicitudesService
     }
 
     /**
-     * @param array{fecha_desde?: string, fecha_hasta?: string, estado?: string, aprobacion?: string, buscar?: string, radicante?: string} $f
+     * @param array{fecha_desde?: string, fecha_hasta?: string, estado?: string, aprobacion?: string, buscar?: string, radicante?: string, id_sede?: int} $f
      * radicante: ''|'todos' — todas; 'estudiantes' — id_estudiante > 0; 'docentes' — radicadas por docente (id_docente_solicitante > 0 e id_estudiante == 0).
+     * id_sede: si &gt; 0, solo solicitudes cuya sede de gestión coincide (trámite estudiantil o sede del docente radicante).
      * @return list<array{solicitud: array, estudiante: ?array, docente_solicitante: ?array}>
      */
     public static function listadoParaAdmin(array $f): array
@@ -334,6 +335,7 @@ final class SolicitudesService
         }
         $bus = trim((string) ($f['buscar'] ?? ''));
         $busNorm = preg_replace('/\s+/', '', $bus);
+        $idSedeFiltro = (int) ($f['id_sede'] ?? 0);
 
         $rows = load_data('solicitudes');
         $out = [];
@@ -369,6 +371,13 @@ final class SolicitudesService
             }
             $estudiante = $idEst > 0 ? repo_estudiante_por_id($idEst) : null;
             $docSol = $idDocSol > 0 ? repo_docente_por_id($idDocSol) : null;
+
+            if ($idSedeFiltro > 0) {
+                $sedeSol = solicitud_sede_para_bandera_gestion($s, $estudiante, $docSol);
+                if ($sedeSol !== $idSedeFiltro) {
+                    continue;
+                }
+            }
 
             if ($busNorm !== '') {
                 $docE = preg_replace('/\D/', '', (string) ($s['documento_estudiante'] ?? ''));
@@ -419,6 +428,29 @@ final class SolicitudesService
         });
 
         return $out;
+    }
+
+    /** Comprueba si la solicitud corresponde a la sede de la bandeja (misma regla que listadoParaAdmin). */
+    public static function solicitudPerteneceASedeBandeja(int $idSolicitud, int $idSedeRequerida): bool
+    {
+        if ($idSedeRequerida <= 0) {
+            return true;
+        }
+        $rows = load_data('solicitudes');
+        foreach ($rows as $s) {
+            if ((int) ($s['id_solicitud'] ?? 0) !== $idSolicitud) {
+                continue;
+            }
+            $s = self::normalizarLegacy($s);
+            $idEst = (int) ($s['id_estudiante'] ?? 0);
+            $idDocSol = (int) ($s['id_docente_solicitante'] ?? 0);
+            $est = $idEst > 0 ? repo_estudiante_por_id($idEst) : null;
+            $docSol = $idDocSol > 0 ? repo_docente_por_id($idDocSol) : null;
+
+            return solicitud_sede_para_bandera_gestion($s, $est, $docSol) === $idSedeRequerida;
+        }
+
+        return false;
     }
 
     /**

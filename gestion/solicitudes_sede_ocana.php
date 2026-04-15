@@ -2,4 +2,4 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/config.php';
 
-(new App\Controllers\Gestion\SolicitudesController(1))->run();
+(new App\Controllers\Gestion\SolicitudesController(2))->run();

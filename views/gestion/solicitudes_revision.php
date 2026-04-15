@@ -10,10 +10,11 @@ $emptyHint = 'No hay solicitudes en revisión con los filtros indicados.';
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-semibold text-academic">Solicitudes en revisión</h1>
-      <p class="mt-1 text-sm text-gray-600">Solo se listan trámites en estado <strong class="font-semibold text-gray-800">En revisión</strong>, ordenados por fecha de registro (más recientes primero). Use la bandeja completa para ver todos los estados.</p>
+      <p class="mt-1 text-sm text-gray-600">Solo se listan trámites en estado <strong class="font-semibold text-gray-800">En revisión</strong>, ordenados por fecha de registro (más recientes primero). Use las bandejas por sede para ver todos los estados filtrados.</p>
     </div>
     <div class="flex flex-wrap gap-2">
-      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/solicitudes.php')) ?>">Bandeja completa</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/solicitudes.php')) ?>">Bandeja Cúcuta</a>
+      <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>">Bandeja Ocaña</a>
       <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
     </div>
   </div>

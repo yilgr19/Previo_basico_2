@@ -8,6 +8,11 @@ use App\Services\SolicitudesService;
 
 final class SolicitudesController extends Controller
 {
+    public function __construct(
+        private readonly int $idSedeBandeja = 0
+    ) {
+    }
+
     public function run(): void
     {
         require_gestion_admin();
@@ -20,7 +25,12 @@ final class SolicitudesController extends Controller
             $est = (string) post('estado', '');
             $resp = (string) post('respuesta', '');
             $guardarElab = post('incluir_elaborada', '') === '1';
-            [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp, $guardarElab);
+            if ($this->idSedeBandeja > 0 && !SolicitudesService::solicitudPerteneceASedeBandeja($id, $this->idSedeBandeja)) {
+                $mensaje = 'Esta solicitud no corresponde a la sede de esta bandeja.';
+                $tipoMsg = 'warning';
+            } else {
+                [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp, $guardarElab);
+            }
         }
 
         $filtroFechaDesde = get('fecha_desde', '');
@@ -33,17 +43,32 @@ final class SolicitudesController extends Controller
         }
         $buscarDoc = get('buscar', '');
 
-        $items = SolicitudesService::listadoParaAdmin([
+        $opts = [
             'fecha_desde' => $filtroFechaDesde,
             'fecha_hasta' => $filtroFechaHasta,
             'estado' => $filtroEstado,
             'aprobacion' => $filtroAprob,
             'radicante' => $filtroRadicante,
             'buscar' => $buscarDoc,
-        ]);
+        ];
+        if ($this->idSedeBandeja > 0) {
+            $opts['id_sede'] = $this->idSedeBandeja;
+        }
+        $items = SolicitudesService::listadoParaAdmin($opts);
+
+        $titulosSede = [1 => 'Cúcuta', 2 => 'Ocaña'];
+        $nombreSede = $titulosSede[$this->idSedeBandeja] ?? '';
+        $pageTitle = $this->idSedeBandeja > 0
+            ? 'Bandeja de solicitudes — Sede ' . $nombreSede
+            : 'Solicitudes institucionales';
+        $bandejaScript = $this->idSedeBandeja === 2
+            ? 'gestion/solicitudes_sede_ocana.php'
+            : 'gestion/solicitudes.php';
 
         $this->render('gestion/solicitudes.php', [
-            'pageTitle' => 'Solicitudes estudiantiles',
+            'pageTitle' => $pageTitle,
+            'bandejaScript' => $bandejaScript,
+            'idSedeBandeja' => $this->idSedeBandeja,
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'items' => $items,

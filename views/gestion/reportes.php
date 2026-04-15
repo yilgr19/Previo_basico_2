@@ -19,31 +19,74 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
 
   <section class="mb-10">
     <h2 class="mb-3 border-b border-blue-100 pb-2 text-lg font-semibold text-academic">Estudiantes</h2>
-    <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-gray-50"><tr>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">ID</th>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">Documento</th>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">Nombre</th>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">Programa</th>
-          <th class="px-3 py-3 text-right font-semibold text-gray-700"></th>
-        </tr></thead>
-        <tbody class="divide-y divide-gray-100">
-          <?php foreach ($estudiantes as $e): ?>
-            <tr class="hover:bg-gray-50/80">
-              <td class="px-3 py-2"><?= (int) $e['id_estudiante'] ?></td>
-              <td class="px-3 py-2"><?= h($e['documento'] ?? '') ?></td>
-              <td class="px-3 py-2"><?= h(trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? ''))) ?></td>
-              <td class="max-w-xs px-3 py-2 text-xs"><?= h($e['programa'] ?? '') ?></td>
-              <td class="px-3 py-2 text-right">
-                <a class="inline-flex rounded-lg border border-blue-600 px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/estudiantes.php?editar=' . (int) $e['id_estudiante'])) ?>">Editar</a>
-              </td>
-            </tr>
+    <?php
+    $estudiantesPorSedeYCarrera = [];
+    foreach ($estudiantes as $e) {
+        $sid = estudiante_sede_efectiva($e);
+        $etiq = trim((string) ($e['programa'] ?? ''));
+        if ($etiq === '' && !empty($e['id_programa'])) {
+            $etiq = programa_label_by_id((int) $e['id_programa']);
+        }
+        if ($etiq === '') {
+            $etiq = 'Sin carrera asignada';
+        }
+        if (!isset($estudiantesPorSedeYCarrera[$sid])) {
+            $estudiantesPorSedeYCarrera[$sid] = [];
+        }
+        $estudiantesPorSedeYCarrera[$sid][$etiq][] = $e;
+    }
+    ksort($estudiantesPorSedeYCarrera);
+    foreach ($estudiantesPorSedeYCarrera as $sid => &$porCarreraEst) {
+        ksort($porCarreraEst, SORT_NATURAL | SORT_FLAG_CASE);
+    }
+    unset($porCarreraEst);
+    $titulosSedeEst = [1 => 'Sede Cúcuta', 2 => 'Sede Ocaña'];
+    $idsSedeOrdenEst = array_keys($estudiantesPorSedeYCarrera);
+    sort($idsSedeOrdenEst, SORT_NUMERIC);
+    ?>
+    <?php if (!$estudiantes): ?>
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="min-w-full text-sm"><tbody><tr><td class="px-4 py-6 text-gray-500">Sin registros.</td></tr></tbody></table></div></div>
+    <?php else: ?>
+      <?php foreach ($idsSedeOrdenEst as $idSedeEst): ?>
+        <?php
+        $porCarreraEst = $estudiantesPorSedeYCarrera[$idSedeEst] ?? [];
+        if ($porCarreraEst === []) {
+            continue;
+        }
+        $tituloSedeEst = $titulosSedeEst[$idSedeEst] ?? ('Sede ' . sede_nombre($idSedeEst));
+        ?>
+        <div class="mb-6">
+          <h3 class="mb-3 text-lg font-semibold text-sky-800"><?= h($tituloSedeEst) ?></h3>
+          <?php foreach ($porCarreraEst as $carreraTituloEst => $listaEst): ?>
+            <div class="mb-4 ms-0 md:ms-3">
+              <h4 class="mb-2 text-sm font-semibold text-blue-800"><?= h($carreraTituloEst) ?></h4>
+              <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead class="bg-gray-50"><tr>
+                    <th class="px-3 py-3 text-left font-semibold text-gray-700">ID</th>
+                    <th class="px-3 py-3 text-left font-semibold text-gray-700">Documento</th>
+                    <th class="px-3 py-3 text-left font-semibold text-gray-700">Nombre</th>
+                    <th class="px-3 py-3 text-right font-semibold text-gray-700"></th>
+                  </tr></thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <?php foreach ($listaEst as $e): ?>
+                      <tr class="hover:bg-gray-50/80">
+                        <td class="px-3 py-2"><?= (int) $e['id_estudiante'] ?></td>
+                        <td class="px-3 py-2"><?= h($e['documento'] ?? '') ?></td>
+                        <td class="px-3 py-2"><?= h(trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? ''))) ?></td>
+                        <td class="px-3 py-2 text-right">
+                          <a class="inline-flex rounded-lg border border-blue-600 px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/estudiantes.php?editar=' . (int) $e['id_estudiante'])) ?>">Editar</a>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           <?php endforeach; ?>
-          <?php if (!$estudiantes): ?><tr><td colspan="5" class="px-3 py-6 text-center text-gray-500">Sin registros.</td></tr><?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
   </section>
 
   <section class="mb-10">
