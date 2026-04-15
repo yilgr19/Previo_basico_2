@@ -107,40 +107,16 @@ if (count($parts) >= 2) {
     </div>
   </section>
 
-  <div id="panel-carrusel" class="relative mb-10 overflow-hidden rounded-2xl shadow-lg ring-1 ring-slate-900/[0.06]">
+  <div class="relative mb-10 overflow-hidden rounded-2xl shadow-lg ring-1 ring-slate-900/[0.06]">
     <div class="relative h-56 sm:h-64 md:h-72">
-      <div data-carousel-track class="flex h-full transition-transform duration-500 ease-out">
-        <div data-carousel-slide class="relative min-w-full shrink-0">
-          <img src="<?= h(url('imagen/1.jpg')) ?>" class="h-full w-full object-cover" alt="">
-          <div class="absolute inset-0 bg-gradient-to-t from-academic/90 via-academic/35 to-academic/20"></div>
-          <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:flex">
-            <div class="max-w-xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:px-5 sm:py-4">
-              <h2 class="text-lg font-bold tracking-tight sm:text-xl">Solicitudes académicas</h2>
-              <p class="mt-1 text-sm text-white/95">Radicación y seguimiento de trámites estudiantiles y docentes.</p>
-            </div>
-          </div>
-        </div>
-        <div data-carousel-slide class="relative min-w-full shrink-0">
-          <img src="<?= h(url('imagen/2.jpg')) ?>" class="h-full w-full object-cover" alt="">
-          <div class="absolute inset-0 bg-gradient-to-t from-academic/90 via-academic/35 to-academic/20"></div>
-          <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:flex">
-            <div class="max-w-xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:px-5 sm:py-4">
-              <h2 class="text-lg font-bold tracking-tight sm:text-xl">Comunidad universitaria</h2>
-              <p class="mt-1 text-sm text-white/95">Estudiantes y docentes integrados en un mismo sistema.</p>
-            </div>
-          </div>
+      <img src="<?= h(url('imagen/1.jpg')) ?>" class="h-full w-full object-cover" alt="">
+      <div class="absolute inset-0 bg-gradient-to-t from-academic/90 via-academic/35 to-academic/20"></div>
+      <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:flex">
+        <div class="max-w-xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:px-5 sm:py-4">
+          <h2 class="text-lg font-bold tracking-tight sm:text-xl">Solicitudes académicas</h2>
+          <p class="mt-1 text-sm text-white/95">Radicación y seguimiento de trámites estudiantiles y docentes.</p>
         </div>
       </div>
-    </div>
-    <button type="button" data-carousel-prev class="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/95 p-2 text-academic shadow-md ring-1 ring-black/5 transition hover:bg-white" aria-label="Anterior">
-      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-    </button>
-    <button type="button" data-carousel-next class="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/95 p-2 text-academic shadow-md ring-1 ring-black/5 transition hover:bg-white" aria-label="Siguiente">
-      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-      <button type="button" data-carousel-dot class="h-2 w-2 rounded-full bg-white shadow" aria-label="Slide 1"></button>
-      <button type="button" data-carousel-dot class="h-2 w-2 rounded-full bg-white/40 shadow" aria-label="Slide 2"></button>
     </div>
   </div>
 
@@ -197,4 +173,3 @@ if (count($parts) >= 2) {
     </a>
   </div>
 </main>
-<script src="<?= h(asset_url('js/panel-carrusel.js')) ?>"></script>

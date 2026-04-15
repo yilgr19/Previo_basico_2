@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/** Hora oficial Colombia (sin horario de verano). Todas las fechas/horas del sistema usan esta zona. */
 define('APP_TIMEZONE', 'America/Bogota');
 date_default_timezone_set(APP_TIMEZONE);
 

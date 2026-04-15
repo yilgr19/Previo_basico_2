@@ -3,12 +3,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-/**
- * Lógica de alta/edición de registros académicos (estudiantes y docentes).
- */
 final class GestionAcademicaService
 {
-    /** @return array{0: string, 1: string} */
     public static function agregarEstudiante(): array
     {
         $tiposPerm = array_column(diccionario_tipos_identificacion(), 'codigo');
@@ -112,7 +108,6 @@ final class GestionAcademicaService
         return ['Estudiante registrado correctamente.', 'success'];
     }
 
-    /** @return array{0: string, 1: string} */
     public static function agregarDocente(): array
     {
         $idSede = (int) post('id_sede', '0');
@@ -170,11 +165,6 @@ final class GestionAcademicaService
         return ['Docente registrado.' . ($clavePost === '' ? ' Contraseña por defecto: doc123.' : ''), 'success'];
     }
 
-    /**
-     * Actualización de datos por el mismo estudiante (perfil).
-     *
-     * @return array{0: string, 1: string}
-     */
     public static function actualizarEstudiantePropio(int $idSesion): array
     {
         if ($idSesion <= 0) {
@@ -185,11 +175,6 @@ final class GestionAcademicaService
         return self::agregarEstudiante();
     }
 
-    /**
-     * Actualización de datos por el mismo docente (perfil).
-     *
-     * @return array{0: string, 1: string}
-     */
     public static function actualizarDocentePropio(int $idSesion): array
     {
         if ($idSesion <= 0) {

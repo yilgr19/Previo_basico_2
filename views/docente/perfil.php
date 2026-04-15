@@ -80,4 +80,3 @@ $ro = $inp . ' bg-gray-50 text-gray-800';
     <button type="submit" class="rounded-lg bg-academic px-4 py-2.5 text-sm font-semibold text-white hover:bg-academic-dark">Guardar cambios</button>
   </form>
 </main>
-<script src="<?= h(asset_url('js/docentes-form.js')) ?>"></script>

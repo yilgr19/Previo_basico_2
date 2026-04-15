@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/** Rol en sesión; usado por paneles docente/estudiante. */
 const ROLE_ADMIN = 'administrador';
 const ROLE_DOCENTE = 'docente';
 const ROLE_ESTUDIANTE = 'estudiante';
@@ -24,9 +23,6 @@ function require_login(): void
     }
 }
 
-/**
- * @param string $dashboardPath Ruta relativa al proyecto, p. ej. gestion/dashboard.php
- */
 function login_user(int $id, string $nombre, string $identificador, string $dashboardPath, string $rol = ''): void
 {
     $_SESSION['user'] = [
@@ -76,7 +72,6 @@ function require_role(string $rolEsperado): void
     }
 }
 
-/** Solo personal administrativo (crear usuarios, ver solicitudes globales). */
 function require_gestion_admin(): void
 {
     require_login();
@@ -86,10 +81,6 @@ function require_gestion_admin(): void
     }
 }
 
-/**
- * Busca credenciales en administradores, luego docentes, luego estudiantes.
- * Administración usa el panel unificado bajo gestion/ (ya no admin/).
- */
 function attempt_login(string $usuario, string $clave): bool
 {
     $usuario = trim($usuario);
@@ -142,7 +133,6 @@ function attempt_login(string $usuario, string $clave): bool
     return false;
 }
 
-/** Rutas antiguas que ya no existen o cambiaron de nombre (sesiones previas al refactor). */
 function dashboard_url_normalizada(array $u): string
 {
     $path = ltrim(str_replace('\\', '/', (string) ($u['dashboard'] ?? '')), '/');

@@ -77,7 +77,6 @@ function get(string $key, ?string $default = null): ?string
     return isset($_GET[$key]) ? trim((string) $_GET[$key]) : $default;
 }
 
-/** Valores del formulario estudiantil tras un error de validación (repoblar vista). */
 function solicitud_estudiante_old_desde_post(): array
 {
     return [
@@ -92,7 +91,6 @@ function solicitud_estudiante_old_desde_post(): array
     ];
 }
 
-/** Valores del formulario docente tras un error de validación. */
 function solicitud_docente_old_desde_post(): array
 {
     return [
@@ -112,11 +110,6 @@ function solicitud_docente_old_desde_post(): array
     ];
 }
 
-/**
- * Tras un fallo al guardar en gestión, repuebla estado, respuesta breve y resolución formal desde POST.
- *
- * @return array{id_solicitud: int, estado: string, respuesta: string, incluir_elaborada: bool, elab: array<string, string>}|null
- */
 function gestion_formulario_repoblar_desde_post(): ?array
 {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || post('accion', '') !== 'cambiar_estado') {
@@ -169,10 +162,6 @@ function asset_url(string $path): string
     return str_repeat('../', $depth) . 'assets/' . $p;
 }
 
-/**
- * Marca de tiempo actual en Colombia (misma zona que APP_TIMEZONE / date_default_timezone_set).
- * Preferir esto para respuestas y auditoría para no depender del TZ por defecto en otros contextos.
- */
 function fecha_hora_colombia(): string
 {
     $tz = defined('APP_TIMEZONE') ? APP_TIMEZONE : 'America/Bogota';
@@ -180,7 +169,6 @@ function fecha_hora_colombia(): string
     return (new \DateTimeImmutable('now', new \DateTimeZone($tz)))->format('Y-m-d H:i:s');
 }
 
-/** Texto corto para vistas (origen horario). */
 function etiqueta_hora_colombia(): string
 {
     return 'Colombia (America/Bogota, UTC−5)';

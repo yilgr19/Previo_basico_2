@@ -101,4 +101,3 @@ $ef = $editar ?? [];
     <p class="text-gray-500">Sin docentes registrados.</p>
   <?php endif; ?>
 </main>
-<script src="<?= h(asset_url('js/docentes-form.js')) ?>"></script>
