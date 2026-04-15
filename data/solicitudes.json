@@ -1,1 +1,194 @@
-[]
+[
+    {
+        "id_solicitud": 1,
+        "id_estudiante": 1,
+        "id_docente_solicitante": 0,
+        "documento_estudiante": "301001",
+        "id_tipo_solicitud": 11,
+        "id_tipo_solicitud_docente": 0,
+        "codigo_tipo": "REQ_CONST_EST",
+        "fecha_registro": "2026-04-10",
+        "estado": "pendiente",
+        "descripcion": "Constancia para beca; el profesor Carlos Andrés Méndez puede confirmar asistencia al módulo práctico.",
+        "documento_docente_relacionado": "201002",
+        "respuesta": "",
+        "fecha_respuesta": "",
+        "respondido_en": "",
+        "anexos_archivos": [],
+        "detalle_estudiante": {
+            "perfil_snapshot": {
+                "id_estudiantil": "301001",
+                "id_programa": 124,
+                "programa_nombre": "[107860] Tecnología en Desarrollo de Software",
+                "estado_academico": "REGULAR",
+                "estado_academico_label": "Regular",
+                "semestre": 4,
+                "id_sede_matricula": 1,
+                "id_jornada_matricula": 1
+            },
+            "clasificacion": {
+                "periodo_academico": "2026-1",
+                "id_sede_solicitud": 1,
+                "id_jornada_solicitud": 1
+            },
+            "cuerpo": {
+                "motivo": "economicos",
+                "motivo_label": "Económicos",
+                "exposicion": "Requiero constancia de estudio para trámite de beca municipal. Indico como referencia académica al docente Carlos Andrés Méndez (documento 201002), quien orientó el proyecto integrador del periodo."
+            },
+            "consentimientos": {
+                "veracidad": true
+            }
+        },
+        "detalle_docente": null,
+        "formulario_version": 2,
+        "notif_pendiente_est": false,
+        "notif_pendiente_doc": false
+    },
+    {
+        "id_solicitud": 2,
+        "id_estudiante": 2,
+        "id_docente_solicitante": 0,
+        "documento_estudiante": "301002",
+        "id_tipo_solicitud": 12,
+        "id_tipo_solicitud_docente": 0,
+        "codigo_tipo": "REQ_CERT_NOTAS",
+        "fecha_registro": "2026-04-08",
+        "estado": "pendiente",
+        "descripcion": "Certificado de notas; la profesora Laura Patricia Ruiz dictó la asignatura referida.",
+        "documento_docente_relacionado": "201003",
+        "respuesta": "",
+        "fecha_respuesta": "",
+        "respondido_en": "",
+        "anexos_archivos": [],
+        "detalle_estudiante": {
+            "perfil_snapshot": {
+                "id_estudiantil": "301002",
+                "id_programa": 124,
+                "programa_nombre": "[107860] Tecnología en Desarrollo de Software",
+                "estado_academico": "REGULAR",
+                "estado_academico_label": "Regular",
+                "semestre": 3,
+                "id_sede_matricula": 1,
+                "id_jornada_matricula": 1
+            },
+            "clasificacion": {
+                "periodo_academico": "2026-1",
+                "id_sede_solicitud": 1,
+                "id_jornada_solicitud": 1
+            },
+            "cuerpo": {
+                "motivo": "cruce_horarios",
+                "motivo_label": "Cruce de horarios",
+                "exposicion": "Solicito certificado de notas del periodo anterior. La docente Laura Patricia Ruiz (documento 201003) puede validar la información de la asignatura de interfaz gráfica."
+            },
+            "consentimientos": {
+                "veracidad": true
+            }
+        },
+        "detalle_docente": null,
+        "formulario_version": 2,
+        "notif_pendiente_est": false,
+        "notif_pendiente_doc": false
+    },
+    {
+        "id_solicitud": 3,
+        "id_estudiante": 3,
+        "id_docente_solicitante": 0,
+        "documento_estudiante": "301003",
+        "id_tipo_solicitud": 13,
+        "id_tipo_solicitud_docente": 0,
+        "codigo_tipo": "REQ_OTRA",
+        "fecha_registro": "2026-04-05",
+        "estado": "pendiente",
+        "descripcion": "Gestión varios; mención a Ana María Vásquez como tutora de taller.",
+        "documento_docente_relacionado": "201005",
+        "respuesta": "",
+        "fecha_respuesta": "",
+        "respondido_en": "",
+        "anexos_archivos": [],
+        "detalle_estudiante": {
+            "perfil_snapshot": {
+                "id_estudiantil": "301003",
+                "id_programa": 121,
+                "programa_nombre": "[91388] Diseño Gráfico",
+                "estado_academico": "REGULAR",
+                "estado_academico_label": "Regular",
+                "semestre": 2,
+                "id_sede_matricula": 1,
+                "id_jornada_matricula": 2
+            },
+            "clasificacion": {
+                "periodo_academico": "2026-1",
+                "id_sede_solicitud": 1,
+                "id_jornada_solicitud": 2
+            },
+            "cuerpo": {
+                "motivo": "otro",
+                "motivo_label": "Otro",
+                "exposicion": "Requiero gestión administrativa relacionada con taller de diseño. Como referencia indico a la profesora Ana María Vásquez (documento 201005), tutora del espacio práctico."
+            },
+            "consentimientos": {
+                "veracidad": true
+            }
+        },
+        "detalle_docente": null,
+        "formulario_version": 2,
+        "notif_pendiente_est": false,
+        "notif_pendiente_doc": false
+    },
+    {
+        "id_solicitud": 4,
+        "id_estudiante": 0,
+        "id_docente_solicitante": 1,
+        "documento_estudiante": "",
+        "id_tipo_solicitud": 0,
+        "id_tipo_solicitud_docente": 3,
+        "codigo_tipo": "DOC_COM_EST",
+        "fecha_registro": "2026-04-14",
+        "estado": "aprobada",
+        "descripcion": "Comisión de estudios; coordinación mencionada con docente Sergio Iván Delgado.",
+        "documento_docente_relacionado": "201004",
+        "respuesta": "si",
+        "fecha_respuesta": "2026-04-15",
+        "respondido_en": "2026-04-15 18:54:25",
+        "anexos_archivos": [],
+        "detalle_estudiante": null,
+        "detalle_docente": {
+            "perfil_snapshot": {
+                "id_empleado": "EMP-5001",
+                "unidad_academica": "Facultad de Ingeniería — Departamento de Sistemas",
+                "categoria_docente": "asociado",
+                "categoria_docente_label": "Asociado",
+                "tipo_contrato": "tiempo_completo",
+                "tipo_contrato_label": "Tiempo completo",
+                "documento": "111111",
+                "nombre_completo": "Juliana Daniela Orozco"
+            },
+            "clasificacion": {
+                "asunto": "Comisión corta para actualización de syllabus",
+                "prioridad": "media",
+                "prioridad_label": "Media"
+            },
+            "carga_afectada": {
+                "nrc": "20456",
+                "nombre_materia": "Bases de datos aplicadas",
+                "horario_impactado": "Martes y jueves 8:00–10:00",
+                "plan_contingencia": "Sesión asíncrona en plataforma y tutoría el viernes."
+            },
+            "cuerpo": {
+                "descripcion_detallada": "Solicito permiso para participar en comisión de estudios durante dos semanas. Coordinación con el docente Sergio Iván Delgado para cubrir laboratorio.",
+                "sustento_legal": "Acuerdo interno de facultad 012\/2025.",
+                "fecha_inicio": "2026-05-05",
+                "fecha_fin": "2026-05-19"
+            },
+            "consentimientos": {
+                "responsabilidad": true
+            }
+        },
+        "formulario_version": 2,
+        "notif_pendiente_est": false,
+        "notif_pendiente_doc": false,
+        "respuesta_elaborada": null
+    }
+]

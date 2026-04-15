@@ -55,6 +55,7 @@ $uSolic = h(url('docente/mis_solicitudes.php'));
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Tipo</th>
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Estado</th>
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Descripción</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-700">Respuesta de la universidad</th>
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Anexos</th>
         </tr></thead>
         <tbody class="divide-y divide-gray-100">
@@ -68,6 +69,29 @@ $uSolic = h(url('docente/mis_solicitudes.php'));
               <td class="px-3 py-2"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
               <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
               <td class="max-w-md px-3 py-2 text-xs"><?= nl2br(h(solicitud_resumen_texto($s))) ?></td>
+              <td class="max-w-xs px-3 py-2 text-xs">
+                <?php
+                $txtCorto = trim((string) ($s['respuesta'] ?? ''));
+                $re = $s['respuesta_elaborada'] ?? null;
+                $mom = solicitud_texto_momento_respuesta($s);
+                ?>
+                <?php if ($mom !== ''): ?>
+                  <p class="mb-1 text-[10px] text-gray-600"><span class="font-mono">Registro de respuesta: <?= h($mom) ?></span> <span class="text-gray-500">· <?= h(etiqueta_hora_colombia()) ?></span></p>
+                <?php endif; ?>
+                <?php if ($txtCorto !== ''): ?>
+                  <div class="mb-1 whitespace-pre-wrap text-gray-800"><?= nl2br(h($txtCorto)) ?></div>
+                <?php endif; ?>
+                <?php if (is_array($re)): ?>
+                  <details class="mt-1 max-w-md">
+                    <summary class="cursor-pointer font-medium text-academic hover:underline">Resolución formal<?php if (!empty($re['numero_respuesta'])): ?> (<?= h((string) $re['numero_respuesta']) ?>)<?php endif; ?></summary>
+                    <div class="mt-2">
+                      <?php require dirname(__DIR__) . '/partials/bloque_respuesta_elaborada_leer.php'; ?>
+                    </div>
+                  </details>
+                <?php elseif ($txtCorto === '' && $mom === ''): ?>
+                  <span class="text-gray-400">—</span>
+                <?php endif; ?>
+              </td>
               <td class="px-3 py-2 text-xs">
                 <?php if (is_array($anexos) && $anexos !== []): ?>
                   <?php foreach ($anexos as $i => $m): ?>
@@ -81,7 +105,7 @@ $uSolic = h(url('docente/mis_solicitudes.php'));
             </tr>
           <?php endforeach; ?>
           <?php if ($listaTab === []): ?>
-            <tr><td colspan="6" class="px-3 py-8 text-center text-gray-500">No hay solicitudes en esta categoría.</td></tr>
+            <tr><td colspan="7" class="px-3 py-8 text-center text-gray-500">No hay solicitudes en esta categoría.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>

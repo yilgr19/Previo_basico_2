@@ -424,3 +424,124 @@ function solicitud_etiqueta_categoria_anexo(?string $categoria): string
     ];
     return $map[$c] ?? ($c !== '' ? $c : '—');
 }
+
+/**
+ * Decisiones narrativas para la resolución formal (carta institucional).
+ *
+ * @return array<int, array{codigo: string, nombre: string}>
+ */
+function diccionario_decision_resolucion_formal(): array
+{
+    return [
+        ['codigo' => 'aprobado', 'nombre' => 'Aprobado — la solicitud sigue un curso favorable'],
+        ['codigo' => 'rechazado', 'nombre' => 'Rechazado — no cumple requisitos'],
+        ['codigo' => 'pendiente_informacion', 'nombre' => 'Pendiente de información (subsanación)'],
+    ];
+}
+
+function solicitud_decision_resolucion_nombre(?string $cod): string
+{
+    $cod = strtolower(trim((string) $cod));
+    foreach (diccionario_decision_resolucion_formal() as $d) {
+        if (($d['codigo'] ?? '') === $cod) {
+            return (string) $d['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+/**
+ * Fecha/hora de cierre de respuesta institucional (vacío = aún no contestada o sin migrar).
+ */
+function solicitud_tiene_respuesta_cerrada(array $s): bool
+{
+    return trim((string) ($s['respondido_en'] ?? '')) !== '';
+}
+
+/**
+ * Texto para mostrar al usuario: prioriza fecha y hora exactas de cierre.
+ */
+function solicitud_texto_momento_respuesta(?array $s): string
+{
+    if ($s === null) {
+        return '';
+    }
+    $t = trim((string) ($s['respondido_en'] ?? ''));
+    if ($t !== '' && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $t)) {
+        return $t;
+    }
+    $fr = trim((string) ($s['fecha_respuesta'] ?? ''));
+    return $fr !== '' ? $fr : '';
+}
+
+/**
+ * Si ya había texto de respuesta en datos viejos sin `respondido_en`, infiere un cierre para bloquear ediciones.
+ */
+function solicitud_inferir_respondido_en_legacy(array $s): string
+{
+    $txt = trim((string) ($s['respuesta'] ?? ''));
+    $elab = $s['respuesta_elaborada'] ?? null;
+    $emElab = is_array($elab) ? trim((string) ($elab['emitido_en'] ?? '')) : '';
+    $tieneElab = is_array($elab) && (
+        $emElab !== ''
+        || trim((string) ($elab['numero_respuesta'] ?? '')) !== ''
+        || trim((string) ($elab['justificacion'] ?? '')) !== ''
+    );
+    if ($txt === '' && !$tieneElab) {
+        return '';
+    }
+    if ($emElab !== '' && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $emElab)) {
+        return $emElab;
+    }
+    $fr = trim((string) ($s['fecha_respuesta'] ?? ''));
+    if ($fr !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $fr)) {
+        return $fr . ' 12:00:00';
+    }
+    $reg = trim((string) ($s['fecha_registro'] ?? ''));
+    if ($reg !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $reg)) {
+        return $reg . ' 12:00:00';
+    }
+
+    return date('Y-m-d') . ' 12:00:00';
+}
+
+/**
+ * Construye el arreglo persistido de respuesta elaborada desde POST (panel gestión).
+ *
+ * @param array<string, mixed>|null $anterior Valores previos para conservar número correlativo.
+ * @param string|null $emitidoEn Fecha y hora ISO (misma marca que el cierre de la solicitud).
+ *
+ * @return array<string, mixed>
+ */
+function solicitud_respuesta_elaborada_desde_post(int $idSolicitud, ?array $anterior, ?string $emitidoEn = null): array
+{
+    $num = '';
+    if (is_array($anterior) && trim((string) ($anterior['numero_respuesta'] ?? '')) !== '') {
+        $num = trim((string) $anterior['numero_respuesta']);
+    } else {
+        $num = 'RES-' . date('Y') . '-' . str_pad((string) $idSolicitud, 5, '0', STR_PAD_LEFT);
+    }
+    $dec = strtolower(trim((string) ($_POST['elab_decision'] ?? '')));
+    $valid = array_column(diccionario_decision_resolucion_formal(), 'codigo');
+    if (!in_array($dec, $valid, true)) {
+        $dec = 'pendiente_informacion';
+    }
+    $emit = $emitidoEn ?? fecha_hora_colombia();
+
+    return [
+        'numero_respuesta' => $num,
+        'id_solicitud' => $idSolicitud,
+        'emitido_en' => $emit,
+        'decision' => $dec,
+        'justificacion' => trim((string) ($_POST['elab_justificacion'] ?? '')),
+        'normativas' => trim((string) ($_POST['elab_normativas'] ?? '')),
+        'subsanacion_items' => trim((string) ($_POST['elab_subsanacion_items'] ?? '')),
+        'subsanacion_error_doc' => trim((string) ($_POST['elab_subsanacion_error_doc'] ?? '')),
+        'subsanacion_fecha_limite' => trim((string) ($_POST['elab_subsanacion_fecha_limite'] ?? '')),
+        'instrucciones_cierre' => trim((string) ($_POST['elab_instrucciones_cierre'] ?? '')),
+        'recursos_apelacion' => trim((string) ($_POST['elab_recursos_apelacion'] ?? '')),
+        'funcionario_nombre' => trim((string) ($_POST['elab_funcionario_nombre'] ?? '')),
+        'funcionario_cargo' => trim((string) ($_POST['elab_funcionario_cargo'] ?? '')),
+        'codigo_verificacion' => trim((string) ($_POST['elab_codigo_verificacion'] ?? '')),
+    ];
+}

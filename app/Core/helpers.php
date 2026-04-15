@@ -97,3 +97,20 @@ function asset_url(string $path): string
     }
     return str_repeat('../', $depth) . 'assets/' . $p;
 }
+
+/**
+ * Marca de tiempo actual en Colombia (misma zona que APP_TIMEZONE / date_default_timezone_set).
+ * Preferir esto para respuestas y auditoría para no depender del TZ por defecto en otros contextos.
+ */
+function fecha_hora_colombia(): string
+{
+    $tz = defined('APP_TIMEZONE') ? APP_TIMEZONE : 'America/Bogota';
+
+    return (new \DateTimeImmutable('now', new \DateTimeZone($tz)))->format('Y-m-d H:i:s');
+}
+
+/** Texto corto para vistas (origen horario). */
+function etiqueta_hora_colombia(): string
+{
+    return 'Colombia (America/Bogota, UTC−5)';
+}

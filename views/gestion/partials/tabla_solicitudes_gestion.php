@@ -87,6 +87,33 @@ $emptyHint = $emptyHint ?? 'No hay solicitudes con los filtros indicados.';
                   <?php endif; ?>
                 </div>
               </details>
+              <?php
+                $Er = is_array($s['respuesta_elaborada'] ?? null) ? $s['respuesta_elaborada'] : [];
+                $elabOpen = $Er !== [];
+                $respCerrada = solicitud_tiene_respuesta_cerrada($s);
+                $momResp = solicitud_texto_momento_respuesta($s);
+              ?>
+              <?php if ($respCerrada): ?>
+              <div class="space-y-2 rounded border border-gray-200 bg-gray-100/80 p-2 text-xs text-gray-800">
+                <p class="font-semibold text-gray-900">Respuesta registrada — bloqueada</p>
+                <p class="text-[11px] text-gray-600">Esta solicitud ya fue contestada por la universidad. No se permiten cambios para preservar la trazabilidad.</p>
+                <?php if ($momResp !== ''): ?>
+                  <p class="font-mono text-[11px] text-gray-800"><span class="font-sans font-medium text-gray-600">Fecha y hora:</span> <?= h($momResp) ?> <span class="font-sans text-[10px] text-gray-500">· <?= h(etiqueta_hora_colombia()) ?></span></p>
+                <?php endif; ?>
+                <p class="text-[10px] font-medium text-gray-500">Estado actual: <?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></p>
+                <?php if (trim((string) ($s['respuesta'] ?? '')) !== ''): ?>
+                  <div class="rounded border border-white bg-white/90 p-2 text-gray-800">
+                    <span class="text-[10px] uppercase text-gray-500">Respuesta breve</span>
+                    <p class="mt-0.5 whitespace-pre-wrap"><?= h((string) $s['respuesta']) ?></p>
+                  </div>
+                <?php endif; ?>
+                <?php if ($Er !== []): ?>
+                  <div class="rounded border border-indigo-100 bg-white p-2">
+                    <?php $re = $Er; require dirname(__DIR__, 2) . '/partials/bloque_respuesta_elaborada_leer.php'; ?>
+                  </div>
+                <?php endif; ?>
+              </div>
+              <?php else: ?>
               <form method="post" class="space-y-2 rounded border border-gray-100 bg-gray-50 p-2">
                 <input type="hidden" name="accion" value="cambiar_estado">
                 <input type="hidden" name="id_solicitud" value="<?= $idSol ?>">
@@ -95,9 +122,72 @@ $emptyHint = $emptyHint ?? 'No hay solicitudes con los filtros indicados.';
                     <option value="<?= h($opt['codigo']) ?>" <?= ((string) ($s['estado'] ?? '') === $opt['codigo']) ? 'selected' : '' ?>><?= h($opt['nombre']) ?></option>
                   <?php endforeach; ?>
                 </select>
-                <textarea name="respuesta" rows="2" class="block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Respuesta al radicante"><?= h((string) ($s['respuesta'] ?? '')) ?></textarea>
-                <button type="submit" class="w-full rounded bg-academic py-1 text-xs font-semibold text-white hover:bg-academic-dark">Guardar</button>
+                <label class="block text-[10px] font-medium text-gray-600">Respuesta breve al radicante</label>
+                <textarea name="respuesta" rows="2" class="block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Texto corto (vista rápida en el panel del usuario)"><?= h((string) ($s['respuesta'] ?? '')) ?></textarea>
+                <label class="flex cursor-pointer items-start gap-2 text-[11px] text-gray-700">
+                  <input type="checkbox" name="incluir_elaborada" value="1" class="mt-0.5 rounded border-gray-300" <?= $elabOpen ? ' checked' : '' ?>>
+                  <span>Guardar también <strong>resolución formal</strong> (bloque ampliado abajo). Si no marca la casilla, no se actualiza la resolución guardada.</span>
+                </label>
+                <p class="rounded bg-amber-50/90 px-2 py-1 text-[10px] text-amber-950">La primera vez que envíe <strong>respuesta breve</strong> o marque y guarde la <strong>resolución formal</strong>, la solicitud quedará <strong>cerrada</strong> (sin nuevas ediciones) y se registrará la fecha y hora exactas.</p>
+                <details class="rounded border border-indigo-100 bg-white" <?= $elabOpen ? ' open' : '' ?>>
+                  <summary class="cursor-pointer select-none rounded px-2 py-1.5 text-[11px] font-semibold text-indigo-900 hover:bg-indigo-50">Resolución formal (opcional)</summary>
+                  <div class="space-y-2 border-t border-indigo-100 p-2 text-[11px]">
+                    <p class="text-gray-600">Estructura tipo carta de resolución. Puede dejar campos vacíos; lo guardado se emite con fecha y hora al enviar el formulario.</p>
+                    <div>
+                      <label class="font-medium text-gray-700">Estado de la decisión (narrativo)</label>
+                      <select name="elab_decision" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs">
+                        <?php foreach (diccionario_decision_resolucion_formal() as $d): ?>
+                          <option value="<?= h($d['codigo']) ?>" <?= ((string) ($Er['decision'] ?? '') === $d['codigo']) ? 'selected' : '' ?>><?= h($d['nombre']) ?></option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Justificación / considerandos</label>
+                      <textarea name="elab_justificacion" rows="3" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Motivo de la decisión, reglamento estudiantil o docente..."><?= h((string) ($Er['justificacion'] ?? '')) ?></textarea>
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Normativa citada (artículos, acuerdos)</label>
+                      <textarea name="elab_normativas" rows="2" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Opcional"><?= h((string) ($Er['normativas'] ?? '')) ?></textarea>
+                    </div>
+                    <p class="font-semibold text-amber-900">Subsanación (si aplica — p. ej. decisión «Pendiente de información»)</p>
+                    <div>
+                      <label class="font-medium text-gray-700">Lista de ítems faltantes</label>
+                      <textarea name="elab_subsanacion_items" rows="2" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Un ítem por línea"><?= h((string) ($Er['subsanacion_items'] ?? '')) ?></textarea>
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Descripción del problema con documentación previa</label>
+                      <textarea name="elab_subsanacion_error_doc" rows="2" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Ej. archivo ilegible, vencido..."><?= h((string) ($Er['subsanacion_error_doc'] ?? '')) ?></textarea>
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Fecha límite de subsanación</label>
+                      <input type="date" name="elab_subsanacion_fecha_limite" value="<?= h((string) ($Er['subsanacion_fecha_limite'] ?? '')) ?>" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs">
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Instrucciones de cierre</label>
+                      <textarea name="elab_instrucciones_cierre" rows="2" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Pasos siguientes para el usuario"><?= h((string) ($Er['instrucciones_cierre'] ?? '')) ?></textarea>
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Recursos de apelación</label>
+                      <textarea name="elab_recursos_apelacion" rows="2" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Ante quién reclamar"><?= h((string) ($Er['recursos_apelacion'] ?? '')) ?></textarea>
+                    </div>
+                    <p class="font-semibold text-gray-800">Firma y autoridad responsable</p>
+                    <div>
+                      <label class="font-medium text-gray-700">Nombre del funcionario</label>
+                      <input type="text" name="elab_funcionario_nombre" value="<?= h((string) ($Er['funcionario_nombre'] ?? '')) ?>" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Nombre completo">
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Cargo y dependencia</label>
+                      <input type="text" name="elab_funcionario_cargo" value="<?= h((string) ($Er['funcionario_cargo'] ?? '')) ?>" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Ej. Coordinación de Registro y Control">
+                    </div>
+                    <div>
+                      <label class="font-medium text-gray-700">Código / sello de verificación (texto)</label>
+                      <input type="text" name="elab_codigo_verificacion" value="<?= h((string) ($Er['codigo_verificacion'] ?? '')) ?>" class="mt-0.5 block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Referencia o hash para autenticidad (opcional)">
+                    </div>
+                  </div>
+                </details>
+                <button type="submit" class="w-full rounded bg-academic py-1.5 text-xs font-semibold text-white hover:bg-academic-dark">Guardar</button>
               </form>
+              <?php endif; ?>
             </td>
           </tr>
         <?php endforeach; ?>

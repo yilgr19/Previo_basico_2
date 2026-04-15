@@ -19,7 +19,8 @@ final class SolicitudesController extends Controller
             $id = (int) post('id_solicitud', '0');
             $est = (string) post('estado', '');
             $resp = (string) post('respuesta', '');
-            [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp);
+            $guardarElab = post('incluir_elaborada', '') === '1';
+            [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp, $guardarElab);
         }
 
         $filtroFechaDesde = get('fecha_desde', '');

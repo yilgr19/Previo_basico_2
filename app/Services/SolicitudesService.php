@@ -121,6 +121,8 @@ final class SolicitudesService
             'documento_docente_relacionado' => $docDoc,
             'respuesta' => '',
             'fecha_respuesta' => '',
+            'respondido_en' => '',
+            'respuesta_elaborada' => null,
             'anexos_archivos' => $anexos,
             'detalle_estudiante' => $detalleEst,
             'detalle_docente' => null,
@@ -251,6 +253,8 @@ final class SolicitudesService
             'documento_docente_relacionado' => $docRel,
             'respuesta' => '',
             'fecha_respuesta' => '',
+            'respondido_en' => '',
+            'respuesta_elaborada' => null,
             'anexos_archivos' => $anexos,
             'detalle_estudiante' => null,
             'detalle_docente' => $detalleDoc,
@@ -265,7 +269,7 @@ final class SolicitudesService
     }
 
     /** @return array{0: string, 1: string} */
-    public static function actualizarEstadoAdmin(int $idSolicitud, string $nuevoEstado, string $respuesta): array
+    public static function actualizarEstadoAdmin(int $idSolicitud, string $nuevoEstado, string $respuesta, bool $guardarRespuestaElaborada = false): array
     {
         if (!in_array($nuevoEstado, solicitud_codigos_estado_validos(), true)) {
             return ['Estado no válido.', 'warning'];
@@ -275,9 +279,23 @@ final class SolicitudesService
         foreach ($rows as &$s) {
             if ((int) ($s['id_solicitud'] ?? 0) === $idSolicitud) {
                 $s = self::normalizarLegacy($s);
+                if (solicitud_tiene_respuesta_cerrada($s)) {
+                    return ['Esta solicitud ya fue respondida por la universidad. No se permiten nuevas modificaciones.', 'warning'];
+                }
+                $respTrim = trim($respuesta);
+                $cierraRespuesta = $respTrim !== '' || $guardarRespuestaElaborada;
+                $ahora = fecha_hora_colombia();
+
                 $s['estado'] = $nuevoEstado;
-                $s['respuesta'] = trim($respuesta);
-                $s['fecha_respuesta'] = date('Y-m-d');
+                $s['respuesta'] = $respTrim;
+                if ($cierraRespuesta) {
+                    $s['respondido_en'] = $ahora;
+                    $s['fecha_respuesta'] = substr($ahora, 0, 10);
+                }
+                if ($guardarRespuestaElaborada) {
+                    $prev = is_array($s['respuesta_elaborada'] ?? null) ? $s['respuesta_elaborada'] : null;
+                    $s['respuesta_elaborada'] = solicitud_respuesta_elaborada_desde_post($idSolicitud, $prev, $ahora);
+                }
                 $idEst = (int) ($s['id_estudiante'] ?? 0);
                 $idDocSol = (int) ($s['id_docente_solicitante'] ?? 0);
                 if ($idEst > 0) {
@@ -502,6 +520,25 @@ final class SolicitudesService
         if (!array_key_exists('notif_pendiente_doc', $s)) {
             $s['notif_pendiente_doc'] = false;
         }
+        if (!array_key_exists('respuesta_elaborada', $s)) {
+            $s['respuesta_elaborada'] = null;
+        } elseif (is_string($s['respuesta_elaborada'])) {
+            $dec = json_decode($s['respuesta_elaborada'], true);
+            $s['respuesta_elaborada'] = is_array($dec) ? $dec : null;
+        } elseif (!is_array($s['respuesta_elaborada'])) {
+            $s['respuesta_elaborada'] = null;
+        }
+        if (!array_key_exists('respondido_en', $s)) {
+            $s['respondido_en'] = '';
+        } else {
+            $s['respondido_en'] = trim((string) $s['respondido_en']);
+        }
+        if ($s['respondido_en'] === '') {
+            $leg = solicitud_inferir_respondido_en_legacy($s);
+            if ($leg !== '') {
+                $s['respondido_en'] = $leg;
+            }
+        }
 
         return $s;
     }
@@ -564,11 +601,12 @@ final class SolicitudesService
         $cand = array_slice($cand, 0, $limit);
         $out = [];
         foreach ($cand as $s) {
+            $mom = solicitud_texto_momento_respuesta($s);
             $out[] = [
                 'id_solicitud' => (int) ($s['id_solicitud'] ?? 0),
                 'estado' => solicitud_estado_nombre((string) ($s['estado'] ?? '')),
                 'tipo' => solicitud_tipo_etiqueta($s),
-                'fecha' => (string) ($s['fecha_respuesta'] ?? $s['fecha_registro'] ?? ''),
+                'fecha' => $mom !== '' ? $mom : (string) ($s['fecha_respuesta'] ?? $s['fecha_registro'] ?? ''),
             ];
         }
 
