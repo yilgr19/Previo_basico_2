@@ -125,6 +125,8 @@ final class SolicitudesService
             'detalle_estudiante' => $detalleEst,
             'detalle_docente' => null,
             'formulario_version' => 2,
+            'notif_pendiente_est' => false,
+            'notif_pendiente_doc' => false,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -253,6 +255,8 @@ final class SolicitudesService
             'detalle_estudiante' => null,
             'detalle_docente' => $detalleDoc,
             'formulario_version' => 2,
+            'notif_pendiente_est' => false,
+            'notif_pendiente_doc' => false,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -270,9 +274,18 @@ final class SolicitudesService
         $found = false;
         foreach ($rows as &$s) {
             if ((int) ($s['id_solicitud'] ?? 0) === $idSolicitud) {
+                $s = self::normalizarLegacy($s);
                 $s['estado'] = $nuevoEstado;
                 $s['respuesta'] = trim($respuesta);
                 $s['fecha_respuesta'] = date('Y-m-d');
+                $idEst = (int) ($s['id_estudiante'] ?? 0);
+                $idDocSol = (int) ($s['id_docente_solicitante'] ?? 0);
+                if ($idEst > 0) {
+                    $s['notif_pendiente_est'] = true;
+                }
+                if ($idDocSol > 0) {
+                    $s['notif_pendiente_doc'] = true;
+                }
                 $found = true;
                 break;
             }
@@ -460,7 +473,115 @@ final class SolicitudesService
         if (isset($map[$e])) {
             $s['estado'] = $map[$e];
         }
+        if (!array_key_exists('notif_pendiente_est', $s)) {
+            $s['notif_pendiente_est'] = false;
+        }
+        if (!array_key_exists('notif_pendiente_doc', $s)) {
+            $s['notif_pendiente_doc'] = false;
+        }
 
         return $s;
+    }
+
+    /** Cantidad de solicitudes con respuesta/estado nuevo sin revisar en el panel del usuario. */
+    public static function conteoNotificacionesParaUsuario(?array $user): int
+    {
+        if ($user === null) {
+            return 0;
+        }
+        $rol = (string) ($user['rol'] ?? '');
+        $id = (int) ($user['id'] ?? 0);
+        if ($id <= 0) {
+            return 0;
+        }
+        $rows = load_data('solicitudes');
+        $n = 0;
+        foreach ($rows as $s) {
+            $s = self::normalizarLegacy($s);
+            if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id && !empty($s['notif_pendiente_est'])) {
+                $n++;
+            }
+            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id && !empty($s['notif_pendiente_doc'])) {
+                $n++;
+            }
+        }
+
+        return $n;
+    }
+
+    /**
+     * @return list<array{id_solicitud: int, estado: string, tipo: string, fecha: string}>
+     */
+    public static function resumenNotificacionesPendientes(?array $user, int $limit = 6): array
+    {
+        if ($user === null || $limit <= 0) {
+            return [];
+        }
+        $rol = (string) ($user['rol'] ?? '');
+        $id = (int) ($user['id'] ?? 0);
+        if ($id <= 0) {
+            return [];
+        }
+        $rows = load_data('solicitudes');
+        $cand = [];
+        foreach ($rows as $s) {
+            $s = self::normalizarLegacy($s);
+            $match = false;
+            if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id && !empty($s['notif_pendiente_est'])) {
+                $match = true;
+            }
+            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id && !empty($s['notif_pendiente_doc'])) {
+                $match = true;
+            }
+            if ($match) {
+                $cand[] = $s;
+            }
+        }
+        usort($cand, static fn ($a, $b) => ((int) ($b['id_solicitud'] ?? 0)) <=> ((int) ($a['id_solicitud'] ?? 0)));
+        $cand = array_slice($cand, 0, $limit);
+        $out = [];
+        foreach ($cand as $s) {
+            $out[] = [
+                'id_solicitud' => (int) ($s['id_solicitud'] ?? 0),
+                'estado' => solicitud_estado_nombre((string) ($s['estado'] ?? '')),
+                'tipo' => solicitud_tipo_etiqueta($s),
+                'fecha' => (string) ($s['fecha_respuesta'] ?? $s['fecha_registro'] ?? ''),
+            ];
+        }
+
+        return $out;
+    }
+
+    /** Marca como vistas las notificaciones del usuario (p. ej. al abrir «Mis solicitudes»). */
+    public static function marcarNotificacionesLeidasParaUsuario(?array $user): void
+    {
+        if ($user === null) {
+            return;
+        }
+        $rol = (string) ($user['rol'] ?? '');
+        $id = (int) ($user['id'] ?? 0);
+        if ($id <= 0 || ($rol !== \ROLE_ESTUDIANTE && $rol !== \ROLE_DOCENTE)) {
+            return;
+        }
+        $rows = load_data('solicitudes');
+        $changed = false;
+        foreach ($rows as &$s) {
+            if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id) {
+                if (!empty($s['notif_pendiente_est'])) {
+                    $s['notif_pendiente_est'] = false;
+                    $changed = true;
+                }
+            }
+            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id) {
+                if (!empty($s['notif_pendiente_doc'])) {
+                    $s['notif_pendiente_doc'] = false;
+                    $changed = true;
+                }
+            }
+        }
+        unset($s);
+        if ($changed) {
+            save_data('solicitudes', $rows);
+        }
     }
 }

@@ -60,6 +60,8 @@ final class SolicitudesController extends Controller
             return;
         }
 
+        SolicitudesService::marcarNotificacionesLeidasParaUsuario(auth_user());
+
         $todas = load_data('solicitudes');
         $propias = [];
         foreach ($todas as $s) {

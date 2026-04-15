@@ -184,4 +184,24 @@ final class GestionAcademicaService
 
         return self::agregarEstudiante();
     }
+
+    /**
+     * Actualización de datos por el mismo docente (perfil).
+     *
+     * @return array{0: string, 1: string}
+     */
+    public static function actualizarDocentePropio(int $idSesion): array
+    {
+        if ($idSesion <= 0) {
+            return ['Sesión inválida.', 'warning'];
+        }
+        $cp = trim((string) post('clave', ''));
+        $cc = trim((string) post('clave_confirmar', ''));
+        if ($cp !== '' && $cp !== $cc) {
+            return ['Las contraseñas no coinciden.', 'warning'];
+        }
+        $_POST['id_docente'] = (string) $idSesion;
+
+        return self::agregarDocente();
+    }
 }

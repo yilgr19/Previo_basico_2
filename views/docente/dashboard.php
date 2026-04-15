@@ -15,7 +15,7 @@
   </section>
 
   <h2 class="mb-4 text-lg font-semibold text-gray-800">Accesos</h2>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
     <a href="<?= h(url('docente/nueva_solicitud.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -29,6 +29,13 @@
       </div>
       <strong class="block text-center text-gray-900">Mis solicitudes</strong>
       <span class="mt-1 block text-center text-xs text-gray-500">Listado filtrado por activas, revisión, aprobadas o rechazadas</span>
+    </a>
+    <a href="<?= h(url('docente/perfil.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-emerald-600">
+        <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <strong class="block text-center text-gray-900">Mi perfil</strong>
+      <span class="mt-1 block text-center text-xs text-gray-500">Actualizar datos de contacto, sede y contraseña</span>
     </a>
   </div>
   <p class="mt-4 text-xs text-gray-500">En <strong>Mis solicitudes</strong> también encontrará las <strong>menciones</strong> de estudiantes (vista confidencial).</p>

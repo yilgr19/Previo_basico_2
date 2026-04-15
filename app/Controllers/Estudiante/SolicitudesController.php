@@ -58,6 +58,8 @@ final class SolicitudesController extends Controller
             return;
         }
 
+        SolicitudesService::marcarNotificacionesLeidasParaUsuario(auth_user());
+
         $todas = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));
         $todas = array_map(static fn ($s) => SolicitudesService::normalizarParaVista($s), $todas);
 
