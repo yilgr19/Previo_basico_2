@@ -13,6 +13,13 @@
     <?php endif; ?>
   </section>
 
+  <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <a href="<?= h(url('docente/solicitudes.php')) ?>" class="rounded-xl border-2 border-academic/30 bg-blue-50/80 p-5 shadow-sm transition hover:shadow-md">
+      <h2 class="text-base font-semibold text-academic">Solicitudes institucionales</h2>
+      <p class="mt-1 text-sm text-gray-600">Radicar trámites, adjuntar evidencias y ver menciones sin datos del estudiante.</p>
+    </a>
+  </div>
+
   <?php if (!$materias): ?>
     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">No tiene asignaturas asignadas. El administrador debe registrar materias con usted como docente.</div>
   <?php endif; ?>

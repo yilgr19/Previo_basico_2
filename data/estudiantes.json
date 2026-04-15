@@ -18,5 +18,25 @@
         "id_sede": 1,
         "id_jornada": 1,
         "clave": "estudiante123"
+    },
+    {
+        "tipo_identificacion": "TI",
+        "documento": "987654321",
+        "nombre": "Maria Jose",
+        "apellido": "Peña",
+        "correo": "maria1@gmail.com",
+        "sexo": "F",
+        "id_programa": 121,
+        "programa": "[91388] Diseño Gráfico",
+        "semestre": 1,
+        "fecha_nacimiento": "2000-02-10",
+        "edad": 26,
+        "direccion": "basjdjkf",
+        "barrio": "san martin",
+        "telefono": "155656546",
+        "id_sede": 1,
+        "id_jornada": 1,
+        "id_estudiante": 2,
+        "clave": "1234"
     }
 ]

@@ -1,0 +1,2 @@
+# Los adjuntos no se sirven directamente; solo vía descargar_anexo.php con sesión.
+Require all denied

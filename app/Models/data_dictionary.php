@@ -29,25 +29,6 @@ function diccionario_programas(): array
     ];
 }
 
-function diccionario_tipos_solicitud(): array
-{
-    return [
-        ['id' => 1, 'nombre' => 'Cancelación de semestre'],
-        ['id' => 2, 'nombre' => 'Curso dirigido'],
-        ['id' => 3, 'nombre' => 'Cancelación de asignaturas'],
-        ['id' => 4, 'nombre' => 'Cambio de jornada'],
-        ['id' => 5, 'nombre' => 'Transferencia interna'],
-        ['id' => 6, 'nombre' => 'Examen de validación por suficiencia'],
-        ['id' => 7, 'nombre' => 'Reingreso'],
-        ['id' => 8, 'nombre' => 'Matrícula mínima de créditos'],
-        ['id' => 9, 'nombre' => 'Traslado de sede'],
-        ['id' => 10, 'nombre' => 'Pago de créditos adicionales'],
-        ['id' => 11, 'nombre' => 'Constancia de estudio'],
-        ['id' => 12, 'nombre' => 'Certificado de notas'],
-        ['id' => 13, 'nombre' => 'Otra'],
-    ];
-}
-
 function diccionario_sedes(): array
 {
     return [
@@ -169,12 +150,89 @@ function jornada_nombre(?int $id): string
     return '';
 }
 
-function tipo_solicitud_nombre(int $id): string
+/**
+ * Tipos de solicitud (catálogo institucional — 13 tipos).
+ *
+ * @return array<int, array{id: int, codigo: string, nombre: string}>
+ */
+function diccionario_tipos_solicitud(): array
+{
+    return [
+        ['id' => 1, 'codigo' => 'REQ_CANCEL_SEM', 'nombre' => 'Cancelación de semestre'],
+        ['id' => 2, 'codigo' => 'REQ_CURSO_DIR', 'nombre' => 'Curso dirigido'],
+        ['id' => 3, 'codigo' => 'REQ_CANCEL_ASIG', 'nombre' => 'Cancelación de asignaturas'],
+        ['id' => 4, 'codigo' => 'REQ_CAMBIO_JORNADA', 'nombre' => 'Cambio de jornada'],
+        ['id' => 5, 'codigo' => 'REQ_TRANSFER_INT', 'nombre' => 'Transferencia interna'],
+        ['id' => 6, 'codigo' => 'REQ_EXAMEN_SUF', 'nombre' => 'Examen de validación por suficiencia'],
+        ['id' => 7, 'codigo' => 'REQ_REINGRESO', 'nombre' => 'Reingreso'],
+        ['id' => 8, 'codigo' => 'REQ_MATR_MIN', 'nombre' => 'Matrícula mínima de créditos'],
+        ['id' => 9, 'codigo' => 'REQ_TRASLADO_SEDE', 'nombre' => 'Traslado de sede'],
+        ['id' => 10, 'codigo' => 'REQ_PAGO_CRED', 'nombre' => 'Pago de créditos adicionales'],
+        ['id' => 11, 'codigo' => 'REQ_CONST_EST', 'nombre' => 'Constancia de estudio'],
+        ['id' => 12, 'codigo' => 'REQ_CERT_NOTAS', 'nombre' => 'Certificado de notas'],
+        ['id' => 13, 'codigo' => 'REQ_OTRA', 'nombre' => 'Otra'],
+    ];
+}
+
+/** Referencia opaca para vistas donde no se revela el radicante (p. ej. docente mencionado). */
+function solicitud_referencia_anonima(int $idSolicitud): string
+{
+    return 'CASO-' . strtoupper(substr(sha1('anon|' . $idSolicitud . '|solicitud'), 0, 10));
+}
+
+function tipo_solicitud_por_id(int $id): ?array
 {
     foreach (diccionario_tipos_solicitud() as $t) {
-        if ((int) $t['id'] === $id) {
-            return $t['nombre'];
+        if ((int) ($t['id'] ?? 0) === $id) {
+            return $t;
         }
     }
-    return 'Tipo #' . $id;
+    return null;
+}
+
+function tipo_solicitud_nombre(int $id): string
+{
+    $t = tipo_solicitud_por_id($id);
+    return $t ? (string) $t['nombre'] : '—';
+}
+
+/**
+ * Estados del flujo de solicitud.
+ *
+ * @return array<int, array{codigo: string, nombre: string, aprobada: bool}>
+ */
+function diccionario_estados_solicitud(): array
+{
+    return [
+        ['codigo' => 'pendiente', 'nombre' => 'Pendiente', 'aprobada' => false],
+        ['codigo' => 'en_revision', 'nombre' => 'En revisión', 'aprobada' => false],
+        ['codigo' => 'aprobada', 'nombre' => 'Aprobada', 'aprobada' => true],
+        ['codigo' => 'rechazada', 'nombre' => 'Rechazada', 'aprobada' => false],
+    ];
+}
+
+function solicitud_estado_nombre(string $codigo): string
+{
+    $norm = strtolower(trim($codigo));
+    $legacy = [
+        'en revisión' => 'en_revision',
+        'en revision' => 'en_revision',
+        'pendiente' => 'pendiente',
+        'aprobada' => 'aprobada',
+        'rechazada' => 'rechazada',
+    ];
+    if (isset($legacy[$norm])) {
+        $codigo = $legacy[$norm];
+    }
+    foreach (diccionario_estados_solicitud() as $e) {
+        if (($e['codigo'] ?? '') === $codigo) {
+            return (string) $e['nombre'];
+        }
+    }
+    return $codigo;
+}
+
+function solicitud_codigos_estado_validos(): array
+{
+    return array_column(diccionario_estados_solicitud(), 'codigo');
 }

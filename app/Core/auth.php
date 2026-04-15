@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+/** Rol en sesión; usado por paneles docente/estudiante. */
 const ROLE_ADMIN = 'administrador';
 const ROLE_DOCENTE = 'docente';
 const ROLE_ESTUDIANTE = 'estudiante';
@@ -8,12 +9,6 @@ const ROLE_ESTUDIANTE = 'estudiante';
 function auth_user(): ?array
 {
     return $_SESSION['user'] ?? null;
-}
-
-function auth_role(): ?string
-{
-    $u = auth_user();
-    return $u['rol'] ?? null;
 }
 
 function auth_id(): ?int
@@ -29,21 +24,17 @@ function require_login(): void
     }
 }
 
-function require_role(string $role): void
-{
-    require_login();
-    if (auth_role() !== $role) {
-        redirect('/login.php');
-    }
-}
-
-function login_user(string $rol, int $id, string $nombre, string $identificador): void
+/**
+ * @param string $dashboardPath Ruta relativa al proyecto, p. ej. gestion/dashboard.php
+ */
+function login_user(int $id, string $nombre, string $identificador, string $dashboardPath, string $rol = ''): void
 {
     $_SESSION['user'] = [
-        'rol' => $rol,
         'id' => $id,
         'nombre' => $nombre,
         'identificador' => $identificador,
+        'dashboard' => $dashboardPath,
+        'rol' => $rol,
     ];
 }
 
@@ -73,7 +64,33 @@ function usuario_coincide_docente_o_estudiante(array $registro, string $usuario)
     return false;
 }
 
-function attempt_login(string $rol, string $usuario, string $clave): bool
+function require_role(string $rolEsperado): void
+{
+    $u = auth_user();
+    if (!$u) {
+        redirect('/login.php');
+    }
+    $r = (string) ($u['rol'] ?? '');
+    if ($r !== $rolEsperado) {
+        redirect(dashboard_url_for_user());
+    }
+}
+
+/** Solo personal administrativo (crear usuarios, ver solicitudes globales). */
+function require_gestion_admin(): void
+{
+    require_login();
+    $u = auth_user();
+    if (!$u || (string) ($u['rol'] ?? '') !== ROLE_ADMIN) {
+        redirect(dashboard_url_for_user());
+    }
+}
+
+/**
+ * Busca credenciales en administradores, luego docentes, luego estudiantes.
+ * Administración usa el panel unificado bajo gestion/ (ya no admin/).
+ */
+function attempt_login(string $usuario, string $clave): bool
 {
     $usuario = trim($usuario);
     $clave = trim($clave);
@@ -81,57 +98,78 @@ function attempt_login(string $rol, string $usuario, string $clave): bool
         return false;
     }
 
-    if ($rol === ROLE_ADMIN) {
-        foreach (load_data('administradores') as $a) {
-            if (strcasecmp((string) ($a['correo'] ?? ''), $usuario) === 0 && ($a['clave'] ?? '') === $clave) {
-                login_user(ROLE_ADMIN, (int) $a['id_admin'], (string) $a['nombre'], (string) $a['correo']);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    if ($rol === ROLE_DOCENTE) {
-        foreach (load_data('docentes') as $d) {
-            if (($d['clave'] ?? '') !== $clave) {
-                continue;
-            }
-            if (!usuario_coincide_docente_o_estudiante($d, $usuario)) {
-                continue;
-            }
-            login_user(ROLE_DOCENTE, (int) $d['id_docente'], trim(($d['nombre'] ?? '') . ' ' . ($d['apellido'] ?? '')), (string) $d['documento']);
+    foreach (load_data('administradores') as $a) {
+        if (strcasecmp((string) ($a['correo'] ?? ''), $usuario) === 0 && ($a['clave'] ?? '') === $clave) {
+            login_user((int) $a['id_admin'], (string) $a['nombre'], (string) $a['correo'], 'gestion/dashboard.php', ROLE_ADMIN);
             return true;
         }
-        return false;
     }
 
-    if ($rol === ROLE_ESTUDIANTE) {
-        foreach (load_data('estudiantes') as $e) {
-            if (($e['clave'] ?? '') !== $clave) {
-                continue;
-            }
-            if (!usuario_coincide_docente_o_estudiante($e, $usuario)) {
-                continue;
-            }
-            login_user(ROLE_ESTUDIANTE, (int) $e['id_estudiante'], trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? '')), (string) $e['documento']);
-            return true;
+    foreach (load_data('docentes') as $d) {
+        if (($d['clave'] ?? '') !== $clave) {
+            continue;
         }
-        return false;
+        if (!usuario_coincide_docente_o_estudiante($d, $usuario)) {
+            continue;
+        }
+        login_user(
+            (int) $d['id_docente'],
+            trim(($d['nombre'] ?? '') . ' ' . ($d['apellido'] ?? '')),
+            (string) $d['documento'],
+            'docente/dashboard.php',
+            ROLE_DOCENTE
+        );
+        return true;
+    }
+
+    foreach (load_data('estudiantes') as $e) {
+        if (($e['clave'] ?? '') !== $clave) {
+            continue;
+        }
+        if (!usuario_coincide_docente_o_estudiante($e, $usuario)) {
+            continue;
+        }
+        login_user(
+            (int) $e['id_estudiante'],
+            trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? '')),
+            (string) $e['documento'],
+            'estudiante/dashboard.php',
+            ROLE_ESTUDIANTE
+        );
+        return true;
     }
 
     return false;
 }
 
-function dashboard_url_for_role(?string $rol): string
+/** Rutas antiguas que ya no existen o cambiaron de nombre (sesiones previas al refactor). */
+function dashboard_url_normalizada(array $u): string
 {
-    switch ($rol) {
-        case ROLE_ADMIN:
-            return url('admin/dashboard.php');
-        case ROLE_DOCENTE:
-            return url('docente/dashboard.php');
-        case ROLE_ESTUDIANTE:
-            return url('estudiante/dashboard.php');
-        default:
-            return url('login.php');
+    $path = ltrim(str_replace('\\', '/', (string) ($u['dashboard'] ?? '')), '/');
+    if ($path === 'admin/dashboard.php') {
+        return url('gestion/dashboard.php');
     }
+
+    return url($path);
+}
+
+function dashboard_url_for_user(): string
+{
+    $u = auth_user();
+    if (!$u) {
+        return url('login.php');
+    }
+    if (!empty($u['dashboard'])) {
+        return dashboard_url_normalizada($u);
+    }
+    if (!empty($u['rol'])) {
+        return match ((string) $u['rol']) {
+            ROLE_ADMIN => url('gestion/dashboard.php'),
+            ROLE_DOCENTE => url('docente/dashboard.php'),
+            ROLE_ESTUDIANTE => url('estudiante/dashboard.php'),
+            default => url('login.php'),
+        };
+    }
+
+    return url('index.php');
 }

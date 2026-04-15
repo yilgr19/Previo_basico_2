@@ -8,24 +8,17 @@ final class LoginController extends Controller
     public function run(): void
     {
         if (auth_user()) {
-            redirect(dashboard_url_for_role(auth_role()));
+            redirect(dashboard_url_for_user());
         }
 
         $error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $rol = post('rol', '');
             $usuario = post('usuario', '');
             $clave = post('clave', '');
-            $map = [
-                'administrador' => ROLE_ADMIN,
-                'docente' => ROLE_DOCENTE,
-                'estudiante' => ROLE_ESTUDIANTE,
-            ];
-            $r = $map[$rol] ?? '';
-            if ($r && attempt_login($r, $usuario, (string) $clave)) {
-                redirect(dashboard_url_for_role($r));
+            if (attempt_login((string) $usuario, (string) $clave)) {
+                redirect(dashboard_url_for_user());
             }
-            $error = 'Credenciales incorrectas o rol no coincide.';
+            $error = 'Usuario o contraseña incorrectos.';
         }
 
         $this->render('login.php', [
