@@ -42,38 +42,6 @@ function repo_materia_por_id(int $id): ?array
     return null;
 }
 
-function repo_existe_matricula(int $idEst, int $idMat): bool
-{
-    foreach (load_data('matriculas') as $x) {
-        if ((int) ($x['id_estudiante'] ?? 0) === $idEst && (int) ($x['id_materia'] ?? 0) === $idMat) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function repo_matriculas_de_estudiante(int $idEst): array
-{
-    $out = [];
-    foreach (load_data('matriculas') as $x) {
-        if ((int) ($x['id_estudiante'] ?? 0) === $idEst) {
-            $out[] = $x;
-        }
-    }
-    return $out;
-}
-
-function repo_matriculas_de_materia(int $idMat): array
-{
-    $out = [];
-    foreach (load_data('matriculas') as $x) {
-        if ((int) ($x['id_materia'] ?? 0) === $idMat) {
-            $out[] = $x;
-        }
-    }
-    return $out;
-}
-
 function repo_materias_por_docente(int $idDoc): array
 {
     $out = [];
@@ -168,6 +136,21 @@ function materia_programa_label(array $m): string
         return '—';
     }
     return programa_label_by_id($id);
+}
+
+/** Materias del programa (malla) para selección en solicitudes estudiantiles. */
+function repo_materias_por_programa(int $idPrograma): array
+{
+    if ($idPrograma <= 0) {
+        return [];
+    }
+    $out = [];
+    foreach (load_data('materias') as $m) {
+        if ((int) ($m['id_programa'] ?? 0) === $idPrograma) {
+            $out[] = $m;
+        }
+    }
+    return repo_materias_ordenadas_por_codigo($out);
 }
 
 function estudiante_nombre_completo(int $idEst): string

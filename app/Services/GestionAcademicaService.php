@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 /**
- * Lógica de alta/edición de registros académicos (estudiantes, docentes, asignaturas, matrículas).
+ * Lógica de alta/edición de registros académicos (estudiantes, docentes, asignaturas).
  */
 final class GestionAcademicaService
 {
@@ -253,31 +253,6 @@ final class GestionAcademicaService
         }
         save_data('materias', $materias);
         return [$mensaje, 'success'];
-    }
-
-    /** @return array{0: string, 1: string} */
-    public static function agregarMatricula(): array
-    {
-        $idEst = (int) post('id_estudiante', '0');
-        $idMat = (int) post('id_materia', '0');
-        if (!repo_estudiante_por_id($idEst)) {
-            return ['No existe un estudiante con ese ID.', 'warning'];
-        }
-        if (!repo_materia_por_id($idMat)) {
-            return ['No existe una asignatura con ese ID.', 'warning'];
-        }
-        if (repo_existe_matricula($idEst, $idMat)) {
-            return ['El estudiante ya está matriculado en esa asignatura.', 'warning'];
-        }
-        $mat = load_data('matriculas');
-        $mat[] = [
-            'id_matricula' => next_numeric_id($mat, 'id_matricula'),
-            'id_estudiante' => $idEst,
-            'id_materia' => $idMat,
-            'fecha' => date('Y-m-d'),
-        ];
-        save_data('matriculas', $mat);
-        return ['Matrícula registrada correctamente.', 'success'];
     }
 
     /**

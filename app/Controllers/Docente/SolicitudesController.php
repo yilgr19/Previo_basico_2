@@ -32,16 +32,19 @@ final class SolicitudesController extends Controller
         $propias = [];
         foreach ($todas as $s) {
             if ((int) ($s['id_docente_solicitante'] ?? 0) === $idDoc) {
-                $propias[] = $s;
+                $propias[] = SolicitudesService::normalizarParaVista($s);
             }
         }
         usort($propias, static fn ($a, $b) => ((int) ($b['id_solicitud'] ?? 0)) <=> ((int) ($a['id_solicitud'] ?? 0)));
+
+        $materiasDocente = repo_materias_ordenadas_por_codigo(repo_materias_por_docente($idDoc));
 
         $menciones = SolicitudesService::listadoMencionesAnonimasParaDocente($idDoc, (string) ($doc['documento'] ?? ''));
 
         $this->render('docente/solicitudes.php', [
             'pageTitle' => 'Solicitudes',
             'doc' => $doc,
+            'materiasDocente' => $materiasDocente,
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'propias' => $propias,

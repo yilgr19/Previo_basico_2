@@ -12,7 +12,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     <h1 class="text-xl font-semibold text-academic">Reportes y gestión de registros</h1>
     <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
   </div>
-  <p class="mb-6 text-sm text-gray-600">Consulte lo registrado. Para <strong>crear o editar</strong> estudiantes, docentes, asignaturas o matrículas use las tarjetas del panel principal.</p>
+  <p class="mb-6 text-sm text-gray-600">Consulte lo registrado. Para <strong>crear o editar</strong> estudiantes, docentes o asignaturas use las tarjetas del panel principal.</p>
   <?php if (!empty($mensaje)): ?>
     <div class="mb-6 rounded-lg border px-4 py-3 text-sm <?= h($alertMsg) ?>"><?= h($mensaje) ?></div>
   <?php endif; ?>
@@ -153,84 +153,5 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section class="mb-6">
-    <h2 class="mb-2 border-b border-blue-100 pb-2 text-lg font-semibold text-academic">Matrículas por asignatura</h2>
-    <p class="mb-4 text-sm text-gray-600">Cada bloque corresponde a una asignatura; puede eliminar matrículas desde el botón.</p>
-    <?php foreach ($materiasOrdenadas as $mat): ?>
-      <?php
-      $idMat = (int) ($mat['id_materia'] ?? 0);
-      $enEsta = array_values(array_filter($matriculas, static fn ($x) => (int) ($x['id_materia'] ?? 0) === $idMat));
-      ?>
-      <div class="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div class="border-b border-gray-100 bg-gray-50 px-4 py-3">
-          <strong class="text-gray-900"><?= h(($mat['codigo'] ?? '') . ' — ' . ($mat['nombre'] ?? '')) ?></strong>
-          <span class="mt-1 block text-sm text-gray-600 md:mt-0 md:inline md:ms-2">
-            <?= h(materia_programa_label($mat)) ?> · <?= h(materia_horario_resumen($mat)) ?>
-            · <?= h(materia_modalidad_etiqueta($mat)) ?>
-            <?php if (($mat['modalidad'] ?? '') === 'presencial' && trim((string) ($mat['salon'] ?? '')) !== ''): ?>
-              · Salón <?= h($mat['salon']) ?>
-            <?php endif; ?>
-            · Docente: <?= h(docente_nombre((int) ($mat['id_docente'] ?? 0))) ?>
-          </span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50"><tr>
-              <th class="px-3 py-2 text-left font-semibold text-gray-700">ID matrícula</th>
-              <th class="px-3 py-2 text-left font-semibold text-gray-700">Fecha</th>
-              <th class="px-3 py-2 text-left font-semibold text-gray-700">Estudiante</th>
-              <th class="px-3 py-2 text-right font-semibold text-gray-700"></th>
-            </tr></thead>
-            <tbody class="divide-y divide-gray-100">
-              <?php foreach ($enEsta as $x): ?>
-                <tr>
-                  <td class="px-3 py-2"><?= (int) $x['id_matricula'] ?></td>
-                  <td class="px-3 py-2"><?= h($x['fecha'] ?? '') ?></td>
-                  <td class="px-3 py-2"><?= h(estudiante_nombre_completo((int) ($x['id_estudiante'] ?? 0))) ?> <span class="text-gray-500">(#<?= (int) ($x['id_estudiante'] ?? 0) ?>)</span></td>
-                  <td class="whitespace-nowrap px-3 py-2 text-right">
-                    <form method="post" class="inline" onsubmit="return confirm('¿Eliminar esta matrícula?');">
-                      <input type="hidden" name="accion" value="eliminar_matricula">
-                      <input type="hidden" name="id_matricula" value="<?= (int) $x['id_matricula'] ?>">
-                      <button type="submit" class="inline-flex rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50">Eliminar</button>
-                    </form>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-              <?php if (!$enEsta): ?>
-                <tr><td colspan="4" class="px-3 py-4 text-gray-500">Sin matrículas en esta asignatura.</td></tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    <?php endforeach; ?>
-    <?php
-    $idsMat = array_map(static fn ($m) => (int) ($m['id_materia'] ?? 0), $materiasOrdenadas);
-    $huerfanas = array_values(array_filter($matriculas, static function ($x) use ($idsMat) {
-        return !in_array((int) ($x['id_materia'] ?? 0), $idsMat, true);
-    }));
-    ?>
-    <?php if ($huerfanas): ?>
-      <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        <strong>Matrículas sin asignatura asociada</strong> (ID de materia inexistente):
-        <ul class="mt-2 list-inside list-disc space-y-1">
-          <?php foreach ($huerfanas as $x): ?>
-            <li>
-              Matrícula #<?= (int) $x['id_matricula'] ?> — materia ID <?= (int) ($x['id_materia'] ?? 0) ?>
-              <form method="post" class="ms-2 inline" onsubmit="return confirm('¿Eliminar?');">
-                <input type="hidden" name="accion" value="eliminar_matricula">
-                <input type="hidden" name="id_matricula" value="<?= (int) $x['id_matricula'] ?>">
-                <button type="submit" class="inline-flex rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-100">Eliminar</button>
-              </form>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
-    <?php endif; ?>
-    <?php if (!$materiasOrdenadas && !$matriculas): ?>
-      <p class="text-gray-500">No hay asignaturas ni matrículas registradas.</p>
-    <?php endif; ?>
   </section>
 </main>

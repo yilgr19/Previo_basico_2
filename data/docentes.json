@@ -9,6 +9,10 @@
         "id_programa": 121,
         "programa": "[91388] Diseño Gráfico",
         "id_docente": 1,
+        "codigo_empleado": "EMP-1001",
+        "unidad_academica": "Facultad de Diseño — Departamento de Gráfico",
+        "categoria_docente": "asociado",
+        "tipo_contrato": "tiempo_completo",
         "clave": "1234"
     }
 ]

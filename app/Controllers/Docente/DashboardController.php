@@ -16,12 +16,10 @@ final class DashboardController extends Controller
             redirect('/login.php');
         }
         $d = repo_docente_por_id($idDoc);
-        $materias = repo_materias_ordenadas_por_codigo(repo_materias_por_docente($idDoc));
 
         $this->render('docente/dashboard.php', [
             'pageTitle' => 'Panel docente',
             'd' => $d,
-            'materias' => $materias,
         ]);
     }
 }

@@ -1,17 +1,26 @@
 <?php
 $inp = 'mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30';
 $lbl = 'mb-1 block text-sm font-medium text-gray-700';
+$ro = $inp . ' bg-gray-50 text-gray-800';
 $mWarn = ($mensaje ?? '') !== '' && ($tipoMsg ?? '') === 'warning';
 $alertClass = $mWarn ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-green-200 bg-green-50 text-green-900';
 if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
     $alertClass = 'border-amber-200 bg-amber-50 text-amber-900';
 }
+$doc = $doc ?? [];
+$materiasDocente = $materiasDocente ?? [];
+$idEmp = trim((string) ($doc['codigo_empleado'] ?? ''));
+if ($idEmp === '') {
+    $idEmp = (string) ($doc['documento'] ?? '');
+}
+$hoy = date('Y-m-d');
+$finMes = date('Y-m-d', strtotime('+30 days'));
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-semibold text-academic">Solicitudes</h1>
-      <p class="mt-1 text-sm text-gray-600">Radique solicitudes institucionales y consulte trámites donde figura su documento (vista confidencial).</p>
+      <p class="mt-1 text-sm text-gray-600">Radique solicitudes institucionales (catálogo docente) y consulte trámites donde figura su documento (vista confidencial).</p>
     </div>
     <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('docente/dashboard.php')) ?>">Volver al panel</a>
   </div>
@@ -22,30 +31,145 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
 
   <div class="mb-10 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
     <h2 class="mb-4 border-b border-blue-100 pb-2 text-base font-semibold text-academic">Nueva solicitud (docente)</h2>
-    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
       <input type="hidden" name="accion" value="nueva_solicitud_docente">
-      <div class="md:col-span-2">
-        <label class="<?= h($lbl) ?>">Tipo de solicitud</label>
-        <select name="id_tipo_solicitud" class="<?= h($inp) ?>" required>
-          <option value="">Seleccione…</option>
-          <?php foreach (diccionario_tipos_solicitud() as $t): ?>
-            <option value="<?= (int) $t['id'] ?>"><?= h((string) $t['nombre']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="md:col-span-2">
-        <label class="<?= h($lbl) ?>">Descripción <span class="text-gray-500">(mín. 10 caracteres)</span></label>
-        <textarea name="descripcion" class="<?= h($inp) ?>" rows="4" required></textarea>
-      </div>
-      <div class="md:col-span-2">
-        <label class="<?= h($lbl) ?>">Otro documento de docente relacionado <span class="text-gray-500">(opcional)</span></label>
-        <input type="text" name="documento_docente_relacionado" class="<?= h($inp) ?>" placeholder="Solo números" inputmode="numeric">
-      </div>
-      <div class="md:col-span-2">
-        <label class="<?= h($lbl) ?>">Evidencias (PDF o imágenes, máx. 8 archivos, 5 MB c/u)</label>
-        <input type="file" name="anexos[]" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*" multiple>
-      </div>
-      <div class="md:col-span-2">
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">1. Perfil y vinculación</legend>
+        <p class="mb-3 text-xs text-gray-500">Datos de origen según su registro (enrutamiento y aprobaciones).</p>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <span class="<?= h($lbl) ?>">ID de empleado / código</span>
+            <div class="<?= h($ro) ?>"><?= h($idEmp) ?></div>
+          </div>
+          <div>
+            <span class="<?= h($lbl) ?>">Documento</span>
+            <div class="<?= h($ro) ?>"><?= h((string) ($doc['documento'] ?? '—')) ?></div>
+          </div>
+          <div class="md:col-span-2">
+            <span class="<?= h($lbl) ?>">Unidad académica</span>
+            <div class="<?= h($ro) ?>"><?= h(trim((string) ($doc['unidad_academica'] ?? '')) !== '' ? (string) $doc['unidad_academica'] : '—') ?></div>
+          </div>
+          <div>
+            <span class="<?= h($lbl) ?>">Categoría docente</span>
+            <div class="<?= h($ro) ?>"><?= h(categoria_docente_nombre((string) ($doc['categoria_docente'] ?? ''))) ?></div>
+          </div>
+          <div>
+            <span class="<?= h($lbl) ?>">Tipo de contrato</span>
+            <div class="<?= h($ro) ?>"><?= h(tipo_contrato_docente_nombre((string) ($doc['tipo_contrato'] ?? ''))) ?></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">2. Clasificación de la solicitud</legend>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Tipo de solicitud (catálogo docente)</label>
+            <select name="id_tipo_solicitud_docente" class="<?= h($inp) ?>" required>
+              <option value="">Seleccione…</option>
+              <?php foreach (diccionario_tipos_solicitud_docente() as $t): ?>
+                <option value="<?= (int) $t['id'] ?>"><?= h((string) $t['nombre']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Asunto</label>
+            <input type="text" name="asunto" class="<?= h($inp) ?>" required minlength="3" placeholder="Título breve de la petición">
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Nivel de prioridad</label>
+            <select name="prioridad" class="<?= h($inp) ?>" required>
+              <option value="">Seleccione…</option>
+              <?php foreach (diccionario_prioridad_solicitud_docente() as $p): ?>
+                <option value="<?= h((string) $p['codigo']) ?>"><?= h((string) $p['nombre']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">3. Carga académica afectada</legend>
+        <p class="mb-3 text-xs text-gray-600">Si impacta sus clases, detalle el grupo y el plan de contingencia.</p>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label class="<?= h($lbl) ?>">ID asignatura (NRC / código)</label>
+            <input type="text" name="nrc" class="<?= h($inp) ?>" list="lista-mats-doc" placeholder="Ej. NRC o código de grupo" autocomplete="off">
+            <datalist id="lista-mats-doc">
+              <?php foreach ($materiasDocente as $mat): ?>
+                <option value="<?= h((string) ($mat['codigo'] ?? '')) ?>"><?= h((string) ($mat['nombre'] ?? '')) ?></option>
+              <?php endforeach; ?>
+            </datalist>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Nombre de la materia</label>
+            <input type="text" name="nombre_materia" class="<?= h($inp) ?>" placeholder="Para trazabilidad">
+          </div>
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Horario impactado</label>
+            <textarea name="horario_impactado" class="<?= h($inp) ?>" rows="2" placeholder="Días y horas exactas afectados"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Plan de contingencia (reposición / cobertura)</label>
+            <textarea name="plan_contingencia" class="<?= h($inp) ?>" rows="3" placeholder="Cómo recuperará horas o quién cubrirá"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">4. Cuerpo y justificación</legend>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Descripción detallada <span class="text-gray-500">(mín. 10 caracteres)</span></label>
+            <textarea name="descripcion_detallada" class="<?= h($inp) ?>" rows="5" required placeholder="Explique la necesidad"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Sustento legal / normativo <span class="text-gray-500">(opcional)</span></label>
+            <textarea name="sustento_legal" class="<?= h($inp) ?>" rows="2" placeholder="Estatuto docente, reglamento, etc."></textarea>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Fecha de inicio</label>
+            <input type="date" name="fecha_inicio" class="<?= h($inp) ?>" value="<?= h($hoy) ?>" required>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Fecha de fin</label>
+            <input type="date" name="fecha_fin" class="<?= h($inp) ?>" value="<?= h($finMes) ?>" required>
+          </div>
+          <div class="md:col-span-2">
+            <label class="<?= h($lbl) ?>">Otro documento de docente relacionado <span class="text-gray-500">(opcional)</span></label>
+            <input type="text" name="documento_docente_relacionado" class="<?= h($inp) ?>" placeholder="Solo números" inputmode="numeric">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">5. Soportes y anexos</legend>
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="<?= h($lbl) ?>">Anexos generales</label>
+            <input type="file" name="anexos[]" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*" multiple>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Documentación de terceros <span class="text-gray-500">(invitaciones, certificados médicos, actas, etc.)</span></label>
+            <input type="file" name="anexos_terceros[]" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*" multiple>
+          </div>
+          <div>
+            <label class="<?= h($lbl) ?>">Formatos institucionales digitalizados</label>
+            <input type="file" name="anexos_formatos[]" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*" multiple>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-lg border border-gray-200 p-4">
+        <legend class="px-1 text-sm font-semibold text-academic">6. Declaración de responsabilidad</legend>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-gray-800">
+          <input type="checkbox" name="consentimiento_responsabilidad" value="1" required class="mt-1">
+          <span>Confirmo que mi ausencia o cambio no impedirá el cumplimiento del microcurrículo o que he dejado actividades programadas para los estudiantes.</span>
+        </label>
+      </fieldset>
+
+      <div>
         <button type="submit" class="inline-flex rounded-lg bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-academic-dark">Enviar solicitud</button>
       </div>
     </form>
@@ -102,13 +226,14 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
             <tr>
               <td class="px-3 py-2 font-mono"><?= $idSol ?></td>
               <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
-              <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
+              <td class="px-3 py-2"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
               <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
-              <td class="max-w-md px-3 py-2 text-xs"><?= nl2br(h((string) ($s['descripcion'] ?? ''))) ?></td>
+              <td class="max-w-md px-3 py-2 text-xs"><?= nl2br(h(solicitud_resumen_texto($s))) ?></td>
               <td class="px-3 py-2 text-xs">
                 <?php if (is_array($anexos) && $anexos !== []): ?>
                   <?php foreach ($anexos as $i => $m): ?>
-                    <a class="text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?></a><br>
+                    <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
+                    <a class="text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?></a><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?><br>
                   <?php endforeach; ?>
                 <?php else: ?>
                   —

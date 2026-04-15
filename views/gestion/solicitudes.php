@@ -8,8 +8,8 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-semibold text-academic">Solicitudes estudiantiles</h1>
-      <p class="mt-1 text-sm text-gray-600">Revise, filtre y responda según el estado del trámite.</p>
+      <h1 class="text-xl font-semibold text-academic">Solicitudes institucionales</h1>
+      <p class="mt-1 text-sm text-gray-600">Revise solicitudes de estudiantes y de docentes, filtre y responda según el estado del trámite.</p>
     </div>
     <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
   </div>
@@ -102,12 +102,13 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
                 <span class="text-gray-400">—</span>
               <?php endif; ?>
             </td>
-            <td class="max-w-[10rem] px-3 py-2 text-xs"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
+            <td class="max-w-[10rem] px-3 py-2 text-xs"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
             <td class="px-3 py-2 font-mono text-xs"><?= h((string) ($s['documento_docente_relacionado'] ?? '') ?: '—') ?></td>
             <td class="max-w-[8rem] px-3 py-2 text-xs">
               <?php if (is_array($anexos) && $anexos !== []): ?>
                 <?php foreach ($anexos as $i => $m): ?>
-                  <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?></a>
+                  <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
+                  <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?></a>
                 <?php endforeach; ?>
               <?php else: ?>
                 —
@@ -116,8 +117,40 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
             <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
             <td class="min-w-[14rem] px-3 py-2">
               <details class="mb-2">
-                <summary class="cursor-pointer text-xs font-medium text-academic hover:underline">Ver descripción</summary>
-                <p class="mt-1 rounded border border-gray-100 bg-gray-50 p-2 text-xs text-gray-800"><?= nl2br(h((string) ($s['descripcion'] ?? ''))) ?></p>
+                <summary class="cursor-pointer text-xs font-medium text-academic hover:underline">Ver detalle</summary>
+                <div class="mt-1 space-y-2 rounded border border-gray-100 bg-gray-50 p-2 text-xs text-gray-800">
+                  <div><?= nl2br(h(solicitud_resumen_texto($s))) ?></div>
+                  <?php
+                  $de = $s['detalle_estudiante'] ?? null;
+                  if (is_array($de)):
+                      $cl = $de['clasificacion'] ?? [];
+                      $cu = $de['cuerpo'] ?? [];
+                  ?>
+                    <dl class="grid grid-cols-1 gap-1 border-t border-gray-200 pt-2 sm:grid-cols-2">
+                      <dt class="font-semibold text-gray-600">Periodo</dt><dd><?= h((string) ($cl['periodo_academico'] ?? '—')) ?></dd>
+                      <dt class="font-semibold text-gray-600">Sede / jornada (petición)</dt><dd><?= h(sede_nombre((int) ($cl['id_sede_solicitud'] ?? 0))) ?> / <?= h(jornada_nombre((int) ($cl['id_jornada_solicitud'] ?? 0))) ?></dd>
+                      <dt class="font-semibold text-gray-600">Motivo</dt><dd><?= h((string) ($cu['motivo_label'] ?? '—')) ?></dd>
+                      <?php if (!empty($cu['materias_etiquetas']) && is_array($cu['materias_etiquetas'])): ?>
+                        <dt class="font-semibold text-gray-600 sm:col-span-2">Asignaturas</dt>
+                        <dd class="sm:col-span-2"><?= h(implode('; ', array_map('strval', $cu['materias_etiquetas']))) ?></dd>
+                      <?php endif; ?>
+                    </dl>
+                  <?php endif; ?>
+                  <?php
+                  $dd = $s['detalle_docente'] ?? null;
+                  if (is_array($dd)):
+                      $cla = $dd['clasificacion'] ?? [];
+                      $carga = $dd['carga_afectada'] ?? [];
+                      $cuer = $dd['cuerpo'] ?? [];
+                  ?>
+                    <dl class="grid grid-cols-1 gap-1 border-t border-gray-200 pt-2 sm:grid-cols-2">
+                      <dt class="font-semibold text-gray-600">Asunto</dt><dd><?= h((string) ($cla['asunto'] ?? '—')) ?></dd>
+                      <dt class="font-semibold text-gray-600">Prioridad</dt><dd><?= h((string) ($cla['prioridad_label'] ?? '—')) ?></dd>
+                      <dt class="font-semibold text-gray-600">NRC / materia</dt><dd><?= h(trim((string) ($carga['nrc'] ?? '') . ' — ' . (string) ($carga['nombre_materia'] ?? ''))) ?></dd>
+                      <dt class="font-semibold text-gray-600">Periodo (fechas)</dt><dd><?= h((string) ($cuer['fecha_inicio'] ?? '—') . ' → ' . (string) ($cuer['fecha_fin'] ?? '—')) ?></dd>
+                    </dl>
+                  <?php endif; ?>
+                </div>
               </details>
               <form method="post" class="space-y-2 rounded border border-gray-100 bg-gray-50 p-2">
                 <input type="hidden" name="accion" value="cambiar_estado">

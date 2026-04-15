@@ -126,7 +126,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
             <td class="max-w-xs px-3 py-2 text-xs"><?= h($e['programa'] ?? '') ?></td>
             <td class="px-3 py-2 text-right whitespace-nowrap">
               <a class="mr-1 inline-flex rounded-lg border border-blue-600 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/estudiantes.php?editar=' . (int) $e['id_estudiante'])) ?>">Editar</a>
-              <form method="post" class="inline" onsubmit="return confirm('¿Eliminar este estudiante y sus matrículas?');">
+              <form method="post" class="inline" onsubmit="return confirm('¿Eliminar este estudiante?');">
                 <input type="hidden" name="accion" value="eliminar">
                 <input type="hidden" name="id_estudiante" value="<?= (int) $e['id_estudiante'] ?>">
                 <button type="submit" class="inline-flex rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50">Eliminar</button>

@@ -24,9 +24,6 @@ final class EstudiantesController extends Controller
                 $id = (int) post('id_estudiante', '0');
                 $estudiantes = array_values(array_filter($estudiantes, static fn ($e) => (int) ($e['id_estudiante'] ?? 0) !== $id));
                 save_data('estudiantes', $estudiantes);
-                $mat = load_data('matriculas');
-                $mat = array_values(array_filter($mat, static fn ($m) => (int) ($m['id_estudiante'] ?? 0) !== $id));
-                save_data('matriculas', $mat);
                 $mensaje = 'Estudiante eliminado.';
             }
         }

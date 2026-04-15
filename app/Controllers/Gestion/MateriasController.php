@@ -20,20 +20,10 @@ final class MateriasController extends Controller
             $accion = post('accion', '');
             if ($accion === 'eliminar') {
                 $id = (int) post('id_materia', '0');
-                $mat = load_data('matriculas');
-                foreach ($mat as $x) {
-                    if ((int) ($x['id_materia'] ?? 0) === $id) {
-                        $mensaje = 'No se puede eliminar: existen matrículas en esta asignatura.';
-                        $tipoMsg = 'warning';
-                        break;
-                    }
-                }
-                if ($mensaje === '') {
-                    $raw = load_data('materias');
-                    $raw = array_values(array_filter($raw, static fn ($m) => (int) ($m['id_materia'] ?? 0) !== $id));
-                    save_data('materias', $raw);
-                    $mensaje = 'Asignatura eliminada.';
-                }
+                $raw = load_data('materias');
+                $raw = array_values(array_filter($raw, static fn ($m) => (int) ($m['id_materia'] ?? 0) !== $id));
+                save_data('materias', $raw);
+                $mensaje = 'Asignatura eliminada.';
             } elseif ($accion === 'guardar') {
                 [$mensaje, $tipoMsg] = GestionAcademicaService::agregarMateria();
             }

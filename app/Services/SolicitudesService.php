@@ -17,24 +17,117 @@ final class SolicitudesService
         }
 
         $idTipo = (int) post('id_tipo_solicitud', '0');
-        $desc = trim((string) post('descripcion', ''));
-        $docDoc = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
-
         $tipo = tipo_solicitud_por_id($idTipo);
         if (!$tipo) {
             return ['Seleccione un tipo de solicitud válido.', 'warning'];
         }
-        $len = function_exists('mb_strlen') ? mb_strlen($desc, 'UTF-8') : strlen($desc);
-        if ($desc === '' || $len < 10) {
-            return ['Describa su solicitud con al menos 10 caracteres.', 'warning'];
+
+        $periodo = trim((string) post('periodo_academico', ''));
+        if (!preg_match('/^\d{4}-\d{1,2}$/', $periodo)) {
+            return ['Indique el periodo académico en formato AAAA-S (ej. 2026-1).', 'warning'];
         }
+
+        $idSedeSol = (int) post('id_sede_solicitud', '0');
+        $idJornadaSol = (int) post('id_jornada_solicitud', '0');
+        if ($idSedeSol <= 0 || sede_nombre($idSedeSol) === '') {
+            return ['Seleccione la sede a la que aplica la solicitud.', 'warning'];
+        }
+        if ($idJornadaSol <= 0 || jornada_nombre($idJornadaSol) === '') {
+            return ['Seleccione la jornada.', 'warning'];
+        }
+
+        $motivo = strtolower(trim((string) post('motivo_solicitud', '')));
+        $motivosOk = array_column(diccionario_motivos_solicitud_estudiante(), 'codigo');
+        if (!in_array($motivo, $motivosOk, true)) {
+            return ['Seleccione el motivo de la solicitud.', 'warning'];
+        }
+
+        $exposicion = trim((string) post('exposicion', ''));
+        $len = function_exists('mb_strlen') ? mb_strlen($exposicion, 'UTF-8') : strlen($exposicion);
+        if ($exposicion === '' || $len < 10) {
+            return ['La exposición de motivos debe tener al menos 10 caracteres.', 'warning'];
+        }
+
+        if (post('consentimiento_veracidad', '') !== '1') {
+            return ['Debe aceptar la declaración de veracidad y el conocimiento del reglamento.', 'warning'];
+        }
+
+        $idProg = (int) ($est['id_programa'] ?? 0);
+        $materiasProg = repo_materias_por_programa($idProg);
+        $idsPermitidos = array_map(static fn ($m) => (int) ($m['id_materia'] ?? 0), $materiasProg);
+        $idsElegidas = [];
+        if (isset($_POST['ids_materias']) && is_array($_POST['ids_materias'])) {
+            foreach ($_POST['ids_materias'] as $idm) {
+                $idm = (int) $idm;
+                if ($idm > 0 && in_array($idm, $idsPermitidos, true)) {
+                    $idsElegidas[] = $idm;
+                }
+            }
+        }
+        $idsElegidas = array_values(array_unique($idsElegidas));
+
+        if (in_array($idTipo, solicitud_tipos_estudiante_requieren_materias(), true) && $idsElegidas === []) {
+            return ['Para este tipo de solicitud debe indicar al menos una asignatura de su malla.', 'warning'];
+        }
+
+        if ($motivo === 'salud' && !SolicitudesAnexosUpload::hayArchivoSubidoOk('soporte_medico')) {
+            return ['Si el motivo es salud, debe adjuntar soporte médico.', 'warning'];
+        }
+        if (in_array($idTipo, [5, 9], true) && !SolicitudesAnexosUpload::hayArchivoSubidoOk('carta_aceptacion')) {
+            return ['Para transferencia o traslado de sede adjunte la carta de aceptación u orden correspondiente.', 'warning'];
+        }
+        if (in_array($idTipo, [10, 11, 12], true) && !SolicitudesAnexosUpload::hayArchivoSubidoOk('recibo_pago')) {
+            return ['Para este trámite con costo administrativo adjunte el recibo de pago.', 'warning'];
+        }
+
+        $docDoc = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
 
         $rows = load_data('solicitudes');
         $idSol = next_numeric_id($rows, 'id_solicitud');
-        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarParaSolicitud($idSol);
+        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
+            ['input' => 'anexos', 'categoria' => 'general', 'multiple' => true],
+            ['input' => 'soporte_medico', 'categoria' => 'soporte_medico', 'multiple' => false],
+            ['input' => 'carta_aceptacion', 'categoria' => 'carta_aceptacion', 'multiple' => false],
+            ['input' => 'recibo_pago', 'categoria' => 'recibo_pago', 'multiple' => false],
+        ]);
         if ($errAnexos !== null) {
             return [$errAnexos, 'warning'];
         }
+
+        $estadoAcad = strtoupper(trim((string) ($est['estado_academico'] ?? 'REGULAR')));
+        $sem = (int) ($est['semestre'] ?? 0);
+        $materiasEtiquetas = [];
+        foreach ($idsElegidas as $mid) {
+            $materiasEtiquetas[] = materia_nombre($mid);
+        }
+
+        $detalleEst = [
+            'perfil_snapshot' => [
+                'id_estudiantil' => (string) ($est['documento'] ?? ''),
+                'id_programa' => $idProg,
+                'programa_nombre' => programa_label_by_id($idProg),
+                'estado_academico' => $estadoAcad,
+                'estado_academico_label' => estado_academico_estudiante_nombre($estadoAcad),
+                'semestre' => $sem,
+                'id_sede_matricula' => (int) ($est['id_sede'] ?? 0),
+                'id_jornada_matricula' => (int) ($est['id_jornada'] ?? 0),
+            ],
+            'clasificacion' => [
+                'periodo_academico' => $periodo,
+                'id_sede_solicitud' => $idSedeSol,
+                'id_jornada_solicitud' => $idJornadaSol,
+            ],
+            'cuerpo' => [
+                'motivo' => $motivo,
+                'motivo_label' => motivo_solicitud_estudiante_nombre($motivo),
+                'exposicion' => $exposicion,
+                'ids_materias_afectadas' => $idsElegidas,
+                'materias_etiquetas' => $materiasEtiquetas,
+            ],
+            'consentimientos' => [
+                'veracidad' => true,
+            ],
+        ];
 
         $row = [
             'id_solicitud' => $idSol,
@@ -42,14 +135,18 @@ final class SolicitudesService
             'id_docente_solicitante' => 0,
             'documento_estudiante' => (string) ($est['documento'] ?? ''),
             'id_tipo_solicitud' => $idTipo,
+            'id_tipo_solicitud_docente' => 0,
             'codigo_tipo' => (string) ($tipo['codigo'] ?? ''),
             'fecha_registro' => date('Y-m-d'),
             'estado' => 'pendiente',
-            'descripcion' => $desc,
+            'descripcion' => $exposicion,
             'documento_docente_relacionado' => $docDoc,
             'respuesta' => '',
             'fecha_respuesta' => '',
             'anexos_archivos' => $anexos,
+            'detalle_estudiante' => $detalleEst,
+            'detalle_docente' => null,
+            'formulario_version' => 2,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -65,33 +162,109 @@ final class SolicitudesService
             return ['Sesión inválida.', 'warning'];
         }
 
-        $idTipo = (int) post('id_tipo_solicitud', '0');
-        $desc = trim((string) post('descripcion', ''));
-        $docRel = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
-
-        $tipo = tipo_solicitud_por_id($idTipo);
-        if (!$tipo) {
-            return ['Seleccione un tipo de solicitud válido.', 'warning'];
+        $idTipoDoc = (int) post('id_tipo_solicitud_docente', '0');
+        $tipoDoc = tipo_solicitud_docente_por_id($idTipoDoc);
+        if (!$tipoDoc) {
+            return ['Seleccione un tipo de solicitud válido (catálogo docente).', 'warning'];
         }
+
+        $asunto = trim((string) post('asunto', ''));
+        if (function_exists('mb_strlen') ? mb_strlen($asunto, 'UTF-8') : strlen($asunto) < 3) {
+            return ['Indique un asunto breve (mínimo 3 caracteres).', 'warning'];
+        }
+
+        $prioridad = strtolower(trim((string) post('prioridad', '')));
+        $priOk = array_column(diccionario_prioridad_solicitud_docente(), 'codigo');
+        if (!in_array($prioridad, $priOk, true)) {
+            return ['Seleccione el nivel de prioridad.', 'warning'];
+        }
+
+        $desc = trim((string) post('descripcion_detallada', ''));
         $len = function_exists('mb_strlen') ? mb_strlen($desc, 'UTF-8') : strlen($desc);
         if ($desc === '' || $len < 10) {
-            return ['Describa su solicitud con al menos 10 caracteres.', 'warning'];
+            return ['La descripción detallada debe tener al menos 10 caracteres.', 'warning'];
         }
+
+        $sustento = trim((string) post('sustento_legal', ''));
+        $nrc = trim((string) post('nrc', ''));
+        $nomMat = trim((string) post('nombre_materia', ''));
+        $horarioImp = trim((string) post('horario_impactado', ''));
+        $planCont = trim((string) post('plan_contingencia', ''));
+
+        $fi = trim((string) post('fecha_inicio', ''));
+        $ff = trim((string) post('fecha_fin', ''));
+        if ($fi === '' || $ff === '') {
+            return ['Indique la fecha de inicio y la fecha de fin del requerimiento.', 'warning'];
+        }
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fi) !== 1 || preg_match('/^\d{4}-\d{2}-\d{2}$/', $ff) !== 1) {
+            return ['Use fechas en formato AAAA-MM-DD.', 'warning'];
+        }
+        if (strcmp($ff, $fi) < 0) {
+            return ['La fecha de fin no puede ser anterior a la de inicio.', 'warning'];
+        }
+
+        if (post('consentimiento_responsabilidad', '') !== '1') {
+            return ['Debe aceptar la declaración de responsabilidad sobre la carga académica.', 'warning'];
+        }
+
+        $docRel = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
 
         $rows = load_data('solicitudes');
         $idSol = next_numeric_id($rows, 'id_solicitud');
-        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarParaSolicitud($idSol);
+        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
+            ['input' => 'anexos', 'categoria' => 'general', 'multiple' => true],
+            ['input' => 'anexos_terceros', 'categoria' => 'doc_terceros', 'multiple' => true],
+            ['input' => 'anexos_formatos', 'categoria' => 'formato_institucional', 'multiple' => true],
+        ]);
         if ($errAnexos !== null) {
             return [$errAnexos, 'warning'];
         }
+
+        $idEmp = trim((string) ($doc['codigo_empleado'] ?? ''));
+        if ($idEmp === '') {
+            $idEmp = (string) ($doc['documento'] ?? '');
+        }
+        $detalleDoc = [
+            'perfil_snapshot' => [
+                'id_empleado' => $idEmp,
+                'unidad_academica' => trim((string) ($doc['unidad_academica'] ?? '')),
+                'categoria_docente' => strtolower(trim((string) ($doc['categoria_docente'] ?? ''))),
+                'categoria_docente_label' => categoria_docente_nombre((string) ($doc['categoria_docente'] ?? '')),
+                'tipo_contrato' => strtolower(trim((string) ($doc['tipo_contrato'] ?? ''))),
+                'tipo_contrato_label' => tipo_contrato_docente_nombre((string) ($doc['tipo_contrato'] ?? '')),
+                'documento' => (string) ($doc['documento'] ?? ''),
+                'nombre_completo' => trim(($doc['nombre'] ?? '') . ' ' . ($doc['apellido'] ?? '')),
+            ],
+            'clasificacion' => [
+                'asunto' => $asunto,
+                'prioridad' => $prioridad,
+                'prioridad_label' => prioridad_solicitud_docente_nombre($prioridad),
+            ],
+            'carga_afectada' => [
+                'nrc' => $nrc,
+                'nombre_materia' => $nomMat,
+                'horario_impactado' => $horarioImp,
+                'plan_contingencia' => $planCont,
+            ],
+            'cuerpo' => [
+                'descripcion_detallada' => $desc,
+                'sustento_legal' => $sustento,
+                'fecha_inicio' => $fi,
+                'fecha_fin' => $ff,
+            ],
+            'consentimientos' => [
+                'responsabilidad' => true,
+            ],
+        ];
 
         $row = [
             'id_solicitud' => $idSol,
             'id_estudiante' => 0,
             'id_docente_solicitante' => $idDocente,
             'documento_estudiante' => '',
-            'id_tipo_solicitud' => $idTipo,
-            'codigo_tipo' => (string) ($tipo['codigo'] ?? ''),
+            'id_tipo_solicitud' => 0,
+            'id_tipo_solicitud_docente' => $idTipoDoc,
+            'codigo_tipo' => (string) ($tipoDoc['codigo'] ?? ''),
             'fecha_registro' => date('Y-m-d'),
             'estado' => 'pendiente',
             'descripcion' => $desc,
@@ -99,6 +272,9 @@ final class SolicitudesService
             'respuesta' => '',
             'fecha_respuesta' => '',
             'anexos_archivos' => $anexos,
+            'detalle_estudiante' => null,
+            'detalle_docente' => $detalleDoc,
+            'formulario_version' => 2,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -248,6 +424,12 @@ final class SolicitudesService
         return $out;
     }
 
+    /** Normaliza claves para vistas y listados (registros antiguos). */
+    public static function normalizarParaVista(array $s): array
+    {
+        return self::normalizarLegacy($s);
+    }
+
     /** Si el usuario puede descargar anexos de esta solicitud (no aplica a vista mención anónima). */
     public static function usuarioPuedeVerAnexos(?array $user, array $solicitud): bool
     {
@@ -275,6 +457,18 @@ final class SolicitudesService
     {
         if (!isset($s['id_docente_solicitante'])) {
             $s['id_docente_solicitante'] = 0;
+        }
+        if (!isset($s['id_tipo_solicitud_docente'])) {
+            $s['id_tipo_solicitud_docente'] = 0;
+        }
+        if (!array_key_exists('detalle_estudiante', $s)) {
+            $s['detalle_estudiante'] = null;
+        }
+        if (!array_key_exists('detalle_docente', $s)) {
+            $s['detalle_docente'] = null;
+        }
+        if (!isset($s['formulario_version'])) {
+            $s['formulario_version'] = 1;
         }
         if (!isset($s['anexos_archivos']) || !is_array($s['anexos_archivos'])) {
             $s['anexos_archivos'] = [];

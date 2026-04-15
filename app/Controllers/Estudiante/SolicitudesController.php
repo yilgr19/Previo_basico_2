@@ -26,6 +26,7 @@ final class SolicitudesController extends Controller
 
         $yo = repo_estudiante_por_id($idEst);
         $todas = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));
+        $todas = array_map(static fn ($s) => SolicitudesService::normalizarParaVista($s), $todas);
 
         $activas = [];
         $aprobadas = [];
@@ -41,9 +42,12 @@ final class SolicitudesController extends Controller
             }
         }
 
+        $materiasPrograma = repo_materias_por_programa((int) ($yo['id_programa'] ?? 0));
+
         $this->render('estudiante/solicitudes.php', [
             'pageTitle' => 'Mis solicitudes',
             'yo' => $yo,
+            'materiasPrograma' => $materiasPrograma,
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'activas' => $activas,

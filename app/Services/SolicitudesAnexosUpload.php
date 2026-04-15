@@ -10,21 +10,33 @@ final class SolicitudesAnexosUpload
 {
     private const MAX_BYTES = 5242880;
 
-    private const MAX_FILES = 8;
+    private const MAX_TOTAL_FILES = 15;
 
     /** @var list<string> */
     private const EXT_OK = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp'];
 
     /**
-     * @return array{0: list<array{guardado: string, original: string, mime: string, bytes: int}>, 1: ?string}
+     * Compatibilidad: solo el campo `anexos` (múltiple).
+     *
+     * @return array{0: list<array<string, mixed>>, 1: ?string}
      */
     public static function guardarParaSolicitud(int $idSolicitud): array
     {
+        return self::guardarMultiplesCampos($idSolicitud, [
+            ['input' => 'anexos', 'categoria' => 'general', 'multiple' => true],
+        ]);
+    }
+
+    /**
+     * Varios inputs de archivo con etiqueta (categoría) para reglas de evidencia.
+     *
+     * @param list<array{input: string, categoria: string, multiple?: bool}> $grupos
+     * @return array{0: list<array<string, mixed>>, 1: ?string}
+     */
+    public static function guardarMultiplesCampos(int $idSolicitud, array $grupos): array
+    {
         if ($idSolicitud <= 0) {
             return [[], 'Identificador de solicitud no válido.'];
-        }
-        if (empty($_FILES['anexos'])) {
-            return [[], null];
         }
 
         $baseDir = self::directorioSolicitud($idSolicitud);
@@ -32,47 +44,98 @@ final class SolicitudesAnexosUpload
             return [[], 'No se pudo crear la carpeta de adjuntos.'];
         }
 
-        $files = self::normalizarFilesArray($_FILES['anexos']);
-        if (count($files) > self::MAX_FILES) {
-            return [[], 'Máximo ' . self::MAX_FILES . ' archivos por solicitud.'];
-        }
-
         $guardados = [];
-        foreach ($files as $f) {
-            if (($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        foreach ($grupos as $g) {
+            $input = (string) ($g['input'] ?? '');
+            $categoria = (string) ($g['categoria'] ?? 'general');
+            $multiple = (bool) ($g['multiple'] ?? true);
+            if ($input === '' || empty($_FILES[$input])) {
                 continue;
             }
-            if (($f['error'] ?? 0) !== UPLOAD_ERR_OK) {
-                return [[], 'Error al subir uno de los archivos.'];
+            $files = self::normalizarFilesArray($_FILES[$input]);
+            if (!$multiple && count($files) > 1) {
+                $files = [$files[0]];
             }
-            $tmp = (string) ($f['tmp_name'] ?? '');
-            if ($tmp === '' || !is_uploaded_file($tmp)) {
-                return [[], 'Archivo inválido.'];
+            foreach ($files as $f) {
+                if (($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+                [$meta, $err] = self::moverUnArchivo($baseDir, $f, $categoria);
+                if ($err !== null) {
+                    return [[], $err];
+                }
+                if ($meta !== null) {
+                    $guardados[] = $meta;
+                    if (count($guardados) > self::MAX_TOTAL_FILES) {
+                        return [[], 'Máximo ' . self::MAX_TOTAL_FILES . ' archivos por solicitud.'];
+                    }
+                }
             }
-            $orig = (string) ($f['name'] ?? 'archivo');
-            $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
-            if (!in_array($ext, self::EXT_OK, true)) {
-                return [[], 'Tipo no permitido. Use PDF o imagen (JPG, PNG, GIF, WEBP).'];
-            }
-            $size = (int) ($f['size'] ?? 0);
-            if ($size <= 0 || $size > self::MAX_BYTES) {
-                return [[], 'Cada archivo debe ser menor a 5 MB.'];
-            }
-            $mime = self::mimeSeguro($tmp, $ext);
-            $nombreFs = uniqid('ev_', true) . '.' . $ext;
-            $dest = $baseDir . DIRECTORY_SEPARATOR . $nombreFs;
-            if (!move_uploaded_file($tmp, $dest)) {
-                return [[], 'No se pudo guardar el archivo.'];
-            }
-            $guardados[] = [
-                'guardado' => $nombreFs,
-                'original' => $orig,
-                'mime' => $mime,
-                'bytes' => $size,
-            ];
         }
 
         return [$guardados, null];
+    }
+
+    /** Indica si hay al menos un archivo válido en el input (para validaciones condicionales). */
+    public static function hayArchivoSubidoOk(string $inputName): bool
+    {
+        if ($inputName === '' || empty($_FILES[$inputName])) {
+            return false;
+        }
+        foreach (self::normalizarFilesArray($_FILES[$inputName]) as $f) {
+            if (($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            if (($f['error'] ?? 0) === UPLOAD_ERR_OK) {
+                $tmp = (string) ($f['tmp_name'] ?? '');
+                if ($tmp !== '' && is_uploaded_file($tmp)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array{name: string, type: int, tmp_name: string, error: int, size: int} $f
+     * @return array{0: ?array<string, mixed>, 1: ?string}
+     */
+    private static function moverUnArchivo(string $baseDir, array $f, string $categoria): array
+    {
+        if (($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return [null, null];
+        }
+        if (($f['error'] ?? 0) !== UPLOAD_ERR_OK) {
+            return [null, 'Error al subir uno de los archivos.'];
+        }
+        $tmp = (string) ($f['tmp_name'] ?? '');
+        if ($tmp === '' || !is_uploaded_file($tmp)) {
+            return [null, 'Archivo inválido.'];
+        }
+        $orig = (string) ($f['name'] ?? 'archivo');
+        $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
+        if (!in_array($ext, self::EXT_OK, true)) {
+            return [null, 'Tipo no permitido. Use PDF o imagen (JPG, PNG, GIF, WEBP).'];
+        }
+        $size = (int) ($f['size'] ?? 0);
+        if ($size <= 0 || $size > self::MAX_BYTES) {
+            return [null, 'Cada archivo debe ser menor a 5 MB.'];
+        }
+        $mime = self::mimeSeguro($tmp, $ext);
+        $nombreFs = uniqid('ev_', true) . '.' . $ext;
+        $dest = $baseDir . DIRECTORY_SEPARATOR . $nombreFs;
+        if (!move_uploaded_file($tmp, $dest)) {
+            return [null, 'No se pudo guardar el archivo.'];
+        }
+
+        return [[
+            'guardado' => $nombreFs,
+            'original' => $orig,
+            'mime' => $mime,
+            'bytes' => $size,
+            'categoria' => $categoria,
+        ], null];
     }
 
     public static function directorioSolicitud(int $idSolicitud): string

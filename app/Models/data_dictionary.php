@@ -236,3 +236,199 @@ function solicitud_codigos_estado_validos(): array
 {
     return array_column(diccionario_estados_solicitud(), 'codigo');
 }
+
+/** Estados académicos para perfil / solicitud (solo lectura desde datos del estudiante). */
+function diccionario_estados_academicos_estudiante(): array
+{
+    return [
+        ['codigo' => 'PAI', 'nombre' => 'PAI (Programa de Acompañamiento)'],
+        ['codigo' => 'REGULAR', 'nombre' => 'Regular'],
+        ['codigo' => 'PRUEBA', 'nombre' => 'Prueba académica'],
+        ['codigo' => 'EGRESADO', 'nombre' => 'Egresado'],
+    ];
+}
+
+function estado_academico_estudiante_nombre(?string $cod): string
+{
+    $cod = strtoupper(trim((string) $cod));
+    foreach (diccionario_estados_academicos_estudiante() as $e) {
+        if (($e['codigo'] ?? '') === $cod) {
+            return (string) $e['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+/** Motivos estadísticos (solicitud estudiantil). */
+function diccionario_motivos_solicitud_estudiante(): array
+{
+    return [
+        ['codigo' => 'salud', 'nombre' => 'Salud'],
+        ['codigo' => 'economicos', 'nombre' => 'Económicos'],
+        ['codigo' => 'cruce_horarios', 'nombre' => 'Cruce de horarios'],
+        ['codigo' => 'cambio_residencia', 'nombre' => 'Cambio de residencia'],
+        ['codigo' => 'otro', 'nombre' => 'Otro'],
+    ];
+}
+
+function motivo_solicitud_estudiante_nombre(?string $cod): string
+{
+    $cod = strtolower(trim((string) $cod));
+    foreach (diccionario_motivos_solicitud_estudiante() as $m) {
+        if (($m['codigo'] ?? '') === $cod) {
+            return (string) $m['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+/**
+ * Catálogo de solicitudes radicadas por docentes (distinto del catálogo estudiantil).
+ *
+ * @return array<int, array{id: int, codigo: string, nombre: string}>
+ */
+function diccionario_tipos_solicitud_docente(): array
+{
+    return [
+        ['id' => 1, 'codigo' => 'DOC_LIC', 'nombre' => 'Licencia o permiso'],
+        ['id' => 2, 'codigo' => 'DOC_RECT_NOT', 'nombre' => 'Rectificación de notas'],
+        ['id' => 3, 'codigo' => 'DOC_DESC_HOR', 'nombre' => 'Descarga horaria'],
+        ['id' => 4, 'codigo' => 'DOC_COMISION', 'nombre' => 'Comisión académica o científica'],
+        ['id' => 5, 'codigo' => 'DOC_RECURSOS', 'nombre' => 'Recursos, equipos o espacios'],
+        ['id' => 6, 'codigo' => 'DOC_REPOS', 'nombre' => 'Reposición de clases / cobertura'],
+        ['id' => 7, 'codigo' => 'DOC_ACT_DAT', 'nombre' => 'Actualización de datos laborales'],
+        ['id' => 8, 'codigo' => 'DOC_ANO_SAB', 'nombre' => 'Año sabático / comisión extendida'],
+        ['id' => 9, 'codigo' => 'DOC_CAPAC', 'nombre' => 'Autorización de capacitación / evento'],
+        ['id' => 10, 'codigo' => 'DOC_OTRA', 'nombre' => 'Otra'],
+    ];
+}
+
+function tipo_solicitud_docente_por_id(int $id): ?array
+{
+    foreach (diccionario_tipos_solicitud_docente() as $t) {
+        if ((int) ($t['id'] ?? 0) === $id) {
+            return $t;
+        }
+    }
+    return null;
+}
+
+function tipo_solicitud_docente_nombre(int $id): string
+{
+    $t = tipo_solicitud_docente_por_id($id);
+    return $t ? (string) $t['nombre'] : '—';
+}
+
+function diccionario_prioridad_solicitud_docente(): array
+{
+    return [
+        ['codigo' => 'baja', 'nombre' => 'Baja'],
+        ['codigo' => 'media', 'nombre' => 'Media'],
+        ['codigo' => 'alta', 'nombre' => 'Alta'],
+    ];
+}
+
+function prioridad_solicitud_docente_nombre(?string $cod): string
+{
+    $cod = strtolower(trim((string) $cod));
+    foreach (diccionario_prioridad_solicitud_docente() as $p) {
+        if (($p['codigo'] ?? '') === $cod) {
+            return (string) $p['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+function diccionario_categoria_docente(): array
+{
+    return [
+        ['codigo' => 'auxiliar', 'nombre' => 'Auxiliar'],
+        ['codigo' => 'asistente', 'nombre' => 'Asistente'],
+        ['codigo' => 'asociado', 'nombre' => 'Asociado'],
+        ['codigo' => 'titular', 'nombre' => 'Titular'],
+    ];
+}
+
+function categoria_docente_nombre(?string $cod): string
+{
+    $cod = strtolower(trim((string) $cod));
+    foreach (diccionario_categoria_docente() as $c) {
+        if (($c['codigo'] ?? '') === $cod) {
+            return (string) $c['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+function diccionario_tipo_contrato_docente(): array
+{
+    return [
+        ['codigo' => 'tiempo_completo', 'nombre' => 'Tiempo completo'],
+        ['codigo' => 'medio_tiempo', 'nombre' => 'Medio tiempo'],
+        ['codigo' => 'catedra', 'nombre' => 'Cátedra'],
+        ['codigo' => 'otro', 'nombre' => 'Otro'],
+    ];
+}
+
+function tipo_contrato_docente_nombre(?string $cod): string
+{
+    $cod = strtolower(trim((string) $cod));
+    foreach (diccionario_tipo_contrato_docente() as $c) {
+        if (($c['codigo'] ?? '') === $cod) {
+            return (string) $c['nombre'];
+        }
+    }
+    return $cod !== '' ? $cod : '—';
+}
+
+/** Tipos estudiantiles que exigen indicar asignaturas de la malla. */
+function solicitud_tipos_estudiante_requieren_materias(): array
+{
+    return [1, 2, 3];
+}
+
+function solicitud_es_radicada_docente(array $s): bool
+{
+    return (int) ($s['id_docente_solicitante'] ?? 0) > 0;
+}
+
+function solicitud_tipo_etiqueta(array $s): string
+{
+    if (solicitud_es_radicada_docente($s)) {
+        $idTd = (int) ($s['id_tipo_solicitud_docente'] ?? 0);
+        if ($idTd > 0) {
+            return tipo_solicitud_docente_nombre($idTd);
+        }
+        return tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0));
+    }
+    return tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0));
+}
+
+/** Texto principal para listados (exposición o descripción según formulario). */
+function solicitud_resumen_texto(array $s): string
+{
+    $de = $s['detalle_estudiante'] ?? null;
+    if (is_array($de) && !empty($de['cuerpo']['exposicion'])) {
+        return (string) $de['cuerpo']['exposicion'];
+    }
+    $dd = $s['detalle_docente'] ?? null;
+    if (is_array($dd) && !empty($dd['cuerpo']['descripcion_detallada'])) {
+        return (string) $dd['cuerpo']['descripcion_detallada'];
+    }
+    return (string) ($s['descripcion'] ?? '');
+}
+
+/** Etiqueta legible para la categoría de un adjunto (evidencias). */
+function solicitud_etiqueta_categoria_anexo(?string $categoria): string
+{
+    $c = strtolower(trim((string) $categoria));
+    $map = [
+        'general' => 'General',
+        'soporte_medico' => 'Soporte médico',
+        'carta_aceptacion' => 'Carta de aceptación',
+        'recibo_pago' => 'Recibo de pago',
+        'doc_terceros' => 'Documentación de terceros',
+        'formato_institucional' => 'Formato institucional',
+    ];
+    return $map[$c] ?? ($c !== '' ? $c : '—');
+}
