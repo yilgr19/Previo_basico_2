@@ -2,7 +2,7 @@
 /**
  * Genera datos de demostración:
  * - 5 estudiantes y 5 docentes sede Cúcuta (id_sede 1) + 5 y 5 sede Ocaña (id_sede 2) = 10 y 10
- * - 3 solicitudes de estudiantes (Cúcuta) y 1 solicitud de docente (Cúcuta)
+ * - 3 solicitudes de estudiantes (Cúcuta), 3 de estudiantes (Ocaña) y 1 solicitud de docente (Cúcuta)
  *
  * Uso (desde la raíz del proyecto):
  *   php scripts/seed_demo_academico.php
@@ -597,6 +597,93 @@ $solicitudes = [
         'notif_pendiente_est' => false,
         'notif_pendiente_doc' => false,
     ],
+    [
+        'id_solicitud' => 5,
+        'id_estudiante' => 6,
+        'id_docente_solicitante' => 0,
+        'documento_estudiante' => $e[6]['documento'],
+        'id_tipo_solicitud' => 11,
+        'id_tipo_solicitud_docente' => 0,
+        'codigo_tipo' => 'REQ_CONST_EST',
+        'fecha_registro' => '2026-04-12',
+        'estado' => 'pendiente',
+        'descripcion' => 'Constancia de estudio sede Ocaña; referencia al docente Ricardo Esteban Pardo.',
+        'documento_docente_relacionado' => '212001',
+        'respuesta' => '',
+        'fecha_respuesta' => '',
+        'respondido_en' => '',
+        'anexos_archivos' => [],
+        'detalle_estudiante' => detalle_estudiante_demo(
+            $e[6],
+            '2026-1',
+            $idSedeOcana,
+            1,
+            'economicos',
+            'Solicito constancia de estudio para proceso de monitoría en la sede Ocaña. Como referencia académica indico al docente Ricardo Esteban Pardo (documento 212001), quien supervisó el módulo de identidad visual.'
+        ),
+        'detalle_docente' => null,
+        'formulario_version' => 2,
+        'notif_pendiente_est' => false,
+        'notif_pendiente_doc' => false,
+    ],
+    [
+        'id_solicitud' => 6,
+        'id_estudiante' => 7,
+        'id_docente_solicitante' => 0,
+        'documento_estudiante' => $e[7]['documento'],
+        'id_tipo_solicitud' => 12,
+        'id_tipo_solicitud_docente' => 0,
+        'codigo_tipo' => 'REQ_CERT_NOTAS',
+        'fecha_registro' => '2026-04-11',
+        'estado' => 'pendiente',
+        'descripcion' => 'Certificado de notas Ocaña; docente Mónica Liliana Fuentes dictó la asignatura.',
+        'documento_docente_relacionado' => '212002',
+        'respuesta' => '',
+        'fecha_respuesta' => '',
+        'respondido_en' => '',
+        'anexos_archivos' => [],
+        'detalle_estudiante' => detalle_estudiante_demo(
+            $e[7],
+            '2026-1',
+            $idSedeOcana,
+            1,
+            'cruce_horarios',
+            'Requiero certificado de notas del periodo 2025-2. La docente Mónica Liliana Fuentes (documento 212002) puede confirmar la calificación del taller de contenidos gráficos.'
+        ),
+        'detalle_docente' => null,
+        'formulario_version' => 2,
+        'notif_pendiente_est' => false,
+        'notif_pendiente_doc' => false,
+    ],
+    [
+        'id_solicitud' => 7,
+        'id_estudiante' => 8,
+        'id_docente_solicitante' => 0,
+        'documento_estudiante' => $e[8]['documento'],
+        'id_tipo_solicitud' => 13,
+        'id_tipo_solicitud_docente' => 0,
+        'codigo_tipo' => 'REQ_OTRA',
+        'fecha_registro' => '2026-04-09',
+        'estado' => 'en_revision',
+        'descripcion' => 'Trámite varios extensión Ocaña; mención al docente Héctor Fabio Leal.',
+        'documento_docente_relacionado' => '212003',
+        'respuesta' => '',
+        'fecha_respuesta' => '',
+        'respondido_en' => '',
+        'anexos_archivos' => [],
+        'detalle_estudiante' => detalle_estudiante_demo(
+            $e[8],
+            '2026-1',
+            $idSedeOcana,
+            2,
+            'otro',
+            'Gestión administrativa en sede Ocaña sobre prácticas de campo. Como contacto académico indico al docente Héctor Fabio Leal (documento 212003), coordinador del espacio de taller.'
+        ),
+        'detalle_docente' => null,
+        'formulario_version' => 2,
+        'notif_pendiente_est' => false,
+        'notif_pendiente_doc' => false,
+    ],
 ];
 
 $okE = save_data('estudiantes', $estudiantes);
@@ -611,5 +698,5 @@ if (!$okE || !$okD || !$okS) {
 echo "Listo.\n";
 echo "- Estudiantes: " . count($estudiantes) . " (5 Cúcuta IDs 1–5, 5 Ocaña IDs 6–10). Clave demo: demo123\n";
 echo "- Docentes: " . count($docentes) . " (5 Cúcuta IDs 1–5, 5 Ocaña IDs 6–10). Clave demo: demo123\n";
-echo "- Solicitudes: " . count($solicitudes) . " (demo en Cúcuta: est. 1–3 y doc. mencionados 201002/003/005; sol. docente id 1 Juliana).\n";
+echo "- Solicitudes: " . count($solicitudes) . " (Cúcuta: est. 1–3 y doc. 1 Juliana; Ocaña: est. 6–8 con doc. 212001–212003).\n";
 echo "  Inicio de sesión: documento numérico + clave demo123\n";

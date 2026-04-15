@@ -129,6 +129,7 @@ final class SolicitudesService
             'formulario_version' => 2,
             'notif_pendiente_est' => false,
             'notif_pendiente_doc' => false,
+            'notif_nueva_gestion' => true,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -151,7 +152,8 @@ final class SolicitudesService
         }
 
         $asunto = trim((string) post('asunto', ''));
-        if (function_exists('mb_strlen') ? mb_strlen($asunto, 'UTF-8') : strlen($asunto) < 3) {
+        $asuntoLen = function_exists('mb_strlen') ? mb_strlen($asunto, 'UTF-8') : strlen($asunto);
+        if ($asuntoLen < 3) {
             return ['Indique un asunto breve (mínimo 3 caracteres).', 'warning'];
         }
 
@@ -261,6 +263,7 @@ final class SolicitudesService
             'formulario_version' => 2,
             'notif_pendiente_est' => false,
             'notif_pendiente_doc' => false,
+            'notif_nueva_gestion' => true,
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -304,6 +307,7 @@ final class SolicitudesService
                 if ($idDocSol > 0) {
                     $s['notif_pendiente_doc'] = true;
                 }
+                $s['notif_nueva_gestion'] = false;
                 $found = true;
                 break;
             }
@@ -430,6 +434,36 @@ final class SolicitudesService
         return $out;
     }
 
+    /**
+     * Conteos para el panel de gestión: totales y pendiente/en revisión por sede (misma regla que las bandejas).
+     *
+     * @return array<int, array{total: int, pendiente_revision: int}> claves 1 (Cúcuta) y 2 (Ocaña)
+     */
+    public static function conteosPanelPorSedeBandeja(): array
+    {
+        $out = [
+            1 => ['total' => 0, 'pendiente_revision' => 0],
+            2 => ['total' => 0, 'pendiente_revision' => 0],
+        ];
+        foreach (load_data('solicitudes') as $row) {
+            $s = self::normalizarLegacy($row);
+            $idEst = (int) ($s['id_estudiante'] ?? 0);
+            $idDocSol = (int) ($s['id_docente_solicitante'] ?? 0);
+            $estudiante = $idEst > 0 ? repo_estudiante_por_id($idEst) : null;
+            $docSol = $idDocSol > 0 ? repo_docente_por_id($idDocSol) : null;
+            $sede = solicitud_sede_para_bandera_gestion($s, $estudiante, $docSol);
+            $sedeKey = $sede === 2 ? 2 : 1;
+
+            $out[$sedeKey]['total']++;
+            $st = (string) ($s['estado'] ?? '');
+            if ($st === 'pendiente' || $st === 'en_revision') {
+                $out[$sedeKey]['pendiente_revision']++;
+            }
+        }
+
+        return $out;
+    }
+
     /** Comprueba si la solicitud corresponde a la sede de la bandeja (misma regla que listadoParaAdmin). */
     public static function solicitudPerteneceASedeBandeja(int $idSolicitud, int $idSedeRequerida): bool
     {
@@ -537,20 +571,15 @@ final class SolicitudesService
         if (!isset($s['anexos_archivos']) || !is_array($s['anexos_archivos'])) {
             $s['anexos_archivos'] = [];
         }
-        $e = strtolower(trim((string) ($s['estado'] ?? '')));
-        $map = [
-            'en revisión' => 'en_revision',
-            'en revision' => 'en_revision',
-            'pendiente' => 'pendiente',
-        ];
-        if (isset($map[$e])) {
-            $s['estado'] = $map[$e];
-        }
+        $s['estado'] = solicitud_estado_a_codigo((string) ($s['estado'] ?? ''));
         if (!array_key_exists('notif_pendiente_est', $s)) {
             $s['notif_pendiente_est'] = false;
         }
         if (!array_key_exists('notif_pendiente_doc', $s)) {
             $s['notif_pendiente_doc'] = false;
+        }
+        if (!array_key_exists('notif_nueva_gestion', $s)) {
+            $s['notif_nueva_gestion'] = false;
         }
         if (!array_key_exists('respuesta_elaborada', $s)) {
             $s['respuesta_elaborada'] = null;
@@ -643,6 +672,89 @@ final class SolicitudesService
         }
 
         return $out;
+    }
+
+    /**
+     * Nuevas solicitudes radicadas sin ver en gestión (panel admin).
+     *
+     * @return array{estudiantes: int, docentes: int, total: int}
+     */
+    public static function conteoNotificacionesGestionPorRadicante(): array
+    {
+        $nEst = 0;
+        $nDoc = 0;
+        foreach (load_data('solicitudes') as $row) {
+            $s = self::normalizarLegacy($row);
+            if (empty($s['notif_nueva_gestion'])) {
+                continue;
+            }
+            if ((int) ($s['id_estudiante'] ?? 0) > 0) {
+                $nEst++;
+            } elseif ((int) ($s['id_docente_solicitante'] ?? 0) > 0) {
+                $nDoc++;
+            }
+        }
+
+        return [
+            'estudiantes' => $nEst,
+            'docentes' => $nDoc,
+            'total' => $nEst + $nDoc,
+        ];
+    }
+
+    /**
+     * @return list<array{id_solicitud: int, tipo: string, fecha: string, radicante: 'estudiante'|'docente'}>
+     */
+    public static function resumenNotificacionesGestion(int $limit = 8): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+        $rows = load_data('solicitudes');
+        $cand = [];
+        foreach ($rows as $s) {
+            $s = self::normalizarLegacy($s);
+            if (empty($s['notif_nueva_gestion'])) {
+                continue;
+            }
+            $idEst = (int) ($s['id_estudiante'] ?? 0);
+            $idDoc = (int) ($s['id_docente_solicitante'] ?? 0);
+            if ($idEst > 0) {
+                $cand[] = [$s, 'estudiante'];
+            } elseif ($idDoc > 0) {
+                $cand[] = [$s, 'docente'];
+            }
+        }
+        usort($cand, static fn ($a, $b) => ((int) ($b[0]['id_solicitud'] ?? 0)) <=> ((int) ($a[0]['id_solicitud'] ?? 0)));
+        $cand = array_slice($cand, 0, $limit);
+        $out = [];
+        foreach ($cand as [$s, $rad]) {
+            $out[] = [
+                'id_solicitud' => (int) ($s['id_solicitud'] ?? 0),
+                'tipo' => solicitud_tipo_etiqueta($s),
+                'fecha' => (string) ($s['fecha_registro'] ?? ''),
+                'radicante' => $rad,
+            ];
+        }
+
+        return $out;
+    }
+
+    /** Marca como vistas las notificaciones de nuevas solicitudes (al abrir una bandeja de gestión). */
+    public static function marcarNotificacionesGestionLeidas(): void
+    {
+        $rows = load_data('solicitudes');
+        $changed = false;
+        foreach ($rows as &$s) {
+            if (!empty($s['notif_nueva_gestion'])) {
+                $s['notif_nueva_gestion'] = false;
+                $changed = true;
+            }
+        }
+        unset($s);
+        if ($changed) {
+            save_data('solicitudes', $rows);
+        }
     }
 
     /** Marca como vistas las notificaciones del usuario (p. ej. al abrir «Mis solicitudes»). */

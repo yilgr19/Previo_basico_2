@@ -30,13 +30,19 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana.php');
       <?php endif; ?>
     </div>
     <div class="flex flex-wrap gap-2">
-      <a class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision.php')) ?>">Solo en revisión</a>
+      <a class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision.php')) ?>">Solo en revisión Cúcuta</a>
+      <a class="inline-flex items-center rounded-lg border border-amber-200/90 bg-amber-50/80 px-3 py-1.5 text-sm font-medium text-amber-950 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>">Solo en revisión Ocaña</a>
       <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
     </div>
   </div>
 
   <?php if ($mensaje): ?>
-    <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>
+    <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>">
+      <?= h($mensaje) ?>
+      <?php if (($tipoMsg ?? '') === 'warning'): ?>
+        <span class="mt-2 block text-[13px] font-normal">Los textos del formulario de la fila afectada se <strong class="font-medium text-gray-800">conservaron</strong>; corrija lo indicado y pulse Guardar de nuevo.</span>
+      <?php endif; ?>
+    </div>
   <?php endif; ?>
 
   <form method="get" action="<?= h($uBandeja) ?>" class="mb-6 space-y-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">

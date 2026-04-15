@@ -77,6 +77,77 @@ function get(string $key, ?string $default = null): ?string
     return isset($_GET[$key]) ? trim((string) $_GET[$key]) : $default;
 }
 
+/** Valores del formulario estudiantil tras un error de validación (repoblar vista). */
+function solicitud_estudiante_old_desde_post(): array
+{
+    return [
+        'id_tipo_solicitud' => post('id_tipo_solicitud', '') ?? '',
+        'periodo_academico' => post('periodo_academico', '') ?? '',
+        'id_sede_solicitud' => post('id_sede_solicitud', '') ?? '',
+        'id_jornada_solicitud' => post('id_jornada_solicitud', '') ?? '',
+        'motivo_solicitud' => post('motivo_solicitud', '') ?? '',
+        'exposicion' => (string) ($_POST['exposicion'] ?? ''),
+        'documento_docente_relacionado' => post('documento_docente_relacionado', '') ?? '',
+        'consentimiento_veracidad' => (isset($_POST['consentimiento_veracidad']) && (string) $_POST['consentimiento_veracidad'] === '1'),
+    ];
+}
+
+/** Valores del formulario docente tras un error de validación. */
+function solicitud_docente_old_desde_post(): array
+{
+    return [
+        'id_tipo_solicitud_docente' => post('id_tipo_solicitud_docente', '') ?? '',
+        'asunto' => (string) ($_POST['asunto'] ?? ''),
+        'prioridad' => post('prioridad', '') ?? '',
+        'nrc' => (string) ($_POST['nrc'] ?? ''),
+        'nombre_materia' => (string) ($_POST['nombre_materia'] ?? ''),
+        'horario_impactado' => (string) ($_POST['horario_impactado'] ?? ''),
+        'plan_contingencia' => (string) ($_POST['plan_contingencia'] ?? ''),
+        'descripcion_detallada' => (string) ($_POST['descripcion_detallada'] ?? ''),
+        'sustento_legal' => (string) ($_POST['sustento_legal'] ?? ''),
+        'fecha_inicio' => post('fecha_inicio', '') ?? '',
+        'fecha_fin' => post('fecha_fin', '') ?? '',
+        'documento_docente_relacionado' => post('documento_docente_relacionado', '') ?? '',
+        'consentimiento_responsabilidad' => (isset($_POST['consentimiento_responsabilidad']) && (string) $_POST['consentimiento_responsabilidad'] === '1'),
+    ];
+}
+
+/**
+ * Tras un fallo al guardar en gestión, repuebla estado, respuesta breve y resolución formal desde POST.
+ *
+ * @return array{id_solicitud: int, estado: string, respuesta: string, incluir_elaborada: bool, elab: array<string, string>}|null
+ */
+function gestion_formulario_repoblar_desde_post(): ?array
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || post('accion', '') !== 'cambiar_estado') {
+        return null;
+    }
+    $id = (int) post('id_solicitud', '0');
+    if ($id <= 0) {
+        return null;
+    }
+
+    return [
+        'id_solicitud' => $id,
+        'estado' => (string) post('estado', ''),
+        'respuesta' => (string) ($_POST['respuesta'] ?? ''),
+        'incluir_elaborada' => post('incluir_elaborada', '') === '1',
+        'elab' => [
+            'decision' => trim((string) post('elab_decision', '')),
+            'justificacion' => trim((string) ($_POST['elab_justificacion'] ?? '')),
+            'normativas' => trim((string) ($_POST['elab_normativas'] ?? '')),
+            'subsanacion_items' => trim((string) ($_POST['elab_subsanacion_items'] ?? '')),
+            'subsanacion_error_doc' => trim((string) ($_POST['elab_subsanacion_error_doc'] ?? '')),
+            'subsanacion_fecha_limite' => trim((string) post('elab_subsanacion_fecha_limite', '')),
+            'instrucciones_cierre' => trim((string) ($_POST['elab_instrucciones_cierre'] ?? '')),
+            'recursos_apelacion' => trim((string) ($_POST['elab_recursos_apelacion'] ?? '')),
+            'funcionario_nombre' => trim((string) ($_POST['elab_funcionario_nombre'] ?? '')),
+            'funcionario_cargo' => trim((string) ($_POST['elab_funcionario_cargo'] ?? '')),
+            'codigo_verificacion' => trim((string) ($_POST['elab_codigo_verificacion'] ?? '')),
+        ],
+    ];
+}
+
 function asset_url(string $path): string
 {
     $p = ltrim($path, '/');

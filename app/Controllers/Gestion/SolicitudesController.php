@@ -16,6 +16,9 @@ final class SolicitudesController extends Controller
     public function run(): void
     {
         require_gestion_admin();
+        if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'GET') {
+            SolicitudesService::marcarNotificacionesGestionLeidas();
+        }
 
         $mensaje = '';
         $tipoMsg = 'success';
@@ -31,6 +34,11 @@ final class SolicitudesController extends Controller
             } else {
                 [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp, $guardarElab);
             }
+        }
+
+        $gestionRepoblar = null;
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && post('accion', '') === 'cambiar_estado' && ($tipoMsg ?? '') === 'warning') {
+            $gestionRepoblar = gestion_formulario_repoblar_desde_post();
         }
 
         $filtroFechaDesde = get('fecha_desde', '');
@@ -78,6 +86,7 @@ final class SolicitudesController extends Controller
             'filtroAprob' => $filtroAprob,
             'filtroRadicante' => $filtroRadicante,
             'buscarDoc' => $buscarDoc,
+            'gestionRepoblar' => $gestionRepoblar,
         ]);
     }
 }

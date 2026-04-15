@@ -46,6 +46,11 @@ final class SolicitudesController extends Controller
 
         $yo = repo_estudiante_por_id($idEst);
 
+        $old = [];
+        if ($vista === 'nueva' && ($tipoMsg ?? '') === 'warning' && $_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud') {
+            $old = solicitud_estudiante_old_desde_post();
+        }
+
         if ($vista === 'nueva') {
             $this->render('estudiante/solicitud_nueva.php', [
                 'pageTitle' => 'Nueva solicitud',
@@ -53,6 +58,7 @@ final class SolicitudesController extends Controller
                 'yo' => $yo,
                 'mensaje' => $mensaje,
                 'tipoMsg' => $tipoMsg,
+                'old' => $old,
             ]);
 
             return;

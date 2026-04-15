@@ -5,14 +5,28 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
     $alertClass = 'border-amber-200 bg-amber-50 text-amber-900';
 }
 $emptyHint = 'No hay solicitudes en revisión con los filtros indicados.';
+$revisionScript = $revisionScript ?? 'gestion/solicitudes_revision.php';
+$idSedeBandeja = (int) ($idSedeBandeja ?? 0);
+$uRevision = url($revisionScript);
+$uRevisionCucuta = url('gestion/solicitudes_revision.php');
+$uRevisionOcana = url('gestion/solicitudes_revision_ocana.php');
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-semibold text-academic">Solicitudes en revisión</h1>
-      <p class="mt-1 text-sm text-gray-600">Solo se listan trámites en estado <strong class="font-semibold text-gray-800">En revisión</strong>, ordenados por fecha de registro (más recientes primero). Use las bandejas por sede para ver todos los estados filtrados.</p>
+      <h1 class="text-xl font-semibold text-academic"><?= h($pageTitle ?? 'Solicitudes en revisión') ?></h1>
+      <p class="mt-1 text-sm text-gray-600">Solo entran aquí trámites cuyo estado es exactamente <strong class="font-semibold text-gray-800">En revisión</strong>. No aparecen solicitudes en <strong class="font-medium text-gray-700">pendiente</strong> ni en otros estados. Orden: fecha de registro, más recientes primero.</p>
+      <?php if ($idSedeBandeja === 1 || $idSedeBandeja === 2): ?>
+        <p class="mt-2 text-xs text-gray-600">Vista acotada a la <strong class="font-medium text-gray-800"><?= $idSedeBandeja === 2 ? 'Sede Ocaña' : 'Sede Cúcuta' ?></strong>. Cambie de sede con los accesos de la derecha.</p>
+      <?php endif; ?>
     </div>
     <div class="flex flex-wrap gap-2">
+      <?php if ($idSedeBandeja !== 1): ?>
+        <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h($uRevisionCucuta) ?>">En revisión Cúcuta</a>
+      <?php endif; ?>
+      <?php if ($idSedeBandeja !== 2): ?>
+        <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h($uRevisionOcana) ?>">En revisión Ocaña</a>
+      <?php endif; ?>
       <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/solicitudes.php')) ?>">Bandeja Cúcuta</a>
       <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>">Bandeja Ocaña</a>
       <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
@@ -20,10 +34,15 @@ $emptyHint = 'No hay solicitudes en revisión con los filtros indicados.';
   </div>
 
   <?php if ($mensaje): ?>
-    <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>
+    <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>">
+      <?= h($mensaje) ?>
+      <?php if (($tipoMsg ?? '') === 'warning'): ?>
+        <span class="mt-2 block text-[13px] font-normal">Los textos del formulario de la fila afectada se <strong class="font-medium text-gray-800">conservaron</strong>; corrija lo indicado y pulse Guardar de nuevo.</span>
+      <?php endif; ?>
+    </div>
   <?php endif; ?>
 
-  <form method="get" action="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="mb-6 space-y-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+  <form method="get" action="<?= h($uRevision) ?>" class="mb-6 space-y-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">Radicante</label>
@@ -54,7 +73,7 @@ $emptyHint = 'No hay solicitudes en revisión con los filtros indicados.';
       </div>
       <div class="flex gap-2">
         <button type="submit" class="rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-900">Aplicar filtros</button>
-        <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="<?= h(url('gestion/solicitudes_revision.php')) ?>">Limpiar</a>
+        <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="<?= h($uRevision) ?>">Limpiar</a>
       </div>
     </div>
   </form>

@@ -277,6 +277,38 @@ function solicitud_codigos_estado_validos(): array
     return array_column(diccionario_estados_solicitud(), 'codigo');
 }
 
+/** Normaliza el estado al código canónico (listados, filtros y JSON legacy). */
+function solicitud_estado_a_codigo(?string $estado): string
+{
+    $t = trim((string) $estado);
+    if ($t === '') {
+        return 'pendiente';
+    }
+    $l = function_exists('mb_strtolower') ? mb_strtolower($t, 'UTF-8') : strtolower($t);
+    $l = str_replace('ó', 'o', $l);
+
+    $aliases = [
+        'en revisión' => 'en_revision',
+        'en revision' => 'en_revision',
+        'en_revision' => 'en_revision',
+        'en-revision' => 'en_revision',
+        'pendiente' => 'pendiente',
+        'aprobada' => 'aprobada',
+        'rechazada' => 'rechazada',
+    ];
+    if (isset($aliases[$l])) {
+        return $aliases[$l];
+    }
+    foreach (solicitud_codigos_estado_validos() as $c) {
+        $lc = function_exists('mb_strtolower') ? mb_strtolower($c, 'UTF-8') : strtolower($c);
+        if ($l === $lc) {
+            return $c;
+        }
+    }
+
+    return in_array($l, solicitud_codigos_estado_validos(), true) ? $l : 'pendiente';
+}
+
 function estado_academico_estudiante_nombre(?string $cod): string
 {
     $cod = strtoupper(trim((string) $cod));

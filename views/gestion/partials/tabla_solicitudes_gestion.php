@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 $emptyHint = $emptyHint ?? 'No hay solicitudes con los filtros indicados.';
+$gestionRepoblar = $gestionRepoblar ?? null;
 ?>
   <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -89,9 +90,36 @@ $emptyHint = $emptyHint ?? 'No hay solicitudes con los filtros indicados.';
               </details>
               <?php
                 $Er = is_array($s['respuesta_elaborada'] ?? null) ? $s['respuesta_elaborada'] : [];
-                $elabOpen = $Er !== [];
                 $respCerrada = solicitud_tiene_respuesta_cerrada($s);
                 $momResp = solicitud_texto_momento_respuesta($s);
+
+                $estForm = (string) ($s['estado'] ?? '');
+                $respForm = (string) ($s['respuesta'] ?? '');
+                $chkIncluirElab = $Er !== [];
+                $rep = null;
+                if (
+                    !$respCerrada
+                    && is_array($gestionRepoblar)
+                    && (int) ($gestionRepoblar['id_solicitud'] ?? 0) === $idSol
+                ) {
+                    $rep = $gestionRepoblar;
+                }
+                if ($rep !== null) {
+                    $estForm = (string) ($rep['estado'] ?? '');
+                    $respForm = (string) ($rep['respuesta'] ?? '');
+                    $chkIncluirElab = !empty($rep['incluir_elaborada']);
+                    foreach (($rep['elab'] ?? []) as $ek => $ev) {
+                        $Er[$ek] = $ev;
+                    }
+                }
+                $elabTieneTexto = false;
+                foreach ($Er as $ev) {
+                    if (is_string($ev) && trim($ev) !== '') {
+                        $elabTieneTexto = true;
+                        break;
+                    }
+                }
+                $elabOpen = $chkIncluirElab || $elabTieneTexto;
               ?>
               <?php if ($respCerrada): ?>
               <div class="space-y-2 rounded border border-gray-200 bg-gray-100/80 p-2 text-xs text-gray-800">
@@ -119,13 +147,13 @@ $emptyHint = $emptyHint ?? 'No hay solicitudes con los filtros indicados.';
                 <input type="hidden" name="id_solicitud" value="<?= $idSol ?>">
                 <select name="estado" class="block w-full rounded border border-gray-300 px-2 py-1 text-xs">
                   <?php foreach (diccionario_estados_solicitud() as $opt): ?>
-                    <option value="<?= h($opt['codigo']) ?>" <?= ((string) ($s['estado'] ?? '') === $opt['codigo']) ? 'selected' : '' ?>><?= h($opt['nombre']) ?></option>
+                    <option value="<?= h($opt['codigo']) ?>" <?= ($estForm === $opt['codigo']) ? 'selected' : '' ?>><?= h($opt['nombre']) ?></option>
                   <?php endforeach; ?>
                 </select>
                 <label class="block text-[10px] font-medium text-gray-600">Respuesta breve al radicante</label>
-                <textarea name="respuesta" rows="2" class="block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Texto corto (vista rápida en el panel del usuario)"><?= h((string) ($s['respuesta'] ?? '')) ?></textarea>
+                <textarea name="respuesta" rows="2" class="block w-full rounded border border-gray-300 px-2 py-1 text-xs" placeholder="Texto corto (vista rápida en el panel del usuario)"><?= h($respForm) ?></textarea>
                 <label class="flex cursor-pointer items-start gap-2 text-[11px] text-gray-700">
-                  <input type="checkbox" name="incluir_elaborada" value="1" class="mt-0.5 rounded border-gray-300" <?= $elabOpen ? ' checked' : '' ?>>
+                  <input type="checkbox" name="incluir_elaborada" value="1" class="mt-0.5 rounded border-gray-300" <?= $chkIncluirElab ? ' checked' : '' ?>>
                   <span>Guardar también <strong>resolución formal</strong> (bloque ampliado abajo). Si no marca la casilla, no se actualiza la resolución guardada.</span>
                 </label>
                 <p class="rounded bg-amber-50/90 px-2 py-1 text-[10px] text-amber-950">La primera vez que envíe <strong>respuesta breve</strong> o marque y guarde la <strong>resolución formal</strong>, la solicitud quedará <strong>cerrada</strong> (sin nuevas ediciones) y se registrará la fecha y hora exactas.</p>

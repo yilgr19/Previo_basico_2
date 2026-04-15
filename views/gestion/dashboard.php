@@ -1,7 +1,13 @@
 <?php
 $adminNombre = $adminNombre ?? 'Administrador';
-$nSolicitudes = (int) ($nSolicitudes ?? 0);
-$nSolicitudesPendienteORevision = (int) ($nSolicitudesPendienteORevision ?? 0);
+$conteosSolicitudesPorSede = $conteosSolicitudesPorSede ?? [
+    1 => ['total' => 0, 'pendiente_revision' => 0],
+    2 => ['total' => 0, 'pendiente_revision' => 0],
+];
+$nCucutaTotal = (int) ($conteosSolicitudesPorSede[1]['total'] ?? 0);
+$nOcanaTotal = (int) ($conteosSolicitudesPorSede[2]['total'] ?? 0);
+$nCucutaPendRev = (int) ($conteosSolicitudesPorSede[1]['pendiente_revision'] ?? 0);
+$nOcanaPendRev = (int) ($conteosSolicitudesPorSede[2]['pendiente_revision'] ?? 0);
 $parts = preg_split('/\s+/', $adminNombre, -1, PREG_SPLIT_NO_EMPTY);
 $primer = $parts[0] ?? $adminNombre;
 $ini = '';
@@ -43,7 +49,11 @@ if (count($parts) >= 2) {
               </a>
               <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                Solo en revisión
+                En revisión Cúcuta
+              </a>
+              <a href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-2.5 text-sm font-semibold text-amber-950 shadow-sm transition hover:bg-amber-100">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                En revisión Ocaña
               </a>
               <a href="<?= h(url('gestion/estudiantes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
                 <svg class="h-4 w-4 text-academic" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
@@ -57,22 +67,41 @@ if (count($parts) >= 2) {
           </div>
         </div>
 
-        <div class="grid w-full max-w-md grid-cols-2 gap-3 sm:gap-4 lg:w-[min(100%,24rem)] lg:shrink-0">
-          <div class="rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm sm:px-4">
+        <div class="grid w-full max-w-2xl grid-cols-2 gap-3 sm:gap-4 lg:w-[min(100%,42rem)] lg:shrink-0">
+          <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
             </div>
-            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900"><?= $nSolicitudes ?></p>
+            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900 group-hover:text-academic"><?= $nCucutaTotal ?></p>
             <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-violet-900/90">Total solicitudes</p>
-          </div>
-          <div class="rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm sm:px-4">
+            <p class="mt-0.5 text-[10px] font-medium leading-tight text-violet-800/80">Sede Cúcuta</p>
+          </a>
+          <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
+            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900 group-hover:text-academic"><?= $nOcanaTotal ?></p>
+            <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-violet-900/90">Total solicitudes</p>
+            <p class="mt-0.5 text-[10px] font-medium leading-tight text-violet-800/80">Sede Ocaña</p>
+          </a>
+          <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-amber-600 shadow-sm ring-1 ring-amber-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
-            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900"><?= $nSolicitudesPendienteORevision ?></p>
+            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900 group-hover:text-amber-800"><?= $nCucutaPendRev ?></p>
             <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-amber-900/90">Pendientes / en revisión</p>
             <p class="mt-0.5 text-[10px] leading-tight text-amber-800/75">Por atender o en análisis</p>
-          </div>
+            <p class="mt-1 text-[10px] font-medium text-amber-900/80">Sede Cúcuta</p>
+          </a>
+          <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
+            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-amber-600 shadow-sm ring-1 ring-amber-100">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <p class="mt-3 text-3xl font-bold tabular-nums text-slate-900 group-hover:text-amber-800"><?= $nOcanaPendRev ?></p>
+            <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-amber-900/90">Pendientes / en revisión</p>
+            <p class="mt-0.5 text-[10px] leading-tight text-amber-800/75">Por atender o en análisis</p>
+            <p class="mt-1 text-[10px] font-medium text-amber-900/80">Sede Ocaña</p>
+          </a>
         </div>
       </div>
     </div>
@@ -135,8 +164,15 @@ if (count($parts) >= 2) {
       <div class="mb-2 flex justify-center text-amber-600 transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
       </div>
-      <strong class="block text-gray-900">Solo en revisión</strong>
-      <span class="mt-1 block text-xs text-gray-600">Diligenciar trámites en análisis</span>
+      <strong class="block text-gray-900">En revisión — Cúcuta</strong>
+      <span class="mt-1 block text-xs text-gray-600">Solo estado «En revisión», sede Cúcuta</span>
+    </a>
+    <a href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-amber-700 transition group-hover:scale-105">
+        <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <strong class="block text-gray-900">En revisión — Ocaña</strong>
+      <span class="mt-1 block text-xs text-gray-600">Solo estado «En revisión», sede Ocaña</span>
     </a>
     <a href="<?= h(url('gestion/reportes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-violet-600 transition group-hover:scale-105">

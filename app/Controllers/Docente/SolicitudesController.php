@@ -48,6 +48,11 @@ final class SolicitudesController extends Controller
             }
         }
 
+        $old = [];
+        if ($vista === 'nueva' && ($tipoMsg ?? '') === 'warning' && $_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud_docente') {
+            $old = solicitud_docente_old_desde_post();
+        }
+
         if ($vista === 'nueva') {
             $this->render('docente/solicitud_nueva.php', [
                 'pageTitle' => 'Nueva solicitud',
@@ -55,6 +60,7 @@ final class SolicitudesController extends Controller
                 'doc' => $doc,
                 'mensaje' => $mensaje,
                 'tipoMsg' => $tipoMsg,
+                'old' => $old,
             ]);
 
             return;
