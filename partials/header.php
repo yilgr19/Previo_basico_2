@@ -70,6 +70,7 @@ if ($u && (string) ($u['rol'] ?? '') === ROLE_ESTUDIANTE) {
       <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Gestión</span>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('gestion/dashboard.php')) ?>">Panel</a>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('gestion/solicitudes.php')) ?>">Bandeja de solicitudes</a>
+      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('gestion/solicitudes_revision.php')) ?>">En revisión</a>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('gestion/reportes.php')) ?>">Reportes</a>
     </div>
     <?php endif; ?>

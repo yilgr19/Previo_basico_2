@@ -37,6 +37,10 @@ if (count($parts) >= 2) {
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 Bandeja de solicitudes
               </a>
+              <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Solo en revisión
+              </a>
               <a href="<?= h(url('gestion/estudiantes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
                 <svg class="h-4 w-4 text-academic" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
                 Estudiantes
@@ -108,13 +112,20 @@ if (count($parts) >= 2) {
   </div>
 
   <h2 class="mb-4 text-lg font-semibold tracking-tight text-slate-800">Accesos rápidos</h2>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
     <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-academic/25 bg-gradient-to-b from-blue-50/90 to-white p-6 text-center shadow-sm ring-1 ring-academic/10 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
       <strong class="block text-gray-900">Bandeja de solicitudes</strong>
       <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder trámites</span>
+    </a>
+    <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-amber-600 transition group-hover:scale-105">
+        <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <strong class="block text-gray-900">Solo en revisión</strong>
+      <span class="mt-1 block text-xs text-gray-600">Diligenciar trámites en análisis</span>
     </a>
     <a href="<?= h(url('gestion/reportes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-violet-600 transition group-hover:scale-105">

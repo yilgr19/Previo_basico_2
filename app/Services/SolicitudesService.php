@@ -300,7 +300,8 @@ final class SolicitudesService
     }
 
     /**
-     * @param array{fecha_desde?: string, fecha_hasta?: string, estado?: string, aprobacion?: string, buscar?: string} $f
+     * @param array{fecha_desde?: string, fecha_hasta?: string, estado?: string, aprobacion?: string, buscar?: string, radicante?: string} $f
+     * radicante: ''|'todos' — todas; 'estudiantes' — id_estudiante > 0; 'docentes' — radicadas por docente (id_docente_solicitante > 0 e id_estudiante == 0).
      * @return list<array{solicitud: array, estudiante: ?array, docente_solicitante: ?array}>
      */
     public static function listadoParaAdmin(array $f): array
@@ -309,6 +310,10 @@ final class SolicitudesService
         $fh = trim((string) ($f['fecha_hasta'] ?? ''));
         $est = trim((string) ($f['estado'] ?? ''));
         $aprob = trim((string) ($f['aprobacion'] ?? ''));
+        $rad = trim((string) ($f['radicante'] ?? ''));
+        if ($rad !== 'estudiantes' && $rad !== 'docentes') {
+            $rad = '';
+        }
         $bus = trim((string) ($f['buscar'] ?? ''));
         $busNorm = preg_replace('/\s+/', '', $bus);
 
@@ -338,6 +343,12 @@ final class SolicitudesService
 
             $idEst = (int) ($s['id_estudiante'] ?? 0);
             $idDocSol = (int) ($s['id_docente_solicitante'] ?? 0);
+            if ($rad === 'estudiantes' && $idEst <= 0) {
+                continue;
+            }
+            if ($rad === 'docentes' && ($idDocSol <= 0 || $idEst > 0)) {
+                continue;
+            }
             $estudiante = $idEst > 0 ? repo_estudiante_por_id($idEst) : null;
             $docSol = $idDocSol > 0 ? repo_docente_por_id($idDocSol) : null;
 
@@ -371,6 +382,18 @@ final class SolicitudesService
         }
 
         usort($out, static function ($a, $b) {
+            $fa = (string) ($a['solicitud']['fecha_registro'] ?? '');
+            $fb = (string) ($b['solicitud']['fecha_registro'] ?? '');
+            if ($fa === '') {
+                $fa = '0000-00-00';
+            }
+            if ($fb === '') {
+                $fb = '0000-00-00';
+            }
+            $cmp = strcmp($fb, $fa);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
             $ia = (int) ($a['solicitud']['id_solicitud'] ?? 0);
             $ib = (int) ($b['solicitud']['id_solicitud'] ?? 0);
 

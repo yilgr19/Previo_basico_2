@@ -6,7 +6,7 @@ namespace App\Controllers\Gestion;
 use App\Controllers\Controller;
 use App\Services\SolicitudesService;
 
-final class SolicitudesController extends Controller
+final class SolicitudesRevisionController extends Controller
 {
     public function run(): void
     {
@@ -24,8 +24,6 @@ final class SolicitudesController extends Controller
 
         $filtroFechaDesde = get('fecha_desde', '');
         $filtroFechaHasta = get('fecha_hasta', '');
-        $filtroEstado = get('estado', '');
-        $filtroAprob = get('aprobacion', '');
         $filtroRadicante = get('radicante', '');
         if ($filtroRadicante !== 'estudiantes' && $filtroRadicante !== 'docentes') {
             $filtroRadicante = '';
@@ -35,21 +33,19 @@ final class SolicitudesController extends Controller
         $items = SolicitudesService::listadoParaAdmin([
             'fecha_desde' => $filtroFechaDesde,
             'fecha_hasta' => $filtroFechaHasta,
-            'estado' => $filtroEstado,
-            'aprobacion' => $filtroAprob,
+            'estado' => 'en_revision',
+            'aprobacion' => '',
             'radicante' => $filtroRadicante,
             'buscar' => $buscarDoc,
         ]);
 
-        $this->render('gestion/solicitudes.php', [
-            'pageTitle' => 'Solicitudes estudiantiles',
+        $this->render('gestion/solicitudes_revision.php', [
+            'pageTitle' => 'Solicitudes en revisión',
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'items' => $items,
             'filtroFechaDesde' => $filtroFechaDesde,
             'filtroFechaHasta' => $filtroFechaHasta,
-            'filtroEstado' => $filtroEstado,
-            'filtroAprob' => $filtroAprob,
             'filtroRadicante' => $filtroRadicante,
             'buscarDoc' => $buscarDoc,
         ]);
