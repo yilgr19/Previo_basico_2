@@ -8,6 +8,8 @@ use App\Services\SolicitudesService;
 
 final class SolicitudesController extends Controller
 {
+    private const FLASH_KEY = '_flash_est_sol';
+
     public function run(): void
     {
         require_role(\ROLE_ESTUDIANTE);
@@ -17,14 +19,45 @@ final class SolicitudesController extends Controller
             redirect('/login.php');
         }
 
+        $vista = $this->vistaDesdeScript();
+
         $mensaje = '';
         $tipoMsg = 'success';
 
+        if ($vista === 'lista') {
+            $flash = $_SESSION[self::FLASH_KEY] ?? null;
+            if (is_array($flash)) {
+                unset($_SESSION[self::FLASH_KEY]);
+                $mensaje = (string) ($flash['mensaje'] ?? '');
+                $tipoMsg = (string) ($flash['tipoMsg'] ?? 'success');
+            }
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud') {
+            if ($vista !== 'nueva') {
+                redirect(url('estudiante/nueva_solicitud.php'));
+            }
             [$mensaje, $tipoMsg] = SolicitudesService::registrarDesdeEstudiante($idEst);
+            if ($tipoMsg === 'success') {
+                $_SESSION[self::FLASH_KEY] = ['mensaje' => $mensaje, 'tipoMsg' => $tipoMsg];
+                redirect(url('estudiante/mis_solicitudes.php'));
+            }
         }
 
         $yo = repo_estudiante_por_id($idEst);
+
+        if ($vista === 'nueva') {
+            $this->render('estudiante/solicitud_nueva.php', [
+                'pageTitle' => 'Nueva solicitud',
+                'solNavActiva' => 'nueva',
+                'yo' => $yo,
+                'mensaje' => $mensaje,
+                'tipoMsg' => $tipoMsg,
+            ]);
+
+            return;
+        }
+
         $todas = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));
         $todas = array_map(static fn ($s) => SolicitudesService::normalizarParaVista($s), $todas);
 
@@ -60,9 +93,9 @@ final class SolicitudesController extends Controller
             $listaTab = $solicitudesActivas;
         }
 
-        $this->render('estudiante/solicitudes.php', [
+        $this->render('estudiante/mis_solicitudes.php', [
             'pageTitle' => 'Mis solicitudes',
-            'yo' => $yo,
+            'solNavActiva' => 'lista',
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'tab' => $tab,
@@ -74,5 +107,12 @@ final class SolicitudesController extends Controller
                 'rechazadas' => count($solicitudesRechazadas),
             ],
         ]);
+    }
+
+    private function vistaDesdeScript(): string
+    {
+        $b = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+
+        return $b === 'nueva_solicitud.php' ? 'nueva' : 'lista';
     }
 }

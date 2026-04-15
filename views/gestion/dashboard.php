@@ -40,13 +40,20 @@
   </div>
 
   <h2 class="mb-4 text-lg font-semibold text-gray-800">Accesos</h2>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border-2 border-academic/30 bg-blue-50/80 p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
-      <strong class="block text-gray-900">Solicitudes estudiantiles</strong>
-      <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder trámites</span>
+      <strong class="block text-gray-900">Bandeja de solicitudes</strong>
+      <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder todos los trámites</span>
+    </a>
+    <a href="<?= h(url('gestion/reportes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-violet-600">
+        <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      </div>
+      <strong class="block text-gray-900">Reportes</strong>
+      <span class="mt-1 block text-xs text-gray-600">Vista consolidada y enlaces a fichas</span>
     </a>
     <a href="<?= h(url('gestion/estudiantes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-blue-600">

@@ -8,6 +8,8 @@ use App\Services\SolicitudesService;
 
 final class SolicitudesController extends Controller
 {
+    private const FLASH_KEY = '_flash_doc_sol';
+
     public function run(): void
     {
         require_role(\ROLE_DOCENTE);
@@ -21,11 +23,41 @@ final class SolicitudesController extends Controller
             redirect('/login.php');
         }
 
+        $vista = $this->vistaDesdeScript();
+
         $mensaje = '';
         $tipoMsg = 'success';
 
+        if ($vista === 'lista') {
+            $flash = $_SESSION[self::FLASH_KEY] ?? null;
+            if (is_array($flash)) {
+                unset($_SESSION[self::FLASH_KEY]);
+                $mensaje = (string) ($flash['mensaje'] ?? '');
+                $tipoMsg = (string) ($flash['tipoMsg'] ?? 'success');
+            }
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud_docente') {
+            if ($vista !== 'nueva') {
+                redirect(url('docente/nueva_solicitud.php'));
+            }
             [$mensaje, $tipoMsg] = SolicitudesService::registrarDesdeDocente($idDoc);
+            if ($tipoMsg === 'success') {
+                $_SESSION[self::FLASH_KEY] = ['mensaje' => $mensaje, 'tipoMsg' => $tipoMsg];
+                redirect(url('docente/mis_solicitudes.php'));
+            }
+        }
+
+        if ($vista === 'nueva') {
+            $this->render('docente/solicitud_nueva.php', [
+                'pageTitle' => 'Nueva solicitud',
+                'solNavActiva' => 'nueva',
+                'doc' => $doc,
+                'mensaje' => $mensaje,
+                'tipoMsg' => $tipoMsg,
+            ]);
+
+            return;
         }
 
         $todas = load_data('solicitudes');
@@ -71,9 +103,9 @@ final class SolicitudesController extends Controller
 
         $menciones = SolicitudesService::listadoMencionesAnonimasParaDocente($idDoc, (string) ($doc['documento'] ?? ''));
 
-        $this->render('docente/solicitudes.php', [
-            'pageTitle' => 'Solicitudes',
-            'doc' => $doc,
+        $this->render('docente/mis_solicitudes.php', [
+            'pageTitle' => 'Mis solicitudes',
+            'solNavActiva' => 'lista',
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'tab' => $tab,
@@ -86,5 +118,12 @@ final class SolicitudesController extends Controller
             ],
             'menciones' => $menciones,
         ]);
+    }
+
+    private function vistaDesdeScript(): string
+    {
+        $b = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+
+        return $b === 'nueva_solicitud.php' ? 'nueva' : 'lista';
     }
 }

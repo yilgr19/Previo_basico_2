@@ -7,14 +7,14 @@
 
   <h2 class="mb-4 text-lg font-semibold text-gray-800">Accesos</h2>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <a href="<?= h(url('estudiante/solicitudes.php#nueva-solicitud')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('estudiante/nueva_solicitud.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </div>
       <strong class="block text-center text-gray-900">Nueva solicitud</strong>
       <span class="mt-1 block text-center text-xs text-gray-500">Radicar un trámite con el formulario completo</span>
     </a>
-    <a href="<?= h(url('estudiante/solicitudes.php?tab=activas#mis-solicitudes')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('estudiante/mis_solicitudes.php?tab=activas')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
