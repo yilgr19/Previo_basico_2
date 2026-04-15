@@ -37,17 +37,53 @@ final class SolicitudesController extends Controller
         }
         usort($propias, static fn ($a, $b) => ((int) ($b['id_solicitud'] ?? 0)) <=> ((int) ($a['id_solicitud'] ?? 0)));
 
-        $materiasDocente = repo_materias_ordenadas_por_codigo(repo_materias_por_docente($idDoc));
+        $solicitudesActivas = [];
+        $solicitudesEnRevision = [];
+        $solicitudesAprobadas = [];
+        $solicitudesRechazadas = [];
+        foreach ($propias as $s) {
+            $st = (string) ($s['estado'] ?? '');
+            if ($st === 'aprobada') {
+                $solicitudesAprobadas[] = $s;
+            } elseif ($st === 'rechazada') {
+                $solicitudesRechazadas[] = $s;
+            } elseif ($st === 'en_revision') {
+                $solicitudesEnRevision[] = $s;
+            } else {
+                $solicitudesActivas[] = $s;
+            }
+        }
+
+        $tab = trim((string) get('tab', 'activas'));
+        $tabsValidos = ['activas', 'en_revision', 'aprobadas', 'rechazadas'];
+        if (!in_array($tab, $tabsValidos, true)) {
+            $tab = 'activas';
+        }
+        if ($tab === 'en_revision') {
+            $listaTab = $solicitudesEnRevision;
+        } elseif ($tab === 'aprobadas') {
+            $listaTab = $solicitudesAprobadas;
+        } elseif ($tab === 'rechazadas') {
+            $listaTab = $solicitudesRechazadas;
+        } else {
+            $listaTab = $solicitudesActivas;
+        }
 
         $menciones = SolicitudesService::listadoMencionesAnonimasParaDocente($idDoc, (string) ($doc['documento'] ?? ''));
 
         $this->render('docente/solicitudes.php', [
             'pageTitle' => 'Solicitudes',
             'doc' => $doc,
-            'materiasDocente' => $materiasDocente,
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
-            'propias' => $propias,
+            'tab' => $tab,
+            'listaTab' => $listaTab,
+            'conteosSolicitudes' => [
+                'activas' => count($solicitudesActivas),
+                'en_revision' => count($solicitudesEnRevision),
+                'aprobadas' => count($solicitudesAprobadas),
+                'rechazadas' => count($solicitudesRechazadas),
+            ],
             'menciones' => $menciones,
         ]);
     }

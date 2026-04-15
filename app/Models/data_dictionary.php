@@ -237,24 +237,17 @@ function solicitud_codigos_estado_validos(): array
     return array_column(diccionario_estados_solicitud(), 'codigo');
 }
 
-/** Estados académicos para perfil / solicitud (solo lectura desde datos del estudiante). */
-function diccionario_estados_academicos_estudiante(): array
-{
-    return [
-        ['codigo' => 'PAI', 'nombre' => 'PAI (Programa de Acompañamiento)'],
-        ['codigo' => 'REGULAR', 'nombre' => 'Regular'],
-        ['codigo' => 'PRUEBA', 'nombre' => 'Prueba académica'],
-        ['codigo' => 'EGRESADO', 'nombre' => 'Egresado'],
-    ];
-}
-
 function estado_academico_estudiante_nombre(?string $cod): string
 {
     $cod = strtoupper(trim((string) $cod));
-    foreach (diccionario_estados_academicos_estudiante() as $e) {
-        if (($e['codigo'] ?? '') === $cod) {
-            return (string) $e['nombre'];
-        }
+    $map = [
+        'PAI' => 'PAI (Programa de Acompañamiento)',
+        'REGULAR' => 'Regular',
+        'PRUEBA' => 'Prueba académica',
+        'EGRESADO' => 'Egresado',
+    ];
+    if ($cod !== '' && isset($map[$cod])) {
+        return $map[$cod];
     }
     return $cod !== '' ? $cod : '—';
 }
@@ -283,23 +276,28 @@ function motivo_solicitud_estudiante_nombre(?string $cod): string
 }
 
 /**
- * Catálogo de solicitudes radicadas por docentes (distinto del catálogo estudiantil).
+ * Catálogo de solicitudes docente (académico, laboral e investigativo; distinto del estudiantil).
  *
  * @return array<int, array{id: int, codigo: string, nombre: string}>
  */
 function diccionario_tipos_solicitud_docente(): array
 {
     return [
-        ['id' => 1, 'codigo' => 'DOC_LIC', 'nombre' => 'Licencia o permiso'],
-        ['id' => 2, 'codigo' => 'DOC_RECT_NOT', 'nombre' => 'Rectificación de notas'],
-        ['id' => 3, 'codigo' => 'DOC_DESC_HOR', 'nombre' => 'Descarga horaria'],
-        ['id' => 4, 'codigo' => 'DOC_COMISION', 'nombre' => 'Comisión académica o científica'],
-        ['id' => 5, 'codigo' => 'DOC_RECURSOS', 'nombre' => 'Recursos, equipos o espacios'],
-        ['id' => 6, 'codigo' => 'DOC_REPOS', 'nombre' => 'Reposición de clases / cobertura'],
-        ['id' => 7, 'codigo' => 'DOC_ACT_DAT', 'nombre' => 'Actualización de datos laborales'],
-        ['id' => 8, 'codigo' => 'DOC_ANO_SAB', 'nombre' => 'Año sabático / comisión extendida'],
-        ['id' => 9, 'codigo' => 'DOC_CAPAC', 'nombre' => 'Autorización de capacitación / evento'],
-        ['id' => 10, 'codigo' => 'DOC_OTRA', 'nombre' => 'Otra'],
+        ['id' => 1, 'codigo' => 'DOC_RECT_ACTA', 'nombre' => 'Rectificación de Acta de Calificaciones'],
+        ['id' => 2, 'codigo' => 'DOC_PERM_LIC', 'nombre' => 'Permiso Remunerado / Licencia Corta'],
+        ['id' => 3, 'codigo' => 'DOC_COM_EST', 'nombre' => 'Comisión de Estudios o Servicios'],
+        ['id' => 4, 'codigo' => 'DOC_CERT_LAB', 'nombre' => 'Certificado Laboral y de Ingresos'],
+        ['id' => 5, 'codigo' => 'DOC_MOD_CARGA', 'nombre' => 'Modificación de Carga Académica'],
+        ['id' => 6, 'codigo' => 'DOC_DESC_INV', 'nombre' => 'Solicitud de Descarga por Investigación'],
+        ['id' => 7, 'codigo' => 'DOC_RES_ESP', 'nombre' => 'Reserva de Espacios de Aprendizaje'],
+        ['id' => 8, 'codigo' => 'DOC_MON_ASI', 'nombre' => 'Asignación de Monitor o Asistente'],
+        ['id' => 9, 'codigo' => 'DOC_REPROG_EVAL', 'nombre' => 'Reprogramación de Evaluaciones'],
+        ['id' => 10, 'codigo' => 'DOC_ANO_SAB', 'nombre' => 'Solicitud de Año Sabático'],
+        ['id' => 11, 'codigo' => 'DOC_NOV_NOM', 'nombre' => 'Reporte de Novedades de Nómina'],
+        ['id' => 12, 'codigo' => 'DOC_INS_EQUIP', 'nombre' => 'Solicitud de Insumos o Equipos'],
+        ['id' => 13, 'codigo' => 'DOC_ASC_ESC', 'nombre' => 'Postulación a Ascenso en Escalafón'],
+        ['id' => 14, 'codigo' => 'DOC_SAL_PED', 'nombre' => 'Solicitud de Salida Pedagógica'],
+        ['id' => 15, 'codigo' => 'DOC_OTRA', 'nombre' => 'Otra / Petición General'],
     ];
 }
 
@@ -379,12 +377,6 @@ function tipo_contrato_docente_nombre(?string $cod): string
         }
     }
     return $cod !== '' ? $cod : '—';
-}
-
-/** Tipos estudiantiles que exigen indicar asignaturas de la malla. */
-function solicitud_tipos_estudiante_requieren_materias(): array
-{
-    return [1, 2, 3];
 }
 
 function solicitud_es_radicada_docente(array $s): bool

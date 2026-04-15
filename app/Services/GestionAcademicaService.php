@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 /**
- * Lógica de alta/edición de registros académicos (estudiantes, docentes, asignaturas).
+ * Lógica de alta/edición de registros académicos (estudiantes y docentes).
  */
 final class GestionAcademicaService
 {
@@ -168,91 +168,6 @@ final class GestionAcademicaService
         $docentes[] = $row;
         save_data('docentes', $docentes);
         return ['Docente registrado.' . ($clavePost === '' ? ' Contraseña por defecto: doc123.' : ''), 'success'];
-    }
-
-    /** @return array{0: string, 1: string} */
-    public static function agregarMateria(): array
-    {
-        $diasOk = array_keys(materia_dias_clase_opciones());
-        $diaClase = post('dia_clase', '');
-        if (!in_array($diaClase, $diasOk, true)) {
-            $diaClase = '';
-        }
-        $idProg = (int) post('id_programa', '0');
-        $idDoc = (int) post('id_docente', '0');
-        $modalidad = post('modalidad', '');
-        if (!in_array($modalidad, ['presencial', 'virtual'], true)) {
-            $modalidad = '';
-        }
-        $salon = trim((string) post('salon', ''));
-        if ($modalidad === 'virtual') {
-            $salon = '';
-        }
-        $horaIni = trim((string) post('hora_inicio', ''));
-        $horaFin = trim((string) post('hora_fin', ''));
-        $row = [
-            'codigo' => post('codigo', ''),
-            'nombre' => post('nombre', ''),
-            'creditos' => (int) post('creditos', '0'),
-            'semestre' => (int) post('semestre', '1'),
-            'id_programa' => $idProg,
-            'dia_clase' => $diaClase,
-            'hora_inicio' => $horaIni,
-            'hora_fin' => $horaFin,
-            'id_docente' => $idDoc,
-            'modalidad' => $modalidad,
-            'salon' => $salon,
-        ];
-        if ($idProg <= 0) {
-            return ['Seleccione la carrera o programa al que pertenece la asignatura.', 'warning'];
-        }
-        if ($diaClase === '') {
-            return ['Seleccione el día de clase.', 'warning'];
-        }
-        if ($modalidad === '') {
-            return ['Seleccione la modalidad de la clase (virtual o presencial).', 'warning'];
-        }
-        if ($idDoc <= 0) {
-            return ['Busque al docente por número de documento y valide antes de guardar.', 'warning'];
-        }
-        if ($horaIni === '' || $horaFin === '') {
-            return ['Indique hora de inicio y hora de fin de la clase.', 'warning'];
-        }
-        if ($modalidad === 'presencial' && $salon === '') {
-            return ['En modalidad presencial debe indicar el salón o aula.', 'warning'];
-        }
-        $docAsig = repo_docente_por_id($idDoc);
-        if (!$docAsig) {
-            return ['Docente no encontrado. Busque de nuevo por documento.', 'warning'];
-        }
-        if ((int) ($docAsig['id_programa'] ?? 0) !== $idProg) {
-            return ['El docente debe estar registrado para la misma carrera (programa) que esta asignatura.', 'warning'];
-        }
-        if (docente_sede_efectiva($docAsig) !== programa_id_sede($idProg)) {
-            return ['La sede del docente no coincide con la carrera de la asignatura.', 'warning'];
-        }
-        $editId = (int) post('id_materia', '0');
-        $materias = load_data('materias');
-        $mensaje = '';
-        if ($editId > 0) {
-            foreach ($materias as &$m) {
-                if ((int) ($m['id_materia'] ?? 0) === $editId) {
-                    $m = array_merge($m, $row);
-                    $mensaje = 'Asignatura actualizada.';
-                    break;
-                }
-            }
-            unset($m);
-            if ($mensaje === '') {
-                return ['Asignatura no encontrada.', 'warning'];
-            }
-        } else {
-            $row['id_materia'] = next_numeric_id($materias, 'id_materia');
-            $materias[] = $row;
-            $mensaje = 'Asignatura creada.';
-        }
-        save_data('materias', $materias);
-        return [$mensaje, 'success'];
     }
 
     /**

@@ -82,7 +82,6 @@ Parcial2DeBa/
 | `administradores.json` | Cuentas de acceso (correo + clave) y nombre. |
 | `docentes.json` | Docentes (login con documento/correo + datos de listados). |
 | `estudiantes.json` | Estudiantes (login + datos de formularios y reportes). |
-| `materias.json` | Asignaturas (altas/edición/bajas vía `gestion/materias.php`). |
 | `solicitudes.json` | Solicitudes radicadas por estudiantes o docentes (trámites y estados). |
 
 ---
@@ -104,14 +103,14 @@ Parcial2DeBa/
 | `logout.php` | `LogoutController` | Cierra sesión. |
 | `gestion/dashboard.php` | `Gestion\DashboardController` | `views/gestion/dashboard.php` (accesos + carrusel). |
 | `gestion/reportes.php` | `Gestion\ReportesController` | `views/gestion/reportes.php` (listados). |
-| `gestion/estudiantes.php`, `docentes.php`, `materias.php`, `solicitudes.php` | `Gestion\*` | Formularios y listados en `views/gestion/`. |
+| `gestion/estudiantes.php`, `docentes.php`, `solicitudes.php` | `Gestion\*` | Formularios y listados en `views/gestion/`. |
 
 ---
 
 ## Front-end
 
 - **CSS:** `assets/css/main.css`.
-- **JS:** `panel-carrusel.js` (carrusel del inicio del panel), `estudiantes-form.js`, `docentes-form.js`, `materias-form.js` (ayudas en formularios). El login se valida solo en servidor.
+- **JS:** `panel-carrusel.js` (carrusel del inicio del panel), `docentes-form.js` (ayudas en formularios de docentes). El login se valida solo en servidor.
 
 ---
 

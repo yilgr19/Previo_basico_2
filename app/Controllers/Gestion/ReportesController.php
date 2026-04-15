@@ -16,8 +16,6 @@ final class ReportesController extends Controller
 
         $estudiantes = load_data('estudiantes');
         $docentes = load_data('docentes');
-        $materias = load_data('materias');
-        $materiasOrdenadas = repo_materias_ordenadas_por_codigo($materias);
 
         $this->render('gestion/reportes.php', [
             'pageTitle' => 'Reportes',
@@ -25,7 +23,6 @@ final class ReportesController extends Controller
             'tipoMsg' => $tipoMsg,
             'estudiantes' => $estudiantes,
             'docentes' => $docentes,
-            'materiasOrdenadas' => $materiasOrdenadas,
         ]);
     }
 }

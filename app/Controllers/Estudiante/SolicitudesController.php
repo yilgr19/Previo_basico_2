@@ -28,31 +28,51 @@ final class SolicitudesController extends Controller
         $todas = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));
         $todas = array_map(static fn ($s) => SolicitudesService::normalizarParaVista($s), $todas);
 
-        $activas = [];
-        $aprobadas = [];
-        $rechazadasOtras = [];
+        $solicitudesActivas = [];
+        $solicitudesEnRevision = [];
+        $solicitudesAprobadas = [];
+        $solicitudesRechazadas = [];
         foreach ($todas as $s) {
             $st = (string) ($s['estado'] ?? '');
             if ($st === 'aprobada') {
-                $aprobadas[] = $s;
+                $solicitudesAprobadas[] = $s;
             } elseif ($st === 'rechazada') {
-                $rechazadasOtras[] = $s;
+                $solicitudesRechazadas[] = $s;
+            } elseif ($st === 'en_revision') {
+                $solicitudesEnRevision[] = $s;
             } else {
-                $activas[] = $s;
+                $solicitudesActivas[] = $s;
             }
         }
 
-        $materiasPrograma = repo_materias_por_programa((int) ($yo['id_programa'] ?? 0));
+        $tab = trim((string) get('tab', 'activas'));
+        $tabsValidos = ['activas', 'en_revision', 'aprobadas', 'rechazadas'];
+        if (!in_array($tab, $tabsValidos, true)) {
+            $tab = 'activas';
+        }
+        if ($tab === 'en_revision') {
+            $listaTab = $solicitudesEnRevision;
+        } elseif ($tab === 'aprobadas') {
+            $listaTab = $solicitudesAprobadas;
+        } elseif ($tab === 'rechazadas') {
+            $listaTab = $solicitudesRechazadas;
+        } else {
+            $listaTab = $solicitudesActivas;
+        }
 
         $this->render('estudiante/solicitudes.php', [
             'pageTitle' => 'Mis solicitudes',
             'yo' => $yo,
-            'materiasPrograma' => $materiasPrograma,
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
-            'activas' => $activas,
-            'aprobadas' => $aprobadas,
-            'rechazadasOtras' => $rechazadasOtras,
+            'tab' => $tab,
+            'listaTab' => $listaTab,
+            'conteosSolicitudes' => [
+                'activas' => count($solicitudesActivas),
+                'en_revision' => count($solicitudesEnRevision),
+                'aprobadas' => count($solicitudesAprobadas),
+                'rechazadas' => count($solicitudesRechazadas),
+            ],
         ]);
     }
 }

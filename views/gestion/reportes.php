@@ -12,7 +12,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     <h1 class="text-xl font-semibold text-academic">Reportes y gestión de registros</h1>
     <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
   </div>
-  <p class="mb-6 text-sm text-gray-600">Consulte lo registrado. Para <strong>crear o editar</strong> estudiantes, docentes o asignaturas use las tarjetas del panel principal.</p>
+  <p class="mb-6 text-sm text-gray-600">Consulte lo registrado. Para <strong>crear o editar</strong> estudiantes o docentes use las tarjetas del panel principal.</p>
   <?php if (!empty($mensaje)): ?>
     <div class="mb-6 rounded-lg border px-4 py-3 text-sm <?= h($alertMsg) ?>"><?= h($mensaje) ?></div>
   <?php endif; ?>
@@ -118,40 +118,4 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     <?php endif; ?>
   </section>
 
-  <section class="mb-10">
-    <h2 class="mb-3 border-b border-blue-100 pb-2 text-lg font-semibold text-academic">Asignaturas</h2>
-    <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-gray-50"><tr>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">ID</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Código</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Nombre</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Carrera</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Horario</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Modalidad</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Salón</th>
-          <th class="px-2 py-3 text-left text-xs font-semibold text-gray-700">Docente</th>
-          <th class="px-2 py-3 text-right text-xs font-semibold text-gray-700"></th>
-        </tr></thead>
-        <tbody class="divide-y divide-gray-100">
-          <?php foreach ($materiasOrdenadas as $m): ?>
-            <tr class="hover:bg-gray-50/80">
-              <td class="px-2 py-2"><?= (int) $m['id_materia'] ?></td>
-              <td class="px-2 py-2"><?= h($m['codigo'] ?? '') ?></td>
-              <td class="max-w-[10rem] px-2 py-2"><?= h($m['nombre'] ?? '') ?></td>
-              <td class="max-w-xs px-2 py-2 text-xs"><?= h(materia_programa_label($m)) ?></td>
-              <td class="whitespace-nowrap px-2 py-2 text-xs"><?= h(materia_horario_resumen($m)) ?></td>
-              <td class="px-2 py-2"><?= h(materia_modalidad_etiqueta($m)) ?></td>
-              <td class="px-2 py-2"><?= h((string) ($m['modalidad'] ?? '') === 'presencial' ? ($m['salon'] ?? '') : '—') ?></td>
-              <td class="max-w-[8rem] px-2 py-2 text-xs"><?= h(docente_nombre((int) ($m['id_docente'] ?? 0))) ?></td>
-              <td class="px-2 py-2 text-right">
-                <a class="inline-flex rounded-lg border border-blue-600 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/materias.php?editar=' . (int) $m['id_materia'])) ?>">Editar</a>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-          <?php if (!$materiasOrdenadas): ?><tr><td colspan="9" class="px-3 py-6 text-center text-gray-500">Sin registros.</td></tr><?php endif; ?>
-        </tbody>
-      </table>
-    </div>
-  </section>
 </main>

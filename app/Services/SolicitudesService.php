@@ -53,22 +53,6 @@ final class SolicitudesService
         }
 
         $idProg = (int) ($est['id_programa'] ?? 0);
-        $materiasProg = repo_materias_por_programa($idProg);
-        $idsPermitidos = array_map(static fn ($m) => (int) ($m['id_materia'] ?? 0), $materiasProg);
-        $idsElegidas = [];
-        if (isset($_POST['ids_materias']) && is_array($_POST['ids_materias'])) {
-            foreach ($_POST['ids_materias'] as $idm) {
-                $idm = (int) $idm;
-                if ($idm > 0 && in_array($idm, $idsPermitidos, true)) {
-                    $idsElegidas[] = $idm;
-                }
-            }
-        }
-        $idsElegidas = array_values(array_unique($idsElegidas));
-
-        if (in_array($idTipo, solicitud_tipos_estudiante_requieren_materias(), true) && $idsElegidas === []) {
-            return ['Para este tipo de solicitud debe indicar al menos una asignatura de su malla.', 'warning'];
-        }
 
         if ($motivo === 'salud' && !SolicitudesAnexosUpload::hayArchivoSubidoOk('soporte_medico')) {
             return ['Si el motivo es salud, debe adjuntar soporte médico.', 'warning'];
@@ -96,10 +80,6 @@ final class SolicitudesService
 
         $estadoAcad = strtoupper(trim((string) ($est['estado_academico'] ?? 'REGULAR')));
         $sem = (int) ($est['semestre'] ?? 0);
-        $materiasEtiquetas = [];
-        foreach ($idsElegidas as $mid) {
-            $materiasEtiquetas[] = materia_nombre($mid);
-        }
 
         $detalleEst = [
             'perfil_snapshot' => [
@@ -121,8 +101,6 @@ final class SolicitudesService
                 'motivo' => $motivo,
                 'motivo_label' => motivo_solicitud_estudiante_nombre($motivo),
                 'exposicion' => $exposicion,
-                'ids_materias_afectadas' => $idsElegidas,
-                'materias_etiquetas' => $materiasEtiquetas,
             ],
             'consentimientos' => [
                 'veracidad' => true,

@@ -141,4 +141,3 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     </table>
   </div>
 </main>
-<script src="<?= h(asset_url('js/estudiantes-form.js')) ?>"></script>

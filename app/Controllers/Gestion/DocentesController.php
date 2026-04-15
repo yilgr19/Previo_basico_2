@@ -20,22 +20,9 @@ final class DocentesController extends Controller
             $accion = post('accion', '');
             if ($accion === 'eliminar') {
                 $id = (int) post('id_docente', '0');
-                $refs = load_data('materias');
-                $bloqueo = false;
-                foreach ($refs as $m) {
-                    if ((int) ($m['id_docente'] ?? 0) === $id) {
-                        $bloqueo = true;
-                        break;
-                    }
-                }
-                if ($bloqueo) {
-                    $mensaje = 'No se puede eliminar: hay asignaturas asignadas a este docente.';
-                    $tipoMsg = 'warning';
-                } else {
-                    $docentes = array_values(array_filter($docentes, static fn ($d) => (int) ($d['id_docente'] ?? 0) !== $id));
-                    save_data('docentes', $docentes);
-                    $mensaje = 'Docente eliminado.';
-                }
+                $docentes = array_values(array_filter($docentes, static fn ($d) => (int) ($d['id_docente'] ?? 0) !== $id));
+                save_data('docentes', $docentes);
+                $mensaje = 'Docente eliminado.';
             } elseif ($accion === 'guardar') {
                 [$mensaje, $tipoMsg] = GestionAcademicaService::agregarDocente();
             }

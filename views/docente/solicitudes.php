@@ -8,13 +8,16 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
     $alertClass = 'border-amber-200 bg-amber-50 text-amber-900';
 }
 $doc = $doc ?? [];
-$materiasDocente = $materiasDocente ?? [];
 $idEmp = trim((string) ($doc['codigo_empleado'] ?? ''));
 if ($idEmp === '') {
     $idEmp = (string) ($doc['documento'] ?? '');
 }
 $hoy = date('Y-m-d');
 $finMes = date('Y-m-d', strtotime('+30 days'));
+$tab = $tab ?? 'activas';
+$listaTab = $listaTab ?? [];
+$conteosSolicitudes = $conteosSolicitudes ?? ['activas' => 0, 'en_revision' => 0, 'aprobadas' => 0, 'rechazadas' => 0];
+$uSolic = h(url('docente/solicitudes.php'));
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -25,11 +28,16 @@ $finMes = date('Y-m-d', strtotime('+30 days'));
     <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('docente/dashboard.php')) ?>">Volver al panel</a>
   </div>
 
+  <nav class="mb-6 flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" aria-label="Secciones">
+    <a href="#nueva-solicitud" class="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Nueva solicitud</a>
+    <a href="#mis-solicitudes" class="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-academic hover:bg-blue-50">Mis solicitudes</a>
+  </nav>
+
   <?php if ($mensaje): ?>
     <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>
   <?php endif; ?>
 
-  <div class="mb-10 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+  <div id="nueva-solicitud" class="mb-10 scroll-mt-24 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
     <h2 class="mb-4 border-b border-blue-100 pb-2 text-base font-semibold text-academic">Nueva solicitud (docente)</h2>
     <form method="post" enctype="multipart/form-data" class="space-y-8">
       <input type="hidden" name="accion" value="nueva_solicitud_docente">
@@ -94,16 +102,11 @@ $finMes = date('Y-m-d', strtotime('+30 days'));
         <p class="mb-3 text-xs text-gray-600">Si impacta sus clases, detalle el grupo y el plan de contingencia.</p>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="<?= h($lbl) ?>">ID asignatura (NRC / código)</label>
-            <input type="text" name="nrc" class="<?= h($inp) ?>" list="lista-mats-doc" placeholder="Ej. NRC o código de grupo" autocomplete="off">
-            <datalist id="lista-mats-doc">
-              <?php foreach ($materiasDocente as $mat): ?>
-                <option value="<?= h((string) ($mat['codigo'] ?? '')) ?>"><?= h((string) ($mat['nombre'] ?? '')) ?></option>
-              <?php endforeach; ?>
-            </datalist>
+            <label class="<?= h($lbl) ?>">ID de grupo (NRC / código)</label>
+            <input type="text" name="nrc" class="<?= h($inp) ?>" placeholder="Ej. NRC o código de grupo" autocomplete="off">
           </div>
           <div>
-            <label class="<?= h($lbl) ?>">Nombre de la materia</label>
+            <label class="<?= h($lbl) ?>">Nombre de la asignatura</label>
             <input type="text" name="nombre_materia" class="<?= h($inp) ?>" placeholder="Para trazabilidad">
           </div>
           <div class="md:col-span-2">
@@ -175,39 +178,29 @@ $finMes = date('Y-m-d', strtotime('+30 days'));
     </form>
   </div>
 
-  <div class="mb-10 rounded-xl border border-indigo-100 bg-indigo-50/30 p-6 shadow-sm">
-    <h2 class="mb-2 text-base font-semibold text-indigo-950">Donde usted es mencionado (estudiantes)</h2>
-    <p class="mb-4 text-xs text-indigo-900/90">Solo se muestra el tipo de trámite y el estado. No puede ver texto, anexos ni datos del solicitante para proteger su confidencialidad.</p>
-    <div class="overflow-x-auto rounded-lg border border-indigo-200/80 bg-white">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-indigo-100/80"><tr>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Referencia</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Fecha</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Tipo</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Estado</th>
-        </tr></thead>
-        <tbody class="divide-y divide-gray-100">
-          <?php foreach ($menciones as $row):
-              $s = $row['solicitud'];
-              $idS = (int) ($s['id_solicitud'] ?? 0);
-              ?>
-            <tr>
-              <td class="px-3 py-2 font-mono text-xs"><?= h(solicitud_referencia_anonima($idS)) ?></td>
-              <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
-              <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
-              <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
-            </tr>
-          <?php endforeach; ?>
-          <?php if (!$menciones): ?>
-            <tr><td colspan="4" class="px-3 py-4 text-center text-gray-500">No hay solicitudes de estudiantes que lo mencionen con su documento.</td></tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
+  <section id="mis-solicitudes" class="mb-10 scroll-mt-24 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-2 text-base font-semibold text-academic">Mis solicitudes</h2>
+    <p class="mb-4 text-xs text-gray-500">Consulte todo lo radicado filtrando por estado. <strong>Activas</strong> son solicitudes pendientes de gestión.</p>
+    <div class="mb-4 flex flex-wrap gap-2">
+      <?php
+      $filtrosDoc = [
+          'activas' => ['label' => 'Activas', 'count' => (int) ($conteosSolicitudes['activas'] ?? 0), 'hint' => 'Pendiente'],
+          'en_revision' => ['label' => 'En revisión', 'count' => (int) ($conteosSolicitudes['en_revision'] ?? 0), 'hint' => ''],
+          'aprobadas' => ['label' => 'Aprobadas', 'count' => (int) ($conteosSolicitudes['aprobadas'] ?? 0), 'hint' => ''],
+          'rechazadas' => ['label' => 'Rechazadas', 'count' => (int) ($conteosSolicitudes['rechazadas'] ?? 0), 'hint' => ''],
+      ];
+      foreach ($filtrosDoc as $k => $info):
+          $active = $tab === $k;
+          $cls = $active
+              ? 'border-academic bg-academic text-white shadow-sm'
+              : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100';
+          ?>
+        <a href="<?= $uSolic ?>?tab=<?= h($k) ?>#mis-solicitudes" title="<?= h($info['hint']) ?>" class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium <?= h($cls) ?>">
+          <?= h($info['label']) ?>
+          <span class="<?= $active ? 'bg-white/20' : 'bg-gray-200/80' ?> rounded-full px-1.5 py-0.5 font-mono text-[10px]"><?= (int) $info['count'] ?></span>
+        </a>
+      <?php endforeach; ?>
     </div>
-  </div>
-
-  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-    <h2 class="mb-4 text-base font-semibold text-academic">Mis solicitudes radicadas</h2>
     <div class="overflow-x-auto rounded-lg border border-gray-200">
       <table class="min-w-full divide-y divide-gray-200 text-sm">
         <thead class="bg-gray-50"><tr>
@@ -219,7 +212,7 @@ $finMes = date('Y-m-d', strtotime('+30 days'));
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Anexos</th>
         </tr></thead>
         <tbody class="divide-y divide-gray-100">
-          <?php foreach ($propias as $s):
+          <?php foreach ($listaTab as $s):
               $idSol = (int) ($s['id_solicitud'] ?? 0);
               $anexos = $s['anexos_archivos'] ?? [];
               ?>
@@ -241,8 +234,39 @@ $finMes = date('Y-m-d', strtotime('+30 days'));
               </td>
             </tr>
           <?php endforeach; ?>
-          <?php if (!$propias): ?>
-            <tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">Aún no ha radicado solicitudes.</td></tr>
+          <?php if ($listaTab === []): ?>
+            <tr><td colspan="6" class="px-3 py-8 text-center text-gray-500">No hay solicitudes en esta categoría.</td></tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="mb-10 rounded-xl border border-indigo-100 bg-indigo-50/30 p-6 shadow-sm">
+    <h2 class="mb-2 text-base font-semibold text-indigo-950">Donde usted es mencionado (estudiantes)</h2>
+    <p class="mb-4 text-xs text-indigo-900/90">Solo se muestra el tipo de trámite y el estado. No puede ver texto, anexos ni datos del solicitante para proteger su confidencialidad.</p>
+    <div class="overflow-x-auto rounded-lg border border-indigo-200/80 bg-white">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-indigo-100/80"><tr>
+          <th class="px-3 py-2 text-left font-semibold text-gray-800">Referencia</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-800">Fecha</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-800">Tipo</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-800">Estado</th>
+        </tr></thead>
+        <tbody class="divide-y divide-gray-100">
+          <?php foreach (($menciones ?? []) as $row):
+              $s = $row['solicitud'];
+              $idS = (int) ($s['id_solicitud'] ?? 0);
+              ?>
+            <tr>
+              <td class="px-3 py-2 font-mono text-xs"><?= h(solicitud_referencia_anonima($idS)) ?></td>
+              <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
+              <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
+              <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
+            </tr>
+          <?php endforeach; ?>
+          <?php if (empty($menciones ?? [])): ?>
+            <tr><td colspan="4" class="px-3 py-4 text-center text-gray-500">No hay solicitudes de estudiantes que lo mencionen con su documento.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>

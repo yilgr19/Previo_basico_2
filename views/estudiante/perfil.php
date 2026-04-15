@@ -100,4 +100,3 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     <button type="submit" class="rounded-lg bg-academic px-4 py-2.5 text-sm font-semibold text-white hover:bg-academic-dark">Guardar cambios</button>
   </form>
 </main>
-<script src="<?= h(asset_url('js/estudiantes-form.js')) ?>"></script>

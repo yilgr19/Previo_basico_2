@@ -130,10 +130,6 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
                       <dt class="font-semibold text-gray-600">Periodo</dt><dd><?= h((string) ($cl['periodo_academico'] ?? '—')) ?></dd>
                       <dt class="font-semibold text-gray-600">Sede / jornada (petición)</dt><dd><?= h(sede_nombre((int) ($cl['id_sede_solicitud'] ?? 0))) ?> / <?= h(jornada_nombre((int) ($cl['id_jornada_solicitud'] ?? 0))) ?></dd>
                       <dt class="font-semibold text-gray-600">Motivo</dt><dd><?= h((string) ($cu['motivo_label'] ?? '—')) ?></dd>
-                      <?php if (!empty($cu['materias_etiquetas']) && is_array($cu['materias_etiquetas'])): ?>
-                        <dt class="font-semibold text-gray-600 sm:col-span-2">Asignaturas</dt>
-                        <dd class="sm:col-span-2"><?= h(implode('; ', array_map('strval', $cu['materias_etiquetas']))) ?></dd>
-                      <?php endif; ?>
                     </dl>
                   <?php endif; ?>
                   <?php
@@ -146,7 +142,7 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
                     <dl class="grid grid-cols-1 gap-1 border-t border-gray-200 pt-2 sm:grid-cols-2">
                       <dt class="font-semibold text-gray-600">Asunto</dt><dd><?= h((string) ($cla['asunto'] ?? '—')) ?></dd>
                       <dt class="font-semibold text-gray-600">Prioridad</dt><dd><?= h((string) ($cla['prioridad_label'] ?? '—')) ?></dd>
-                      <dt class="font-semibold text-gray-600">NRC / materia</dt><dd><?= h(trim((string) ($carga['nrc'] ?? '') . ' — ' . (string) ($carga['nombre_materia'] ?? ''))) ?></dd>
+                      <dt class="font-semibold text-gray-600">NRC / asignatura</dt><dd><?= h(trim((string) ($carga['nrc'] ?? '') . ' — ' . (string) ($carga['nombre_materia'] ?? ''))) ?></dd>
                       <dt class="font-semibold text-gray-600">Periodo (fechas)</dt><dd><?= h((string) ($cuer['fecha_inicio'] ?? '—') . ' → ' . (string) ($cuer['fecha_fin'] ?? '—')) ?></dd>
                     </dl>
                   <?php endif; ?>

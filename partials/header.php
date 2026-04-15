@@ -37,7 +37,8 @@ $home = $u ? dashboard_url_for_user() : url('index.php');
     <div class="order-last flex w-full flex-wrap items-center gap-2 border-t border-gray-100 pt-3 text-sm md:order-none md:w-auto md:border-0 md:pt-0">
       <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Estudiante</span>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('estudiante/dashboard.php')) ?>">Inicio</a>
-      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('estudiante/solicitudes.php')) ?>">Solicitudes</a>
+      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('estudiante/solicitudes.php#nueva-solicitud')) ?>">Nueva solicitud</a>
+      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('estudiante/solicitudes.php?tab=activas#mis-solicitudes')) ?>">Mis solicitudes</a>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('estudiante/perfil.php')) ?>">Mi perfil</a>
     </div>
     <?php endif; ?>
@@ -45,7 +46,8 @@ $home = $u ? dashboard_url_for_user() : url('index.php');
     <div class="order-last flex w-full flex-wrap items-center gap-2 border-t border-gray-100 pt-3 text-sm md:order-none md:w-auto md:border-0 md:pt-0">
       <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Docente</span>
       <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('docente/dashboard.php')) ?>">Panel</a>
-      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('docente/solicitudes.php')) ?>">Solicitudes</a>
+      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('docente/solicitudes.php#nueva-solicitud')) ?>">Nueva solicitud</a>
+      <a class="rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100" href="<?= h(url('docente/solicitudes.php?tab=activas#mis-solicitudes')) ?>">Mis solicitudes</a>
     </div>
     <?php endif; ?>
     <?php if ($u): ?>
