@@ -178,7 +178,7 @@
         "formulario_version": 2,
         "notif_pendiente_est": false,
         "notif_pendiente_doc": false,
-        "notif_nueva_gestion": true
+        "notif_nueva_gestion": false
     },
     {
         "id_solicitud": 4,
@@ -233,6 +233,6 @@
         "formulario_version": 2,
         "notif_pendiente_est": false,
         "notif_pendiente_doc": false,
-        "notif_nueva_gestion": true
+        "notif_nueva_gestion": false
     }
 ]

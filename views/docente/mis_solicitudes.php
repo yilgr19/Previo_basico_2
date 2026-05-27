@@ -65,7 +65,7 @@ $uSolic = h(url('docente/mis_solicitudes.php'));
               ?>
             <tr>
               <td class="px-3 py-2 font-mono"><?= $idSol ?></td>
-              <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
+              <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]"><?= h(solicitud_texto_momento_radicacion($s) ?: '—') ?></td>
               <td class="px-3 py-2"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
               <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
               <td class="max-w-md px-3 py-2 text-xs"><?= nl2br(h(solicitud_resumen_texto($s))) ?></td>
@@ -112,34 +112,4 @@ $uSolic = h(url('docente/mis_solicitudes.php'));
     </div>
   </section>
 
-  <div class="mb-10 rounded-xl border border-indigo-100 bg-indigo-50/30 p-6 shadow-sm">
-    <h2 class="mb-2 text-base font-semibold text-indigo-950">Donde usted es mencionado (estudiantes)</h2>
-    <p class="mb-4 text-xs text-indigo-900/90">Solo se muestra el tipo de trámite y el estado. No puede ver texto, anexos ni datos del solicitante para proteger su confidencialidad.</p>
-    <div class="overflow-x-auto rounded-lg border border-indigo-200/80 bg-white">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-indigo-100/80"><tr>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Referencia</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Fecha</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Tipo</th>
-          <th class="px-3 py-2 text-left font-semibold text-gray-800">Estado</th>
-        </tr></thead>
-        <tbody class="divide-y divide-gray-100">
-          <?php foreach (($menciones ?? []) as $row):
-              $s = $row['solicitud'];
-              $idS = (int) ($s['id_solicitud'] ?? 0);
-              ?>
-            <tr>
-              <td class="px-3 py-2 font-mono text-xs"><?= h(solicitud_referencia_anonima($idS)) ?></td>
-              <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
-              <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
-              <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
-            </tr>
-          <?php endforeach; ?>
-          <?php if (empty($menciones ?? [])): ?>
-            <tr><td colspan="4" class="px-3 py-4 text-center text-gray-500">No hay solicitudes de estudiantes que lo mencionen con su documento.</td></tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
 </main>

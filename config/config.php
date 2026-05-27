@@ -16,7 +16,8 @@ define('DATA_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'data');
 define('PARTIALS_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'partials');
 define('VIEWS_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'views');
 define('ASSETS_URL', 'assets');
-define('SITE_FOOTER_LINE', 'By Melanny Guate & Camilo Ramirez © 2026 — Sistema Académico');
+define('SITE_APP_NAME', 'Sistema de solicitudes académicas');
+define('SITE_FOOTER_LINE', 'By Melanny Guate & Camilo Ramirez © 2026 — Sistema de solicitudes académicas');
 
 spl_autoload_register(static function (string $class): void {
     $prefix = 'App\\';
@@ -32,6 +33,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+require_once dirname(__DIR__) . '/config/database.php';
 require_once CORE_PATH . '/helpers.php';
 require_once MODELS_PATH . '/data_dictionary.php';
 require_once MODELS_PATH . '/storage.php';

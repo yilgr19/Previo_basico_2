@@ -1,6 +1,6 @@
-# Sistema Académico (PHP + JSON)
+# Sistema de solicitudes académicas (PHP + JSON)
 
-Aplicación web en PHP con persistencia en archivos **JSON** (sin base de datos). Incluye paneles para **estudiantes**, **docentes** y **gestión administrativa** (solicitudes, reportes, datos maestros). Interfaz con **Tailwind CSS** vía CDN.
+Aplicación web en PHP con persistencia en **MySQL** (XAMPP) o, si se desactiva, en archivos **JSON** en `data/`. Incluye paneles para **estudiantes**, **docentes** y **gestión administrativa** (solicitudes, reportes, datos maestros). Interfaz con **Tailwind CSS** vía CDN.
 
 ---
 
@@ -8,8 +8,9 @@ Aplicación web en PHP con persistencia en archivos **JSON** (sin base de datos)
 
 | Requisito | Detalle |
 |-----------|---------|
-| PHP | **8.0 o superior** (extensiones típicas: `json`, `mbstring`, `fileinfo` para adjuntos) |
+| PHP | **8.0 o superior** (`json`, `mbstring`, `fileinfo`, **`pdo_mysql`**) |
 | Servidor web | Apache con PHP (p. ej. **XAMPP** en Windows) |
+| MySQL | **MariaDB/MySQL** en XAMPP (base `solicitudes_academicas`) |
 | Navegador | Cualquier navegador moderno |
 
 ---
@@ -31,7 +32,31 @@ Aplicación web en PHP con persistencia en archivos **JSON** (sin base de datos)
 ### 3. Iniciar Apache
 
 1. Abra el **Panel de control de XAMPP**.
-2. Inicie el módulo **Apache** (no es obligatorio MySQL: el proyecto no usa MariaDB/MySQL).
+2. Inicie **Apache** y **MySQL**.
+
+### 3b. Base de datos (phpMyAdmin)
+
+1. Importe `database/solicitudes_academicas.sql` en phpMyAdmin (crea la base `solicitudes_academicas`, tablas y datos demo).
+   - Opcional: ejecute antes `database/00_crear_base.sql` si la base aún no existe.
+   - Si los nombres de catálogos muestran `??`, ejecute: `php database/fix_catalog_utf8.php`
+2. Si prefiere migrar desde JSON en lugar del volcado SQL:
+   ```bat
+   C:\xampp\php\php.exe database\seed_from_json.php
+   ```
+3. Conexión en `config/database.php`: host `127.0.0.1`, base `solicitudes_academicas`, usuario `root`, contraseña vacía (XAMPP por defecto). `DB_ENABLED` en `true` usa MySQL; en `false` vuelve a JSON.
+4. **Prueba exhaustiva de persistencia** (crea y borra datos de prueba):
+   ```bat
+   C:\xampp\php\php.exe database\test_integracion_bd.php
+   ```
+   Para conservar los registros creados: añada `--keep`.
+5. **Ver estado actual** de respuestas y conteos:
+   ```bat
+   C:\xampp\php\php.exe database\verificar_registros.php
+   ```
+6. **Resetear solo solicitudes** (conserva usuarios; crea 4 trámites Cúcuta + 4 Ocaña):
+   ```bat
+   C:\xampp\php\php.exe database\limpiar_y_sembrar_solicitudes.php
+   ```
 
 ### 4. Abrir la aplicación
 
@@ -40,8 +65,8 @@ Aplicación web en PHP con persistencia en archivos **JSON** (sin base de datos)
 
 ### 5. Credenciales
 
-- Los usuarios se definen en `data/*.json` (administradores, docentes, estudiantes).
-- Ejemplo de administrador por defecto (según `data/administradores.json`):
+- Los usuarios demo están en MySQL (tablas `administradores`, `docentes`, `estudiantes`) o en `data/*.json` si `DB_ENABLED` es `false`.
+- Ejemplo de administrador por defecto:
   - **Usuario (correo):** el campo `correo` del administrador.
   - **Contraseña:** el campo `clave` correspondiente.
 - Docentes y estudiantes pueden iniciar con **documento** o **correo** y su **clave** en los JSON.
@@ -57,9 +82,9 @@ Aplicación web en PHP con persistencia en archivos **JSON** (sin base de datos)
 | Configuración y arranque | `config/config.php` |
 | Controladores | `app/Controllers/` |
 | Vistas | `views/`, `partials/` |
-| Modelos / almacenamiento | `app/Models/` (`storage.php`, `repository.php`, `data_dictionary.php`) |
+| Modelos / almacenamiento | `app/Models/` (`storage.php`, `MysqlStorage.php`, `repository.php`, `data_dictionary.php`) |
 | Servicios | `app/Services/` (`SolicitudesService`, `GestionAcademicaService`, etc.) |
-| Datos | `data/*.json` |
+| Datos | MySQL (`solicitudes_academicas`) o `data/*.json` |
 | Entradas públicas | `index.php`, `login.php`, `logout.php`, `estudiante/*.php`, `docente/*.php`, `gestion/*.php` |
 
 La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, vista y pie.

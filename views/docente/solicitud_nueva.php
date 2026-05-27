@@ -140,10 +140,6 @@ $valFechaFin = ($old['fecha_fin'] ?? '') !== '' ? (string) $old['fecha_fin'] : $
             <label class="<?= h($lbl) ?>">Fecha de fin</label>
             <input type="date" name="fecha_fin" class="<?= h($inp) ?>" value="<?= h($valFechaFin) ?>" required>
           </div>
-          <div class="md:col-span-2">
-            <label class="<?= h($lbl) ?>">Otro documento de docente relacionado <span class="text-gray-500">(opcional)</span></label>
-            <input type="text" name="documento_docente_relacionado" class="<?= h($inp) ?>" placeholder="Solo números" inputmode="numeric" value="<?= h((string) ($old['documento_docente_relacionado'] ?? '')) ?>">
-          </div>
         </div>
       </fieldset>
 

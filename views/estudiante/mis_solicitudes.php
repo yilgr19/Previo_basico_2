@@ -82,7 +82,7 @@ $uSolic = h(url('estudiante/mis_solicitudes.php'));
         <tbody class="divide-y divide-gray-100">
           <?php foreach ($listaTab as $s): ?>
             <tr>
-              <td class="whitespace-nowrap px-3 py-2"><?= h((string) ($s['fecha_registro'] ?? '')) ?></td>
+              <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]"><?= h(solicitud_texto_momento_radicacion($s) ?: '—') ?></td>
               <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
               <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
               <?php $tblDesc($s); ?>

@@ -2,7 +2,7 @@
   <div class="mx-auto w-full max-w-md">
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
       <div class="p-6 sm:p-8">
-        <h1 class="mb-6 text-center text-xl font-bold text-academic">Sistema Académico</h1>
+        <h1 class="mb-6 text-center text-xl font-bold text-academic"><?= h(defined('SITE_APP_NAME') ? SITE_APP_NAME : 'Sistema de solicitudes académicas') ?></h1>
         <?php if ($error): ?>
           <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><?= h($error) ?></div>
         <?php endif; ?>

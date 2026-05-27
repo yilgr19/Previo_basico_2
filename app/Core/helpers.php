@@ -86,7 +86,6 @@ function solicitud_estudiante_old_desde_post(): array
         'id_jornada_solicitud' => post('id_jornada_solicitud', '') ?? '',
         'motivo_solicitud' => post('motivo_solicitud', '') ?? '',
         'exposicion' => (string) ($_POST['exposicion'] ?? ''),
-        'documento_docente_relacionado' => post('documento_docente_relacionado', '') ?? '',
         'consentimiento_veracidad' => (isset($_POST['consentimiento_veracidad']) && (string) $_POST['consentimiento_veracidad'] === '1'),
     ];
 }
@@ -105,7 +104,6 @@ function solicitud_docente_old_desde_post(): array
         'sustento_legal' => (string) ($_POST['sustento_legal'] ?? ''),
         'fecha_inicio' => post('fecha_inicio', '') ?? '',
         'fecha_fin' => post('fecha_fin', '') ?? '',
-        'documento_docente_relacionado' => post('documento_docente_relacionado', '') ?? '',
         'consentimiento_responsabilidad' => (isset($_POST['consentimiento_responsabilidad']) && (string) $_POST['consentimiento_responsabilidad'] === '1'),
     ];
 }

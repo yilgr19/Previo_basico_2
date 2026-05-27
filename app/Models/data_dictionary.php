@@ -1,8 +1,14 @@
 <?php
 declare(strict_types=1);
 
+use App\Models\MysqlStorage;
+
 function diccionario_programas(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogProgramas();
+    }
+
     return [
         ['id' => 117, 'codigo' => '90604', 'nombre' => 'Técnica Profesional en Operaciones Logísticas', 'id_sede' => 1],
         ['id' => 118, 'codigo' => '90605', 'nombre' => 'Tecnología en Gestión Logística Empresarial', 'id_sede' => 1],
@@ -31,6 +37,10 @@ function diccionario_programas(): array
 
 function diccionario_sedes(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogSedes();
+    }
+
     return [
         ['id' => 1, 'nombre' => 'Cúcuta'],
         ['id' => 2, 'nombre' => 'Ocaña'],
@@ -39,6 +49,10 @@ function diccionario_sedes(): array
 
 function diccionario_jornadas(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogJornadas();
+    }
+
     return [
         ['id' => 1, 'nombre' => 'Diurna'],
         ['id' => 2, 'nombre' => 'Nocturna'],
@@ -49,6 +63,10 @@ function diccionario_jornadas(): array
 
 function diccionario_tipos_identificacion(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogTiposIdentificacion();
+    }
+
     return [
         ['codigo' => 'CC', 'nombre' => 'Cédula de ciudadanía'],
         ['codigo' => 'TI', 'nombre' => 'Tarjeta de identidad'],
@@ -60,6 +78,10 @@ function diccionario_tipos_identificacion(): array
 
 function diccionario_sexo(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogSexos();
+    }
+
     return [
         ['codigo' => 'M', 'nombre' => 'Masculino'],
         ['codigo' => 'F', 'nombre' => 'Femenino'],
@@ -197,6 +219,10 @@ function jornada_nombre(?int $id): string
  */
 function diccionario_tipos_solicitud(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogTiposSolicitudEstudiante();
+    }
+
     return [
         ['id' => 1, 'codigo' => 'REQ_CANCEL_SEM', 'nombre' => 'Cancelación de semestre'],
         ['id' => 2, 'codigo' => 'REQ_CURSO_DIR', 'nombre' => 'Curso dirigido'],
@@ -243,6 +269,10 @@ function tipo_solicitud_nombre(int $id): string
  */
 function diccionario_estados_solicitud(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogEstadosSolicitud();
+    }
+
     return [
         ['codigo' => 'pendiente', 'nombre' => 'Pendiente', 'aprobada' => false],
         ['codigo' => 'en_revision', 'nombre' => 'En revisión', 'aprobada' => false],
@@ -327,6 +357,10 @@ function estado_academico_estudiante_nombre(?string $cod): string
 /** Motivos estadísticos (solicitud estudiantil). */
 function diccionario_motivos_solicitud_estudiante(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogMotivosSolicitudEstudiante();
+    }
+
     return [
         ['codigo' => 'salud', 'nombre' => 'Salud'],
         ['codigo' => 'economicos', 'nombre' => 'Económicos'],
@@ -354,6 +388,10 @@ function motivo_solicitud_estudiante_nombre(?string $cod): string
  */
 function diccionario_tipos_solicitud_docente(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogTiposSolicitudDocente();
+    }
+
     return [
         ['id' => 1, 'codigo' => 'DOC_RECT_ACTA', 'nombre' => 'Rectificación de Acta de Calificaciones'],
         ['id' => 2, 'codigo' => 'DOC_PERM_LIC', 'nombre' => 'Permiso Remunerado / Licencia Corta'],
@@ -391,6 +429,10 @@ function tipo_solicitud_docente_nombre(int $id): string
 
 function diccionario_prioridad_solicitud_docente(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogPrioridadesSolicitudDocente();
+    }
+
     return [
         ['codigo' => 'baja', 'nombre' => 'Baja'],
         ['codigo' => 'media', 'nombre' => 'Media'],
@@ -411,6 +453,10 @@ function prioridad_solicitud_docente_nombre(?string $cod): string
 
 function diccionario_categoria_docente(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogCategoriasDocente();
+    }
+
     return [
         ['codigo' => 'auxiliar', 'nombre' => 'Auxiliar'],
         ['codigo' => 'asistente', 'nombre' => 'Asistente'],
@@ -432,6 +478,10 @@ function categoria_docente_nombre(?string $cod): string
 
 function diccionario_tipo_contrato_docente(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogTiposContratoDocente();
+    }
+
     return [
         ['codigo' => 'tiempo_completo', 'nombre' => 'Tiempo completo'],
         ['codigo' => 'medio_tiempo', 'nombre' => 'Medio tiempo'],
@@ -466,6 +516,44 @@ function solicitud_tipo_etiqueta(array $s): string
         return tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0));
     }
     return tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0));
+}
+
+function solicitud_texto_momento_radicacion(array $s): string
+{
+    $fr = trim((string) ($s['fecha_registro'] ?? ''));
+    if ($fr !== '' && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $fr)) {
+        return $fr;
+    }
+    if ($fr !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $fr)) {
+        return $fr . ' 00:00:00';
+    }
+
+    return $fr;
+}
+
+function solicitud_motivo_admin_etiqueta(array $s): string
+{
+    $de = $s['detalle_estudiante'] ?? null;
+    if (is_array($de)) {
+        $cu = $de['cuerpo'] ?? [];
+        $lab = trim((string) ($cu['motivo_label'] ?? ''));
+        if ($lab !== '') {
+            return $lab;
+        }
+        $cod = trim((string) ($cu['motivo'] ?? ''));
+        if ($cod !== '') {
+            return motivo_solicitud_estudiante_nombre($cod);
+        }
+    }
+    $dd = $s['detalle_docente'] ?? null;
+    if (is_array($dd)) {
+        $asunto = trim((string) (($dd['clasificacion'] ?? [])['asunto'] ?? ''));
+        if ($asunto !== '') {
+            return $asunto;
+        }
+    }
+
+    return '—';
 }
 
 /** Texto principal para listados (exposición o descripción según formulario). */
@@ -504,6 +592,10 @@ function solicitud_etiqueta_categoria_anexo(?string $categoria): string
  */
 function diccionario_decision_resolucion_formal(): array
 {
+    if (function_exists('storage_usa_mysql') && storage_usa_mysql()) {
+        return MysqlStorage::catalogDecisionesResolucionFormal();
+    }
+
     return [
         ['codigo' => 'aprobado', 'nombre' => 'Aprobado — la solicitud sigue un curso favorable'],
         ['codigo' => 'rechazado', 'nombre' => 'Rechazado — no cumple requisitos'],

@@ -127,10 +127,6 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
             <label class="<?= h($lbl) ?>">Exposición de motivos <span class="text-gray-500">(mín. 10 caracteres)</span></label>
             <textarea name="exposicion" class="<?= h($inp) ?>" rows="5" required placeholder="Explique su situación con el detalle necesario"><?= h((string) ($old['exposicion'] ?? '')) ?></textarea>
           </div>
-          <div class="md:col-span-2">
-            <label class="<?= h($lbl) ?>">Documento del docente relacionado <span class="text-gray-500">(opcional)</span></label>
-            <input type="text" name="documento_docente_relacionado" class="<?= h($inp) ?>" placeholder="Solo números, sin puntos" inputmode="numeric" value="<?= h((string) ($old['documento_docente_relacionado'] ?? '')) ?>">
-          </div>
         </div>
       </fieldset>
 

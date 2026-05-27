@@ -33,7 +33,7 @@ if ($u && (string) ($u['rol'] ?? '') === ROLE_ESTUDIANTE) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= h($pageTitle ?? 'Sistema Académico') ?></title>
+  <title><?= h($pageTitle ?? (defined('SITE_APP_NAME') ? SITE_APP_NAME : 'Sistema de solicitudes académicas')) ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -65,7 +65,7 @@ if ($u && (string) ($u['rol'] ?? '') === ROLE_ESTUDIANTE) {
           <svg class="h-6 w-6 opacity-95" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
         </span>
         <span class="min-w-0 text-left">
-          <span class="block truncate text-[15px] font-bold tracking-tight text-slate-900">Sistema Académico</span>
+          <span class="block truncate text-[15px] font-bold tracking-tight text-slate-900"><?= h(defined('SITE_APP_NAME') ? SITE_APP_NAME : 'Sistema de solicitudes académicas') ?></span>
           <span class="block text-[11px] font-medium text-slate-500">Portal institucional</span>
         </span>
       </a>

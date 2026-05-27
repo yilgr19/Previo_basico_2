@@ -109,8 +109,6 @@ final class SolicitudesController extends Controller
             $listaTab = $solicitudesActivas;
         }
 
-        $menciones = SolicitudesService::listadoMencionesAnonimasParaDocente($idDoc, (string) ($doc['documento'] ?? ''));
-
         $this->render('docente/mis_solicitudes.php', [
             'pageTitle' => 'Mis solicitudes',
             'solNavActiva' => 'lista',
@@ -124,7 +122,6 @@ final class SolicitudesController extends Controller
                 'aprobadas' => count($solicitudesAprobadas),
                 'rechazadas' => count($solicitudesRechazadas),
             ],
-            'menciones' => $menciones,
         ]);
     }
 

@@ -83,7 +83,7 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana.php');
     </div>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
       <div class="min-w-0 flex-1">
-        <label class="mb-1 block text-sm font-medium text-gray-700">Buscar por documento o nombre del radicante (y documento de docente mencionado en solicitudes de estudiante)</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Buscar por documento o nombre del radicante</label>
         <div class="flex gap-2">
           <input type="search" name="buscar" value="<?= h($buscarDoc ?? '') ?>" placeholder="Ej. 1098… o parte del nombre" class="mt-1 block min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm">
           <button type="submit" class="mt-1 inline-flex shrink-0 items-center justify-center rounded-lg bg-academic px-4 py-2 text-white shadow-sm hover:bg-academic-dark" title="Buscar" aria-label="Buscar">

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 /**
- * Registro y gestión de solicitudes (JSON + adjuntos).
+ * Registro y gestión de solicitudes (MySQL/JSON + adjuntos).
  */
 final class SolicitudesService
 {
@@ -64,8 +64,6 @@ final class SolicitudesService
             return ['Para este trámite con costo administrativo adjunte el recibo de pago.', 'warning'];
         }
 
-        $docDoc = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
-
         $rows = load_data('solicitudes');
         $idSol = next_numeric_id($rows, 'id_solicitud');
         [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
@@ -115,10 +113,10 @@ final class SolicitudesService
             'id_tipo_solicitud' => $idTipo,
             'id_tipo_solicitud_docente' => 0,
             'codigo_tipo' => (string) ($tipo['codigo'] ?? ''),
-            'fecha_registro' => date('Y-m-d'),
+            'fecha_registro' => fecha_hora_colombia(),
             'estado' => 'pendiente',
             'descripcion' => $exposicion,
-            'documento_docente_relacionado' => $docDoc,
+            'documento_docente_relacionado' => '',
             'respuesta' => '',
             'fecha_respuesta' => '',
             'respondido_en' => '',
@@ -191,8 +189,6 @@ final class SolicitudesService
             return ['Debe aceptar la declaración de responsabilidad sobre la carga académica.', 'warning'];
         }
 
-        $docRel = preg_replace('/\D/', '', trim((string) post('documento_docente_relacionado', '')));
-
         $rows = load_data('solicitudes');
         $idSol = next_numeric_id($rows, 'id_solicitud');
         [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
@@ -249,10 +245,10 @@ final class SolicitudesService
             'id_tipo_solicitud' => 0,
             'id_tipo_solicitud_docente' => $idTipoDoc,
             'codigo_tipo' => (string) ($tipoDoc['codigo'] ?? ''),
-            'fecha_registro' => date('Y-m-d'),
+            'fecha_registro' => fecha_hora_colombia(),
             'estado' => 'pendiente',
             'descripcion' => $desc,
-            'documento_docente_relacionado' => $docRel,
+            'documento_docente_relacionado' => '',
             'respuesta' => '',
             'fecha_respuesta' => '',
             'respondido_en' => '',
@@ -282,16 +278,14 @@ final class SolicitudesService
         foreach ($rows as &$s) {
             if ((int) ($s['id_solicitud'] ?? 0) === $idSolicitud) {
                 $s = self::normalizarLegacy($s);
-                if (solicitud_tiene_respuesta_cerrada($s)) {
-                    return ['Esta solicitud ya fue respondida por la universidad. No se permiten nuevas modificaciones.', 'warning'];
-                }
                 $respTrim = trim($respuesta);
-                $cierraRespuesta = $respTrim !== '' || $guardarRespuestaElaborada;
                 $ahora = fecha_hora_colombia();
+                $yaRespondida = trim((string) ($s['respondido_en'] ?? '')) !== '';
+                $cierraRespuesta = $respTrim !== '' || $guardarRespuestaElaborada;
 
                 $s['estado'] = $nuevoEstado;
                 $s['respuesta'] = $respTrim;
-                if ($cierraRespuesta) {
+                if (!$yaRespondida && $cierraRespuesta) {
                     $s['respondido_en'] = $ahora;
                     $s['fecha_respuesta'] = substr($ahora, 0, 10);
                 }
@@ -386,10 +380,9 @@ final class SolicitudesService
             if ($busNorm !== '') {
                 $docE = preg_replace('/\D/', '', (string) ($s['documento_estudiante'] ?? ''));
                 $docEd = $estudiante ? preg_replace('/\D/', '', (string) ($estudiante['documento'] ?? '')) : '';
-                $docProf = preg_replace('/\D/', '', (string) ($s['documento_docente_relacionado'] ?? ''));
                 $docDocenteRad = $docSol ? preg_replace('/\D/', '', (string) ($docSol['documento'] ?? '')) : '';
                 $hay = str_contains($docE, $busNorm) || str_contains($docEd, $busNorm)
-                    || str_contains($docProf, $busNorm) || str_contains($docDocenteRad, $busNorm);
+                    || str_contains($docDocenteRad, $busNorm);
                 if (!$hay && $estudiante) {
                     $nombre = strtolower((string) (($estudiante['nombre'] ?? '') . ' ' . ($estudiante['apellido'] ?? '')));
                     if (!str_contains($nombre, strtolower($bus))) {
@@ -485,41 +478,6 @@ final class SolicitudesService
         }
 
         return false;
-    }
-
-    /**
-     * Solicitudes radicadas por estudiante donde el docente aparece en documento_docente_relacionado.
-     * Vista sin datos identificables del estudiante (uso en panel docente).
-     *
-     * @return list<array{solicitud: array, vista_anonima: true}>
-     */
-    public static function listadoMencionesAnonimasParaDocente(int $idDocente, string $documentoDocente): array
-    {
-        $docNorm = preg_replace('/\D/', '', $documentoDocente);
-        if ($docNorm === '') {
-            return [];
-        }
-
-        $rows = load_data('solicitudes');
-        $out = [];
-        foreach ($rows as $s) {
-            $s = self::normalizarLegacy($s);
-            $idEst = (int) ($s['id_estudiante'] ?? 0);
-            if ($idEst <= 0) {
-                continue;
-            }
-            $rel = preg_replace('/\D/', '', (string) ($s['documento_docente_relacionado'] ?? ''));
-            if ($rel === '' || $rel !== $docNorm) {
-                continue;
-            }
-            $out[] = ['solicitud' => $s, 'vista_anonima' => true];
-        }
-
-        usort($out, static function ($a, $b) {
-            return ((int) ($b['solicitud']['id_solicitud'] ?? 0)) <=> ((int) ($a['solicitud']['id_solicitud'] ?? 0));
-        });
-
-        return $out;
     }
 
     /** Normaliza claves para vistas y listados (registros antiguos). */
