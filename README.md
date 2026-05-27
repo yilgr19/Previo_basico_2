@@ -1,6 +1,6 @@
-# Sistema de solicitudes académicas (PHP + JSON)
+# Sistema de solicitudes académicas (PHP + MySQL)
 
-Aplicación web en PHP con persistencia en **MySQL** (XAMPP) o, si se desactiva, en archivos **JSON** en `data/`. Incluye paneles para **estudiantes**, **docentes** y **gestión administrativa** (solicitudes, reportes, datos maestros). Interfaz con **Tailwind CSS** vía CDN.
+Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles para **estudiantes**, **docentes** y **gestión administrativa** (solicitudes, reportes, datos maestros). Interfaz con **Tailwind CSS** vía CDN.
 
 ---
 
@@ -38,25 +38,12 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP) o, si se desactiva,
 
 1. Importe `database/solicitudes_academicas.sql` en phpMyAdmin (crea la base `solicitudes_academicas`, tablas y datos demo).
    - Opcional: ejecute antes `database/00_crear_base.sql` si la base aún no existe.
-   - Si los nombres de catálogos muestran `??`, ejecute: `php database/fix_catalog_utf8.php`
-2. Si prefiere migrar desde JSON en lugar del volcado SQL:
+2. Conexión en `config/database.php`: host `127.0.0.1`, base `solicitudes_academicas`, usuario `root`, contraseña vacía (XAMPP por defecto). **`DB_ENABLED` debe estar en `true`.**
+3. **Vaciar solo solicitudes** (conserva usuarios; para cargar trámites manualmente desde la web):
    ```bat
-   C:\xampp\php\php.exe database\seed_from_json.php
+   C:\xampp\php\php.exe database\limpiar_solicitudes.php
    ```
-3. Conexión en `config/database.php`: host `127.0.0.1`, base `solicitudes_academicas`, usuario `root`, contraseña vacía (XAMPP por defecto). `DB_ENABLED` en `true` usa MySQL; en `false` vuelve a JSON.
-4. **Prueba exhaustiva de persistencia** (crea y borra datos de prueba):
-   ```bat
-   C:\xampp\php\php.exe database\test_integracion_bd.php
-   ```
-   Para conservar los registros creados: añada `--keep`.
-5. **Ver estado actual** de respuestas y conteos:
-   ```bat
-   C:\xampp\php\php.exe database\verificar_registros.php
-   ```
-6. **Resetear solo solicitudes** (conserva usuarios; crea 4 trámites Cúcuta + 4 Ocaña):
-   ```bat
-   C:\xampp\php\php.exe database\limpiar_y_sembrar_solicitudes.php
-   ```
+4. **Ver solicitudes con toda la información** en phpMyAdmin: ejecute `database/crear_vista_solicitudes.sql` y abra la vista **`v_solicitudes_completa`** (une cabecera + detalle estudiante/docente + resolución formal).
 
 ### 4. Abrir la aplicación
 
@@ -65,13 +52,13 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP) o, si se desactiva,
 
 ### 5. Credenciales
 
-- Los usuarios demo están en MySQL (tablas `administradores`, `docentes`, `estudiantes`) o en `data/*.json` si `DB_ENABLED` es `false`.
+- Los usuarios demo están en MySQL (tablas `administradores`, `docentes`, `estudiantes`), definidos al importar `solicitudes_academicas.sql`.
 - Ejemplo de administrador por defecto:
-  - **Usuario (correo):** el campo `correo` del administrador.
-  - **Contraseña:** el campo `clave` correspondiente.
-- Docentes y estudiantes pueden iniciar con **documento** o **correo** y su **clave** en los JSON.
+  - **Usuario (correo):** `admin@academico.edu`
+  - **Contraseña:** `admin123`
+- Docentes y estudiantes pueden iniciar con **documento** o **correo** y su **clave** (p. ej. `demo123` en los registros demo).
 
-> **Nota:** Revise los archivos en `data/` para ver o crear cuentas de prueba. No suba contraseñas reales a repositorios públicos.
+> **Nota:** No suba contraseñas reales a repositorios públicos. En producción use contraseñas hasheadas.
 
 ---
 
@@ -84,7 +71,8 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP) o, si se desactiva,
 | Vistas | `views/`, `partials/` |
 | Modelos / almacenamiento | `app/Models/` (`storage.php`, `MysqlStorage.php`, `repository.php`, `data_dictionary.php`) |
 | Servicios | `app/Services/` (`SolicitudesService`, `GestionAcademicaService`, etc.) |
-| Datos | MySQL (`solicitudes_academicas`) o `data/*.json` |
+| Datos | MySQL (`solicitudes_academicas`) |
+| Adjuntos | `uploads/solicitudes/` |
 | Entradas públicas | `index.php`, `login.php`, `logout.php`, `estudiante/*.php`, `docente/*.php`, `gestion/*.php` |
 
 La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, vista y pie.
@@ -102,9 +90,9 @@ La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, v
 
 - Estilos base: `assets/css/main.css` (complemento; el grueso del diseño es Tailwind por CDN).
 
-## Datos de demostración (`data/`)
+## Datos de demostración
 
-El repositorio incluye un juego mínimo de prueba: **2 estudiantes y 2 docentes por sede** (Cúcuta y Ocaña), **2 solicitudes** de ejemplo (una radicada por estudiante y una por docente) y el resto de JSON necesarios (`administradores.json`, `materias.json`, etc.). Puede ampliar registros editando los archivos o desde el panel de gestión.
+Al importar `database/solicitudes_academicas.sql` se cargan usuarios demo (estudiantes y docentes por sede Cúcuta y Ocaña). Las solicitudes puede crearlas desde la aplicación o vaciar la bandeja con `limpiar_solicitudes.php` y cargarlas manualmente.
 
 ---
 

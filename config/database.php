@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/** true = leer/escribir en MySQL; false = archivos JSON en data/ */
+/** true = MySQL (producción). false = respaldo JSON en data/ (solo desarrollo). */
 define('DB_ENABLED', true);
 
 define('DB_HOST', '127.0.0.1');

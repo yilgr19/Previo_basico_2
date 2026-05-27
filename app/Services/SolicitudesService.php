@@ -248,7 +248,7 @@ final class SolicitudesService
             'fecha_registro' => fecha_hora_colombia(),
             'estado' => 'pendiente',
             'descripcion' => $desc,
-            'documento_docente_relacionado' => '',
+            'documento_docente_relacionado' => (string) ($doc['documento'] ?? ''),
             'respuesta' => '',
             'fecha_respuesta' => '',
             'respondido_en' => '',

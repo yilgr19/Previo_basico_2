@@ -1,2 +1,2 @@
-# Evitar acceso directo a los JSON desde el navegador (Apache)
+# Evitar acceso directo a la carpeta data/ desde el navegador (Apache)
 Require all denied

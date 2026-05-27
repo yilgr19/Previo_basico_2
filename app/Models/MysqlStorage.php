@@ -392,15 +392,15 @@ final class MysqlStorage
             'id_solicitud' => $id,
             'id_estudiante' => self::nullIfZeroInt($s['id_estudiante'] ?? 0),
             'id_docente_solicitante' => self::nullIfZeroInt($s['id_docente_solicitante'] ?? 0),
-            'documento_estudiante' => self::nullIfEmpty($s['documento_estudiante'] ?? null),
+            'documento_estudiante' => self::strOrEmpty($s['documento_estudiante'] ?? ''),
             'id_tipo_solicitud' => self::nullIfZeroInt($s['id_tipo_solicitud'] ?? 0),
             'id_tipo_solicitud_docente' => self::nullIfZeroInt($s['id_tipo_solicitud_docente'] ?? 0),
-            'codigo_tipo' => self::nullIfEmpty($s['codigo_tipo'] ?? null),
+            'codigo_tipo' => self::strOrEmpty($s['codigo_tipo'] ?? ''),
             'fecha_registro' => $fr,
             'estado' => solicitud_estado_a_codigo((string) ($s['estado'] ?? 'pendiente')),
-            'descripcion' => self::nullIfEmpty($s['descripcion'] ?? null),
-            'documento_docente_relacionado' => self::nullIfEmpty($s['documento_docente_relacionado'] ?? null),
-            'respuesta' => self::nullIfEmpty($s['respuesta'] ?? null),
+            'descripcion' => self::strOrEmpty($s['descripcion'] ?? ''),
+            'documento_docente_relacionado' => self::strOrEmpty($s['documento_docente_relacionado'] ?? ''),
+            'respuesta' => self::strOrEmpty($s['respuesta'] ?? ''),
             'fecha_respuesta' => $fechaResp !== null && $fechaResp !== '' ? $fechaResp : null,
             'respondido_en' => $respondido !== '' ? self::normalizarDateTime($respondido) : null,
             'formulario_version' => (int) ($s['formulario_version'] ?? 2),
@@ -443,10 +443,7 @@ final class MysqlStorage
         $cu = $de['cuerpo'] ?? [];
         $co = $de['consentimientos'] ?? [];
 
-        $motivo = self::nullIfEmpty($cu['motivo'] ?? null);
-        if ($motivo === null || $motivo === '') {
-            $motivo = null;
-        }
+        $motivo = self::strOrEmpty($cu['motivo'] ?? '');
 
         $pdo->prepare(
             'INSERT INTO solicitud_detalle_estudiante (
@@ -462,20 +459,20 @@ final class MysqlStorage
             )'
         )->execute([
             'id_solicitud' => $id,
-            'id_estudiantil' => self::nullIfEmpty($ps['id_estudiantil'] ?? null),
+            'id_estudiantil' => self::strOrEmpty($ps['id_estudiantil'] ?? ''),
             'id_programa' => self::nullIfZeroInt($ps['id_programa'] ?? 0),
-            'programa_nombre' => self::nullIfEmpty($ps['programa_nombre'] ?? null),
-            'estado_academico' => self::nullIfEmpty($ps['estado_academico'] ?? null),
-            'estado_academico_label' => self::nullIfEmpty($ps['estado_academico_label'] ?? null),
+            'programa_nombre' => self::strOrEmpty($ps['programa_nombre'] ?? ''),
+            'estado_academico' => self::strOrEmpty($ps['estado_academico'] ?? ''),
+            'estado_academico_label' => self::strOrEmpty($ps['estado_academico_label'] ?? ''),
             'semestre' => self::nullIfZeroInt($ps['semestre'] ?? 0),
             'id_sede_matricula' => self::nullIfZeroInt($ps['id_sede_matricula'] ?? 0),
             'id_jornada_matricula' => self::nullIfZeroInt($ps['id_jornada_matricula'] ?? 0),
-            'periodo_academico' => self::nullIfEmpty($cl['periodo_academico'] ?? null),
+            'periodo_academico' => self::strOrEmpty($cl['periodo_academico'] ?? ''),
             'id_sede_solicitud' => self::nullIfZeroInt($cl['id_sede_solicitud'] ?? 0),
             'id_jornada_solicitud' => self::nullIfZeroInt($cl['id_jornada_solicitud'] ?? 0),
-            'motivo' => $motivo,
-            'motivo_label' => self::nullIfEmpty($cu['motivo_label'] ?? null),
-            'exposicion' => self::nullIfEmpty($cu['exposicion'] ?? null),
+            'motivo' => $motivo ?? '',
+            'motivo_label' => self::strOrEmpty($cu['motivo_label'] ?? ''),
+            'exposicion' => self::strOrEmpty($cu['exposicion'] ?? ''),
             'consentimiento_veracidad' => !empty($co['veracidad']) ? 1 : 0,
         ]);
     }
@@ -503,25 +500,25 @@ final class MysqlStorage
             )'
         )->execute([
             'id_solicitud' => $id,
-            'id_empleado' => self::nullIfEmpty($ps['id_empleado'] ?? null),
-            'unidad_academica' => self::nullIfEmpty($ps['unidad_academica'] ?? null),
-            'categoria_docente' => self::nullIfEmpty($ps['categoria_docente'] ?? null),
-            'categoria_docente_label' => self::nullIfEmpty($ps['categoria_docente_label'] ?? null),
-            'tipo_contrato' => self::nullIfEmpty($ps['tipo_contrato'] ?? null),
-            'tipo_contrato_label' => self::nullIfEmpty($ps['tipo_contrato_label'] ?? null),
-            'documento' => self::nullIfEmpty($ps['documento'] ?? null),
-            'nombre_completo' => self::nullIfEmpty($ps['nombre_completo'] ?? null),
-            'asunto' => self::nullIfEmpty($cl['asunto'] ?? null),
-            'prioridad' => self::nullIfEmpty($cl['prioridad'] ?? null),
-            'prioridad_label' => self::nullIfEmpty($cl['prioridad_label'] ?? null),
-            'nrc' => self::nullIfEmpty($ca['nrc'] ?? null),
-            'nombre_materia' => self::nullIfEmpty($ca['nombre_materia'] ?? null),
-            'horario_impactado' => self::nullIfEmpty($ca['horario_impactado'] ?? null),
-            'plan_contingencia' => self::nullIfEmpty($ca['plan_contingencia'] ?? null),
-            'descripcion_detallada' => self::nullIfEmpty($cu['descripcion_detallada'] ?? null),
-            'sustento_legal' => self::nullIfEmpty($cu['sustento_legal'] ?? null),
-            'fecha_inicio' => self::nullIfEmpty($cu['fecha_inicio'] ?? null),
-            'fecha_fin' => self::nullIfEmpty($cu['fecha_fin'] ?? null),
+            'id_empleado' => self::strOrEmpty($ps['id_empleado'] ?? ''),
+            'unidad_academica' => self::strOrEmpty($ps['unidad_academica'] ?? ''),
+            'categoria_docente' => self::strOrEmpty($ps['categoria_docente'] ?? ''),
+            'categoria_docente_label' => self::strOrEmpty($ps['categoria_docente_label'] ?? ''),
+            'tipo_contrato' => self::strOrEmpty($ps['tipo_contrato'] ?? ''),
+            'tipo_contrato_label' => self::strOrEmpty($ps['tipo_contrato_label'] ?? ''),
+            'documento' => self::strOrEmpty($ps['documento'] ?? ''),
+            'nombre_completo' => self::strOrEmpty($ps['nombre_completo'] ?? ''),
+            'asunto' => self::strOrEmpty($cl['asunto'] ?? ''),
+            'prioridad' => self::strOrEmpty($cl['prioridad'] ?? ''),
+            'prioridad_label' => self::strOrEmpty($cl['prioridad_label'] ?? ''),
+            'nrc' => self::strOrEmpty($ca['nrc'] ?? ''),
+            'nombre_materia' => self::strOrEmpty($ca['nombre_materia'] ?? ''),
+            'horario_impactado' => self::strOrEmpty($ca['horario_impactado'] ?? ''),
+            'plan_contingencia' => self::strOrEmpty($ca['plan_contingencia'] ?? ''),
+            'descripcion_detallada' => self::strOrEmpty($cu['descripcion_detallada'] ?? ''),
+            'sustento_legal' => self::strOrEmpty($cu['sustento_legal'] ?? ''),
+            'fecha_inicio' => self::strOrEmpty($cu['fecha_inicio'] ?? ''),
+            'fecha_fin' => self::strOrEmpty($cu['fecha_fin'] ?? ''),
             'consentimiento_responsabilidad' => !empty($co['responsabilidad']) ? 1 : 0,
         ]);
     }
@@ -591,6 +588,16 @@ final class MysqlStorage
         $s = trim((string) $v);
 
         return $s === '' ? null : $s;
+    }
+
+    /** Texto vacío en lugar de NULL (phpMyAdmin y reportes más legibles). */
+    private static function strOrEmpty(mixed $v): string
+    {
+        if ($v === null) {
+            return '';
+        }
+
+        return trim((string) $v);
     }
 
     private static function nullIfZeroInt(mixed $v): ?int
