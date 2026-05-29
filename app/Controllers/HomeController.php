@@ -10,6 +10,6 @@ final class HomeController extends Controller
         if (auth_user()) {
             redirect(dashboard_url_for_user());
         }
-        redirect('/login.php');
+        redirect('/login');
     }
 }

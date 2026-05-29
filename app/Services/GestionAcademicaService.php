@@ -108,63 +108,6 @@ final class GestionAcademicaService
         return ['Estudiante registrado correctamente.', 'success'];
     }
 
-    public static function agregarDocente(): array
-    {
-        $idSede = (int) post('id_sede', '0');
-        $idProg = (int) post('id_programa', '0');
-        $idsProgValidos = array_column(diccionario_programas(), 'id');
-        if (!in_array($idSede, [1, 2], true)) {
-            return ['Seleccione la sede (Cúcuta u Ocaña).', 'warning'];
-        }
-        if (!in_array($idProg, $idsProgValidos, true)) {
-            return ['Seleccione la carrera a la que dicta clase.', 'warning'];
-        }
-        if (programa_id_sede($idProg) !== $idSede) {
-            return ['La carrera seleccionada no corresponde a la sede indicada.', 'warning'];
-        }
-        $documento = trim((string) post('documento', ''));
-        if ($documento === '') {
-            return ['Ingrese el documento.', 'warning'];
-        }
-        $editId = (int) post('id_docente', '0');
-        $docentes = load_data('docentes');
-        foreach ($docentes as $d) {
-            if ((string) ($d['documento'] ?? '') === $documento && (int) ($d['id_docente'] ?? 0) !== $editId) {
-                return ['Ya existe otro docente con ese documento.', 'warning'];
-            }
-        }
-        $clavePost = post('clave', '');
-        $row = [
-            'nombre' => post('nombre', ''),
-            'apellido' => post('apellido', ''),
-            'documento' => $documento,
-            'correo' => post('correo', ''),
-            'telefono' => post('telefono', ''),
-            'id_sede' => $idSede,
-            'id_programa' => $idProg,
-            'programa' => programa_label_by_id($idProg),
-        ];
-        if ($editId > 0) {
-            foreach ($docentes as &$d) {
-                if ((int) ($d['id_docente'] ?? 0) === $editId) {
-                    if ($clavePost !== '') {
-                        $d['clave'] = $clavePost;
-                    }
-                    $d = array_merge($d, $row);
-                    save_data('docentes', $docentes);
-                    return ['Docente actualizado.', 'success'];
-                }
-            }
-            unset($d);
-            return ['Docente no encontrado.', 'warning'];
-        }
-        $row['id_docente'] = next_numeric_id($docentes, 'id_docente');
-        $row['clave'] = $clavePost !== '' ? $clavePost : 'doc123';
-        $docentes[] = $row;
-        save_data('docentes', $docentes);
-        return ['Docente registrado.' . ($clavePost === '' ? ' Contraseña por defecto: doc123.' : ''), 'success'];
-    }
-
     public static function actualizarEstudiantePropio(int $idSesion): array
     {
         if ($idSesion <= 0) {
@@ -173,20 +116,5 @@ final class GestionAcademicaService
         $_POST['id_estudiante'] = (string) $idSesion;
 
         return self::agregarEstudiante();
-    }
-
-    public static function actualizarDocentePropio(int $idSesion): array
-    {
-        if ($idSesion <= 0) {
-            return ['Sesión inválida.', 'warning'];
-        }
-        $cp = trim((string) post('clave', ''));
-        $cc = trim((string) post('clave_confirmar', ''));
-        if ($cp !== '' && $cp !== $cc) {
-            return ['Las contraseñas no coinciden.', 'warning'];
-        }
-        $_POST['id_docente'] = (string) $idSesion;
-
-        return self::agregarDocente();
     }
 }

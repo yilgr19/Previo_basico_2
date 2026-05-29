@@ -27,7 +27,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-xl font-semibold text-academic">Mi perfil</h1>
-    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard.php')) ?>">Volver al inicio</a>
+    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard')) ?>">Volver al inicio</a>
   </div>
   <?php if ($mensaje): ?>
     <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>

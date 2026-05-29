@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers\Gestion;
 
 use App\Controllers\Controller;
+use App\Services\SolicitudDocumentosService;
 use App\Services\SolicitudesService;
 
 final class SolicitudesRevisionController extends Controller
@@ -33,6 +34,14 @@ final class SolicitudesRevisionController extends Controller
                 $tipoMsg = 'warning';
             } else {
                 [$mensaje, $tipoMsg] = SolicitudesService::actualizarEstadoAdmin($id, $est, $resp, $guardarElab);
+            }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'solicitar_documento') {
+            $id = (int) post('id_solicitud', '0');
+            if ($this->idSedeBandeja > 0 && !SolicitudesService::solicitudPerteneceASedeBandeja($id, $this->idSedeBandeja)) {
+                $mensaje = 'Esta solicitud no corresponde a la sede de esta bandeja.';
+                $tipoMsg = 'warning';
+            } else {
+                [$mensaje, $tipoMsg] = SolicitudDocumentosService::solicitarDesdeAdmin($id);
             }
         }
 
@@ -76,8 +85,8 @@ final class SolicitudesRevisionController extends Controller
             ? 'Solicitudes en revisión — Sede ' . $nombreSede
             : 'Solicitudes en revisión';
         $revisionScript = $this->idSedeBandeja === 2
-            ? 'gestion/solicitudes_revision_ocana.php'
-            : 'gestion/solicitudes_revision.php';
+            ? 'gestion/solicitudes_revision_ocana'
+            : 'gestion/solicitudes_revision';
 
         $this->render('gestion/solicitudes_revision.php', [
             'pageTitle' => $pageTitle,

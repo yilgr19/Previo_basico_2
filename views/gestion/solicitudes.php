@@ -6,17 +6,17 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
 }
 ?>
 <?php
-$bandejaScript = $bandejaScript ?? 'gestion/solicitudes.php';
+$bandejaScript = $bandejaScript ?? 'gestion/solicitudes';
 $idSedeBandeja = (int) ($idSedeBandeja ?? 0);
 $uBandeja = url($bandejaScript);
-$uBandejaCucuta = url('gestion/solicitudes.php');
-$uBandejaOcana = url('gestion/solicitudes_sede_ocana.php');
+$uBandejaCucuta = url('gestion/solicitudes');
+$uBandejaOcana = url('gestion/solicitudes_sede_ocana');
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-semibold text-academic"><?= h($pageTitle ?? 'Solicitudes institucionales') ?></h1>
-      <p class="mt-1 text-sm text-gray-600">Revise solicitudes de estudiantes y de docentes, filtre y responda según el estado del trámite. La tabla se ordena por <strong class="font-medium text-gray-800">fecha de registro</strong> (más recientes primero). Solo se listan trámites de la sede indicada en el título.</p>
+      <p class="mt-1 text-sm text-gray-600">Revise solicitudes de estudiantes, filtre y responda según el estado del trámite. La tabla se ordena por <strong class="font-medium text-gray-800">fecha de registro</strong> (más recientes primero). Solo se listan trámites de la sede indicada en el título.</p>
       <?php if ($idSedeBandeja === 1 || $idSedeBandeja === 2): ?>
         <p class="mt-2 flex flex-wrap gap-2 text-xs">
           <span class="font-medium text-gray-600">Otra sede:</span>
@@ -30,9 +30,9 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana.php');
       <?php endif; ?>
     </div>
     <div class="flex flex-wrap gap-2">
-      <a class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision.php')) ?>">Solo en revisión Cúcuta</a>
-      <a class="inline-flex items-center rounded-lg border border-amber-200/90 bg-amber-50/80 px-3 py-1.5 text-sm font-medium text-amber-950 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>">Solo en revisión Ocaña</a>
-      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
+      <a class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision')) ?>">Solo en revisión Cúcuta</a>
+      <a class="inline-flex items-center rounded-lg border border-amber-200/90 bg-amber-50/80 px-3 py-1.5 text-sm font-medium text-amber-950 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision_ocana')) ?>">Solo en revisión Ocaña</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard')) ?>">Volver al panel</a>
     </div>
   </div>
 
@@ -52,7 +52,6 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana.php');
         <select name="radicante" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm">
           <option value="" <?= (($filtroRadicante ?? '') === '') ? 'selected' : '' ?>>Todos</option>
           <option value="estudiantes" <?= (($filtroRadicante ?? '') === 'estudiantes') ? 'selected' : '' ?>>Solo estudiantes</option>
-          <option value="docentes" <?= (($filtroRadicante ?? '') === 'docentes') ? 'selected' : '' ?>>Solo docentes</option>
         </select>
       </div>
       <div>

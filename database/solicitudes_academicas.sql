@@ -565,27 +565,28 @@ INSERT INTO `tipos_solicitud_docente` (`id_tipo_solicitud_docente`, `codigo`, `n
 CREATE TABLE `tipos_solicitud_estudiante` (
   `id_tipo_solicitud` tinyint(3) UNSIGNED NOT NULL,
   `codigo` varchar(30) NOT NULL,
-  `nombre` varchar(120) NOT NULL
+  `nombre` varchar(120) NOT NULL,
+  `plazo` varchar(100) NOT NULL DEFAULT '15 días hábiles' COMMENT 'Plazo institucional de respuesta o trámite'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tipos_solicitud_estudiante`
 --
 
-INSERT INTO `tipos_solicitud_estudiante` (`id_tipo_solicitud`, `codigo`, `nombre`) VALUES
-(1, 'REQ_CANCEL_SEM', 'Cancelación de semestre'),
-(2, 'REQ_CURSO_DIR', 'Curso dirigido'),
-(3, 'REQ_CANCEL_ASIG', 'Cancelación de asignaturas'),
-(4, 'REQ_CAMBIO_JORNADA', 'Cambio de jornada'),
-(5, 'REQ_TRANSFER_INT', 'Transferencia interna'),
-(6, 'REQ_EXAMEN_SUF', 'Examen de validación por suficiencia'),
-(7, 'REQ_REINGRESO', 'Reingreso'),
-(8, 'REQ_MATR_MIN', 'Matrícula mínima de créditos'),
-(9, 'REQ_TRASLADO_SEDE', 'Traslado de sede'),
-(10, 'REQ_PAGO_CRED', 'Pago de créditos adicionales'),
-(11, 'REQ_CONST_EST', 'Constancia de estudio'),
-(12, 'REQ_CERT_NOTAS', 'Certificado de notas'),
-(13, 'REQ_OTRA', 'Otra');
+INSERT INTO `tipos_solicitud_estudiante` (`id_tipo_solicitud`, `codigo`, `nombre`, `plazo`) VALUES
+(1, 'REQ_CANCEL_SEM', 'Cancelación de semestre', '15 días hábiles'),
+(2, 'REQ_CURSO_DIR', 'Curso dirigido', '20 días hábiles'),
+(3, 'REQ_CANCEL_ASIG', 'Cancelación de asignaturas', '10 días hábiles'),
+(4, 'REQ_CAMBIO_JORNADA', 'Cambio de jornada', '15 días hábiles'),
+(5, 'REQ_TRANSFER_INT', 'Transferencia interna', '30 días hábiles'),
+(6, 'REQ_EXAMEN_SUF', 'Examen de validación por suficiencia', '20 días hábiles'),
+(7, 'REQ_REINGRESO', 'Reingreso', '30 días hábiles'),
+(8, 'REQ_MATR_MIN', 'Matrícula mínima de créditos', '10 días hábiles'),
+(9, 'REQ_TRASLADO_SEDE', 'Traslado de sede', '30 días hábiles'),
+(10, 'REQ_PAGO_CRED', 'Pago de créditos adicionales', '10 días hábiles'),
+(11, 'REQ_CONST_EST', 'Constancia de estudio', '5 días hábiles'),
+(12, 'REQ_CERT_NOTAS', 'Certificado de notas', '5 días hábiles'),
+(13, 'REQ_OTRA', 'Otra', '15 días hábiles');
 
 --
 -- Índices para tablas volcadas

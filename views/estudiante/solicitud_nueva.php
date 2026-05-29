@@ -20,9 +20,9 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-semibold text-academic">Nueva solicitud</h1>
-      <p class="mt-1 text-sm text-gray-600">Radique un trámite según el catálogo institucional. Los datos de identificación se toman de su sesión.</p>
+      <p class="mt-1 text-sm text-gray-600">Radique un trámite según el catálogo institucional. Los soportes documentales solo se solicitan si gestión académica los requiere después de la radicación.</p>
     </div>
-    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard.php')) ?>">Volver al inicio</a>
+    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard')) ?>">Volver al inicio</a>
   </div>
 
   <?php require dirname(__DIR__) . '/partials/sol_nav_estudiante.php'; ?>
@@ -31,14 +31,14 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
     <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>">
       <?= h($mensaje) ?>
       <?php if (($tipoMsg ?? '') === 'warning'): ?>
-        <span class="mt-2 block text-[13px] font-normal">Puede corregir y enviar de nuevo: <strong class="font-medium text-gray-800">conservamos lo que escribió</strong> en el formulario (excepto archivos adjuntos; vuelva a seleccionarlos si eran obligatorios).</span>
+        <span class="mt-2 block text-[13px] font-normal">Puede corregir y enviar de nuevo: <strong class="font-medium text-gray-800">conservamos lo que escribió</strong> en el formulario.</span>
       <?php endif; ?>
     </div>
   <?php endif; ?>
 
   <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
     <h2 class="mb-4 border-b border-blue-100 pb-2 text-base font-semibold text-academic">Formulario de radicación</h2>
-    <form method="post" enctype="multipart/form-data" action="<?= h(url('estudiante/nueva_solicitud.php')) ?>" class="space-y-8">
+    <form method="post" enctype="multipart/form-data" action="<?= h(url('estudiante/nueva_solicitud')) ?>" class="space-y-8">
       <input type="hidden" name="accion" value="nueva_solicitud">
 
       <fieldset class="rounded-lg border border-gray-200 p-4">
@@ -75,6 +75,7 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
                 <option value="<?= (int) $t['id'] ?>" <?= ((string) ($old['id_tipo_solicitud'] ?? '')) === (string) (int) $t['id'] ? 'selected' : '' ?>><?= h((string) $t['nombre']) ?></option>
               <?php endforeach; ?>
             </select>
+            <p id="hint_plazo_tipo" class="mt-1 text-xs text-gray-500"></p>
           </div>
           <div>
             <label class="<?= h($lbl) ?>">Periodo académico</label>
@@ -82,7 +83,7 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
           </div>
           <div>
             <label class="<?= h($lbl) ?>">Sede (petición)</label>
-            <select name="id_sede_solicitud" class="<?= h($inp) ?>" required>
+            <select name="id_sede_solicitud" id="fld_sede_solicitud" class="<?= h($inp) ?>" required>
               <option value="">Seleccione…</option>
               <?php foreach (diccionario_sedes() as $sd): ?>
                 <?php
@@ -131,30 +132,7 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
       </fieldset>
 
       <fieldset class="rounded-lg border border-gray-200 p-4">
-        <legend class="px-1 text-sm font-semibold text-academic">4. Soportes obligatorios (evidencias)</legend>
-        <p class="mb-3 text-xs text-gray-600">Según el tipo y el motivo, el sistema exigirá: soporte médico (motivo salud), carta (transferencia/traslado) o recibo (trámites con costo). Adjunte también evidencias generales si aplica.</p>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div class="md:col-span-2">
-            <label class="<?= h($lbl) ?>">Evidencias generales <span class="text-gray-500">(PDF o imágenes, máx. 15 archivos en total, 5 MB c/u)</span></label>
-            <input type="file" name="anexos[]" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*" multiple>
-          </div>
-          <div>
-            <label class="<?= h($lbl) ?>">Soporte médico <span class="text-gray-500" id="hint-medico">(obligatorio si motivo es salud)</span></label>
-            <input type="file" name="soporte_medico" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*">
-          </div>
-          <div>
-            <label class="<?= h($lbl) ?>">Carta de aceptación / orden <span class="text-gray-500" id="hint-carta">(transferencia interna o traslado de sede)</span></label>
-            <input type="file" name="carta_aceptacion" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*">
-          </div>
-          <div class="md:col-span-2">
-            <label class="<?= h($lbl) ?>">Recibo de pago <span class="text-gray-500" id="hint-recibo">(pago créditos adicionales, constancia o certificado de notas)</span></label>
-            <input type="file" name="recibo_pago" class="<?= h($inp) ?>" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*">
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset class="rounded-lg border border-gray-200 p-4">
-        <legend class="px-1 text-sm font-semibold text-academic">5. Declaración de veracidad</legend>
+        <legend class="px-1 text-sm font-semibold text-academic">4. Declaración de veracidad</legend>
         <label class="flex cursor-pointer items-start gap-3 text-sm text-gray-800">
           <input type="checkbox" name="consentimiento_veracidad" value="1" required class="mt-1" <?= !empty($old['consentimiento_veracidad']) ? 'checked' : '' ?>>
           <span>Declaro que la información suministrada es verídica y que conozco el reglamento estudiantil aplicable a este trámite.</span>
@@ -167,3 +145,29 @@ $valPeriodo = ($old['periodo_academico'] ?? '') !== '' ? (string) $old['periodo_
     </form>
   </div>
 </main>
+<script>
+(function () {
+  var matrizPlazos = <?= json_encode($matrizPlazos ?? [], JSON_UNESCAPED_UNICODE) ?: '{}' ?>;
+  var selTipo = document.getElementById('fld_tipo_solicitud');
+  var selSede = document.getElementById('fld_sede_solicitud');
+  var hint = document.getElementById('hint_plazo_tipo');
+  if (!selTipo || !selSede || !hint) return;
+  function actualizar() {
+    var tipo = selTipo.value;
+    var sede = selSede.value;
+    if (!tipo || !sede) {
+      hint.textContent = '';
+      return;
+    }
+    var dias = matrizPlazos[tipo + '-' + sede];
+    if (dias) {
+      hint.textContent = 'Plazo estimado de respuesta: ' + dias + (dias === 1 ? ' día' : ' días') + '.';
+    } else {
+      hint.textContent = 'No hay plazo configurado para este tipo y sede. Contacte a gestión académica.';
+    }
+  }
+  selTipo.addEventListener('change', actualizar);
+  selSede.addEventListener('change', actualizar);
+  actualizar();
+})();
+</script>

@@ -27,7 +27,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
 <main class="flex-1 w-full mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-xl font-semibold text-academic">Registrar estudiante</h1>
-    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
+    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard')) ?>">Volver al panel</a>
   </div>
   <?php if ($mensaje): ?>
     <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>
@@ -102,7 +102,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
     <div class="flex flex-wrap gap-3">
       <button type="submit" class="rounded-lg bg-academic px-4 py-2.5 text-sm font-semibold text-white hover:bg-academic-dark"><?= $editar ? 'Actualizar' : 'Guardar' ?></button>
       <?php if ($editar): ?>
-        <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50" href="<?= h(url('gestion/estudiantes.php')) ?>">Cancelar edición</a>
+        <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50" href="<?= h(url('gestion/estudiantes')) ?>">Cancelar edición</a>
       <?php endif; ?>
     </div>
   </form>
@@ -125,7 +125,7 @@ $lbl = 'mb-1 block text-sm font-medium text-gray-700';
             <td class="px-3 py-2"><?= h(trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? ''))) ?></td>
             <td class="max-w-xs px-3 py-2 text-xs"><?= h($e['programa'] ?? '') ?></td>
             <td class="px-3 py-2 text-right whitespace-nowrap">
-              <a class="mr-1 inline-flex rounded-lg border border-blue-600 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/estudiantes.php?editar=' . (int) $e['id_estudiante'])) ?>">Editar</a>
+              <a class="mr-1 inline-flex rounded-lg border border-blue-600 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50" href="<?= h(url('gestion/estudiantes?editar=' . (int) $e['id_estudiante'])) ?>">Editar</a>
               <form method="post" class="inline" onsubmit="return confirm('¿Eliminar este estudiante?');">
                 <input type="hidden" name="accion" value="eliminar">
                 <input type="hidden" name="id_estudiante" value="<?= (int) $e['id_estudiante'] ?>">

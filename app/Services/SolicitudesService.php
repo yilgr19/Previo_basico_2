@@ -54,27 +54,9 @@ final class SolicitudesService
 
         $idProg = (int) ($est['id_programa'] ?? 0);
 
-        if ($motivo === 'salud' && !SolicitudesAnexosUpload::hayArchivoSubidoOk('soporte_medico')) {
-            return ['Si el motivo es salud, debe adjuntar soporte médico.', 'warning'];
-        }
-        if (in_array($idTipo, [5, 9], true) && !SolicitudesAnexosUpload::hayArchivoSubidoOk('carta_aceptacion')) {
-            return ['Para transferencia o traslado de sede adjunte la carta de aceptación u orden correspondiente.', 'warning'];
-        }
-        if (in_array($idTipo, [10, 11, 12], true) && !SolicitudesAnexosUpload::hayArchivoSubidoOk('recibo_pago')) {
-            return ['Para este trámite con costo administrativo adjunte el recibo de pago.', 'warning'];
-        }
-
         $rows = load_data('solicitudes');
         $idSol = next_numeric_id($rows, 'id_solicitud');
-        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
-            ['input' => 'anexos', 'categoria' => 'general', 'multiple' => true],
-            ['input' => 'soporte_medico', 'categoria' => 'soporte_medico', 'multiple' => false],
-            ['input' => 'carta_aceptacion', 'categoria' => 'carta_aceptacion', 'multiple' => false],
-            ['input' => 'recibo_pago', 'categoria' => 'recibo_pago', 'multiple' => false],
-        ]);
-        if ($errAnexos !== null) {
-            return [$errAnexos, 'warning'];
-        }
+        $anexos = [];
 
         $estadoAcad = strtoupper(trim((string) ($est['estado_academico'] ?? 'REGULAR')));
         $sem = (int) ($est['semestre'] ?? 0);
@@ -108,15 +90,12 @@ final class SolicitudesService
         $row = [
             'id_solicitud' => $idSol,
             'id_estudiante' => $idEstudiante,
-            'id_docente_solicitante' => 0,
             'documento_estudiante' => (string) ($est['documento'] ?? ''),
             'id_tipo_solicitud' => $idTipo,
-            'id_tipo_solicitud_docente' => 0,
             'codigo_tipo' => (string) ($tipo['codigo'] ?? ''),
             'fecha_registro' => fecha_hora_colombia(),
             'estado' => 'pendiente',
             'descripcion' => $exposicion,
-            'documento_docente_relacionado' => '',
             'respuesta' => '',
             'fecha_respuesta' => '',
             'respondido_en' => '',
@@ -126,140 +105,8 @@ final class SolicitudesService
             'detalle_docente' => null,
             'formulario_version' => 2,
             'notif_pendiente_est' => false,
-            'notif_pendiente_doc' => false,
             'notif_nueva_gestion' => true,
-        ];
-        $rows[] = $row;
-        save_data('solicitudes', $rows);
-
-        return ['Solicitud registrada correctamente.', 'success'];
-    }
-
-    /** @return array{0: string, 1: string} */
-    public static function registrarDesdeDocente(int $idDocente): array
-    {
-        $doc = repo_docente_por_id($idDocente);
-        if (!$doc) {
-            return ['Sesión inválida.', 'warning'];
-        }
-
-        $idTipoDoc = (int) post('id_tipo_solicitud_docente', '0');
-        $tipoDoc = tipo_solicitud_docente_por_id($idTipoDoc);
-        if (!$tipoDoc) {
-            return ['Seleccione un tipo de solicitud válido (catálogo docente).', 'warning'];
-        }
-
-        $asunto = trim((string) post('asunto', ''));
-        $asuntoLen = function_exists('mb_strlen') ? mb_strlen($asunto, 'UTF-8') : strlen($asunto);
-        if ($asuntoLen < 3) {
-            return ['Indique un asunto breve (mínimo 3 caracteres).', 'warning'];
-        }
-
-        $prioridad = strtolower(trim((string) post('prioridad', '')));
-        $priOk = array_column(diccionario_prioridad_solicitud_docente(), 'codigo');
-        if (!in_array($prioridad, $priOk, true)) {
-            return ['Seleccione el nivel de prioridad.', 'warning'];
-        }
-
-        $desc = trim((string) post('descripcion_detallada', ''));
-        $len = function_exists('mb_strlen') ? mb_strlen($desc, 'UTF-8') : strlen($desc);
-        if ($desc === '' || $len < 10) {
-            return ['La descripción detallada debe tener al menos 10 caracteres.', 'warning'];
-        }
-
-        $sustento = trim((string) post('sustento_legal', ''));
-        $nrc = trim((string) post('nrc', ''));
-        $nomMat = trim((string) post('nombre_materia', ''));
-        $horarioImp = trim((string) post('horario_impactado', ''));
-        $planCont = trim((string) post('plan_contingencia', ''));
-
-        $fi = trim((string) post('fecha_inicio', ''));
-        $ff = trim((string) post('fecha_fin', ''));
-        if ($fi === '' || $ff === '') {
-            return ['Indique la fecha de inicio y la fecha de fin del requerimiento.', 'warning'];
-        }
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fi) !== 1 || preg_match('/^\d{4}-\d{2}-\d{2}$/', $ff) !== 1) {
-            return ['Use fechas en formato AAAA-MM-DD.', 'warning'];
-        }
-        if (strcmp($ff, $fi) < 0) {
-            return ['La fecha de fin no puede ser anterior a la de inicio.', 'warning'];
-        }
-
-        if (post('consentimiento_responsabilidad', '') !== '1') {
-            return ['Debe aceptar la declaración de responsabilidad sobre la carga académica.', 'warning'];
-        }
-
-        $rows = load_data('solicitudes');
-        $idSol = next_numeric_id($rows, 'id_solicitud');
-        [$anexos, $errAnexos] = SolicitudesAnexosUpload::guardarMultiplesCampos($idSol, [
-            ['input' => 'anexos', 'categoria' => 'general', 'multiple' => true],
-            ['input' => 'anexos_terceros', 'categoria' => 'doc_terceros', 'multiple' => true],
-            ['input' => 'anexos_formatos', 'categoria' => 'formato_institucional', 'multiple' => true],
-        ]);
-        if ($errAnexos !== null) {
-            return [$errAnexos, 'warning'];
-        }
-
-        $idEmp = trim((string) ($doc['codigo_empleado'] ?? ''));
-        if ($idEmp === '') {
-            $idEmp = (string) ($doc['documento'] ?? '');
-        }
-        $detalleDoc = [
-            'perfil_snapshot' => [
-                'id_empleado' => $idEmp,
-                'unidad_academica' => trim((string) ($doc['unidad_academica'] ?? '')),
-                'categoria_docente' => strtolower(trim((string) ($doc['categoria_docente'] ?? ''))),
-                'categoria_docente_label' => categoria_docente_nombre((string) ($doc['categoria_docente'] ?? '')),
-                'tipo_contrato' => strtolower(trim((string) ($doc['tipo_contrato'] ?? ''))),
-                'tipo_contrato_label' => tipo_contrato_docente_nombre((string) ($doc['tipo_contrato'] ?? '')),
-                'documento' => (string) ($doc['documento'] ?? ''),
-                'nombre_completo' => trim(($doc['nombre'] ?? '') . ' ' . ($doc['apellido'] ?? '')),
-            ],
-            'clasificacion' => [
-                'asunto' => $asunto,
-                'prioridad' => $prioridad,
-                'prioridad_label' => prioridad_solicitud_docente_nombre($prioridad),
-            ],
-            'carga_afectada' => [
-                'nrc' => $nrc,
-                'nombre_materia' => $nomMat,
-                'horario_impactado' => $horarioImp,
-                'plan_contingencia' => $planCont,
-            ],
-            'cuerpo' => [
-                'descripcion_detallada' => $desc,
-                'sustento_legal' => $sustento,
-                'fecha_inicio' => $fi,
-                'fecha_fin' => $ff,
-            ],
-            'consentimientos' => [
-                'responsabilidad' => true,
-            ],
-        ];
-
-        $row = [
-            'id_solicitud' => $idSol,
-            'id_estudiante' => 0,
-            'id_docente_solicitante' => $idDocente,
-            'documento_estudiante' => '',
-            'id_tipo_solicitud' => 0,
-            'id_tipo_solicitud_docente' => $idTipoDoc,
-            'codigo_tipo' => (string) ($tipoDoc['codigo'] ?? ''),
-            'fecha_registro' => fecha_hora_colombia(),
-            'estado' => 'pendiente',
-            'descripcion' => $desc,
-            'documento_docente_relacionado' => (string) ($doc['documento'] ?? ''),
-            'respuesta' => '',
-            'fecha_respuesta' => '',
-            'respondido_en' => '',
-            'respuesta_elaborada' => null,
-            'anexos_archivos' => $anexos,
-            'detalle_estudiante' => null,
-            'detalle_docente' => $detalleDoc,
-            'formulario_version' => 2,
-            'notif_pendiente_est' => false,
-            'notif_pendiente_doc' => false,
-            'notif_nueva_gestion' => true,
+            'docs_pendientes_estudiante' => [],
         ];
         $rows[] = $row;
         save_data('solicitudes', $rows);
@@ -497,11 +344,7 @@ final class SolicitudesService
             return true;
         }
         $idEst = (int) ($solicitud['id_estudiante'] ?? 0);
-        $idDoc = (int) ($solicitud['id_docente_solicitante'] ?? 0);
         if ($rol === \ROLE_ESTUDIANTE && $idEst > 0 && (int) ($user['id'] ?? 0) === $idEst) {
-            return true;
-        }
-        if ($rol === \ROLE_DOCENTE && $idDoc > 0 && (int) ($user['id'] ?? 0) === $idDoc) {
             return true;
         }
 
@@ -538,6 +381,9 @@ final class SolicitudesService
         }
         if (!array_key_exists('notif_nueva_gestion', $s)) {
             $s['notif_nueva_gestion'] = false;
+        }
+        if (!array_key_exists('docs_pendientes_estudiante', $s) || !is_array($s['docs_pendientes_estudiante'])) {
+            $s['docs_pendientes_estudiante'] = [];
         }
         if (!array_key_exists('respuesta_elaborada', $s)) {
             $s['respuesta_elaborada'] = null;
@@ -580,9 +426,6 @@ final class SolicitudesService
             if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id && !empty($s['notif_pendiente_est'])) {
                 $n++;
             }
-            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id && !empty($s['notif_pendiente_doc'])) {
-                $n++;
-            }
         }
 
         return $n;
@@ -607,9 +450,6 @@ final class SolicitudesService
             $s = self::normalizarLegacy($s);
             $match = false;
             if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id && !empty($s['notif_pendiente_est'])) {
-                $match = true;
-            }
-            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id && !empty($s['notif_pendiente_doc'])) {
                 $match = true;
             }
             if ($match) {
@@ -661,7 +501,16 @@ final class SolicitudesService
     }
 
     /**
-     * @return list<array{id_solicitud: int, tipo: string, fecha: string, radicante: 'estudiante'|'docente'}>
+     * @return list<array{
+     *   id_solicitud: int,
+     *   tipo: string,
+     *   fecha: string,
+     *   radicante: 'estudiante'|'docente',
+     *   semaforo: string,
+     *   semaforo_etiqueta: string,
+     *   dias_restantes: ?int,
+     *   fecha_vencimiento: ?string
+     * }>
      */
     public static function resumenNotificacionesGestion(int $limit = 8): array
     {
@@ -683,15 +532,34 @@ final class SolicitudesService
                 $cand[] = [$s, 'docente'];
             }
         }
-        usort($cand, static fn ($a, $b) => ((int) ($b[0]['id_solicitud'] ?? 0)) <=> ((int) ($a[0]['id_solicitud'] ?? 0)));
+
+        $prio = ['rojo' => 0, 'amarillo' => 1, 'verde' => 2];
+        usort($cand, static function ($a, $b) use ($prio) {
+            $semA = PlazosSolicitudService::semaforoSolicitud($a[0]);
+            $semB = PlazosSolicitudService::semaforoSolicitud($b[0]);
+            $pa = !empty($semA['activo']) ? ($prio[$semA['estado']] ?? 9) : 9;
+            $pb = !empty($semB['activo']) ? ($prio[$semB['estado']] ?? 9) : 9;
+            if ($pa !== $pb) {
+                return $pa <=> $pb;
+            }
+
+            return ((int) ($b[0]['id_solicitud'] ?? 0)) <=> ((int) ($a[0]['id_solicitud'] ?? 0));
+        });
+
         $cand = array_slice($cand, 0, $limit);
         $out = [];
         foreach ($cand as [$s, $rad]) {
+            $sem = PlazosSolicitudService::semaforoSolicitud($s);
             $out[] = [
                 'id_solicitud' => (int) ($s['id_solicitud'] ?? 0),
                 'tipo' => solicitud_tipo_etiqueta($s),
                 'fecha' => (string) ($s['fecha_registro'] ?? ''),
                 'radicante' => $rad,
+                'semaforo' => $sem['estado'],
+                'semaforo_activo' => !empty($sem['activo']),
+                'semaforo_etiqueta' => $sem['etiqueta'],
+                'dias_restantes' => $sem['dias_restantes'],
+                'fecha_vencimiento' => $sem['fecha_vencimiento'],
             ];
         }
 
@@ -723,23 +591,15 @@ final class SolicitudesService
         }
         $rol = (string) ($user['rol'] ?? '');
         $id = (int) ($user['id'] ?? 0);
-        if ($id <= 0 || ($rol !== \ROLE_ESTUDIANTE && $rol !== \ROLE_DOCENTE)) {
+        if ($id <= 0 || $rol !== \ROLE_ESTUDIANTE) {
             return;
         }
         $rows = load_data('solicitudes');
         $changed = false;
         foreach ($rows as &$s) {
-            if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id) {
-                if (!empty($s['notif_pendiente_est'])) {
-                    $s['notif_pendiente_est'] = false;
-                    $changed = true;
-                }
-            }
-            if ($rol === \ROLE_DOCENTE && (int) ($s['id_docente_solicitante'] ?? 0) === $id) {
-                if (!empty($s['notif_pendiente_doc'])) {
-                    $s['notif_pendiente_doc'] = false;
-                    $changed = true;
-                }
+            if ($rol === \ROLE_ESTUDIANTE && (int) ($s['id_estudiante'] ?? 0) === $id && !empty($s['notif_pendiente_est'])) {
+                $s['notif_pendiente_est'] = false;
+                $changed = true;
             }
         }
         unset($s);

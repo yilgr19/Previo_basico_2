@@ -35,11 +35,11 @@ $sedeTxt = $idSede > 0 ? sede_nombre($idSede) : '';
               Este es su espacio para <strong class="font-semibold text-slate-800">solicitudes académicas</strong> y datos de contacto. Radique trámites con <strong class="font-semibold text-slate-800">Nueva solicitud</strong> y consulte el estado en <strong class="font-semibold text-slate-800">Mis solicitudes</strong>.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="<?= h(url('estudiante/nueva_solicitud.php')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
+              <a href="<?= h(url('estudiante/nueva_solicitud')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                 Nueva solicitud
               </a>
-              <a href="<?= h(url('estudiante/mis_solicitudes.php?tab=activas')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
+              <a href="<?= h(url('estudiante/mis_solicitudes?tab=activas')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
                 <svg class="h-4 w-4 text-academic" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>
                 Mis solicitudes
               </a>
@@ -114,21 +114,21 @@ $sedeTxt = $idSede > 0 ? sede_nombre($idSede) : '';
 
   <h2 class="mb-4 text-lg font-semibold tracking-tight text-slate-800">Accesos rápidos</h2>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <a href="<?= h(url('estudiante/nueva_solicitud.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('estudiante/nueva_solicitud')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic transition group-hover:scale-105">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </div>
       <strong class="block text-center text-gray-900">Nueva solicitud</strong>
       <span class="mt-1 block text-center text-xs text-gray-500">Radicar un trámite con el formulario completo</span>
     </a>
-    <a href="<?= h(url('estudiante/mis_solicitudes.php?tab=activas')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('estudiante/mis_solicitudes?tab=activas')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic transition group-hover:scale-105">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
       <strong class="block text-center text-gray-900">Mis solicitudes</strong>
       <span class="mt-1 block text-center text-xs text-gray-500">Ver todo filtrado por estado</span>
     </a>
-    <a href="<?= h(url('estudiante/perfil.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('estudiante/perfil')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-emerald-600 transition group-hover:scale-105">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       </div>

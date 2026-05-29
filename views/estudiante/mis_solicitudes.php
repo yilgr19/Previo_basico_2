@@ -7,7 +7,7 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
 $tab = $tab ?? 'activas';
 $listaTab = $listaTab ?? [];
 $conteosSolicitudes = $conteosSolicitudes ?? ['activas' => 0, 'en_revision' => 0, 'aprobadas' => 0, 'rechazadas' => 0];
-$uSolic = h(url('estudiante/mis_solicitudes.php'));
+$uSolic = h(url('estudiante/mis_solicitudes'));
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -15,13 +15,17 @@ $uSolic = h(url('estudiante/mis_solicitudes.php'));
       <h1 class="text-xl font-semibold text-academic">Mis solicitudes</h1>
       <p class="mt-1 text-sm text-gray-600">Historial y seguimiento de sus trámites radicados, filtrados por estado.</p>
     </div>
-    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard.php')) ?>">Volver al inicio</a>
+    <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('estudiante/dashboard')) ?>">Volver al inicio</a>
   </div>
 
   <?php require dirname(__DIR__) . '/partials/sol_nav_estudiante.php'; ?>
 
   <?php if ($mensaje): ?>
     <div class="mb-4 rounded-lg border px-4 py-3 text-sm <?= h($alertClass) ?>"><?= h($mensaje) ?></div>
+  <?php endif; ?>
+
+  <?php if (!empty($panelDoc) && is_array($panelDoc)): ?>
+    <?php require __DIR__ . '/partials/panel_documento_solicitado.php'; ?>
   <?php endif; ?>
 
   <?php
@@ -40,7 +44,7 @@ $uSolic = h(url('estudiante/mis_solicitudes.php'));
       foreach ($ax as $i => $m) {
           $cat = (string) ($m['categoria'] ?? 'general');
           $badge = $cat !== '' && $cat !== 'general' ? ' <span class="text-gray-500">(' . h(solicitud_etiqueta_categoria_anexo($cat)) . ')</span>' : '';
-          echo '<a class="text-academic hover:underline" href="' . h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) . '">' . h((string) ($m['original'] ?? 'archivo')) . '</a>' . $badge . '<br>';
+          echo '<a class="text-academic hover:underline" href="' . h(url('descargar_anexo?s=' . $idSol . '&f=' . $i)) . '">' . h((string) ($m['original'] ?? 'archivo')) . '</a>' . $badge . '<br>';
       }
       echo '</td>';
   };
@@ -80,14 +84,27 @@ $uSolic = h(url('estudiante/mis_solicitudes.php'));
           <th class="px-3 py-2 text-left font-semibold text-gray-700">Respuesta</th>
         </tr></thead>
         <tbody class="divide-y divide-gray-100">
-          <?php foreach ($listaTab as $s): ?>
-            <tr>
+          <?php foreach ($listaTab as $s):
+              $docsPend = \App\Services\SolicitudDocumentosService::listarPendientes($s, true);
+          ?>
+            <tr id="sol-<?= (int) ($s['id_solicitud'] ?? 0) ?>">
               <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]"><?= h(solicitud_texto_momento_radicacion($s) ?: '—') ?></td>
               <td class="px-3 py-2"><?= h(tipo_solicitud_nombre((int) ($s['id_tipo_solicitud'] ?? 0))) ?></td>
               <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
               <?php $tblDesc($s); ?>
               <?php $tblAnexos($s); ?>
               <td class="max-w-xs px-3 py-2 text-xs">
+                <?php if ($docsPend !== []): ?>
+                  <div class="mb-2 rounded border border-amber-200 bg-amber-50 px-2 py-1.5">
+                    <p class="text-[10px] font-semibold text-amber-900">Documentos por cargar</p>
+                    <?php foreach ($docsPend as $dp): ?>
+                      <?php $cat = (string) ($dp['categoria'] ?? ''); ?>
+                      <a class="mt-1 block text-[11px] font-medium text-academic hover:underline" href="<?= h(url('estudiante/mis_solicitudes?solicitud=' . (int) ($s['id_solicitud'] ?? 0) . '&doc=' . rawurlencode($cat) . '#panel-doc-solicitado')) ?>">
+                        → <?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>
+                      </a>
+                    <?php endforeach; ?>
+                  </div>
+                <?php endif; ?>
                 <?php
                 $txtCorto = trim((string) ($s['respuesta'] ?? ''));
                 $re = $s['respuesta_elaborada'] ?? null;

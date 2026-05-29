@@ -8,6 +8,7 @@ $gestionRepoblar = $gestionRepoblar ?? null;
       <thead class="bg-gray-50">
         <tr>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">ID</th>
+          <th class="px-3 py-3 text-left font-semibold text-gray-700" title="Plazo según tipo y sede">Plazo</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Enviada</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Radicante</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Tipo</th>
@@ -25,9 +26,22 @@ $gestionRepoblar = $gestionRepoblar ?? null;
             $idSol = (int) ($s['id_solicitud'] ?? 0);
             $nomEst = $e ? trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? '')) : '';
             $anexos = $s['anexos_archivos'] ?? [];
+            $sem = \App\Services\PlazosSolicitudService::semaforoSolicitud($s, $e ?: null, $ds ?: null);
+            $semActivo = semaforo_plazo_activo($sem);
+            $semCls = $semActivo ? semaforo_plazo_clases((string) ($sem['estado'] ?? 'gris')) : semaforo_plazo_clases('ninguno');
             ?>
-          <tr class="align-top">
+          <tr class="align-top<?= $semActivo ? ' ' . h($semCls['fondo']) : '' ?>">
             <td class="px-3 py-2 font-mono"><?= $idSol ?></td>
+            <td class="max-w-[7rem] px-3 py-2 text-[11px]">
+              <?php if ($semActivo): ?>
+                <span class="inline-flex items-center gap-1.5 font-medium">
+                  <span class="h-2.5 w-2.5 shrink-0 rounded-full <?= h($semCls['punto']) ?>" title="<?= h((string) ($sem['etiqueta'] ?? '')) ?>"></span>
+                  <span class="<?= h($semCls['badge']) ?> rounded px-1 py-0.5 text-[10px] leading-tight"><?= h((string) ($sem['etiqueta'] ?? '')) ?></span>
+                </span>
+              <?php else: ?>
+                <span class="text-gray-400">—</span>
+              <?php endif; ?>
+            </td>
             <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]"><?= h(solicitud_texto_momento_radicacion($s) ?: '—') ?></td>
             <td class="max-w-xs px-3 py-2">
               <?php if ($e): ?>
@@ -48,7 +62,7 @@ $gestionRepoblar = $gestionRepoblar ?? null;
               <?php if (is_array($anexos) && $anexos !== []): ?>
                 <?php foreach ($anexos as $i => $m): ?>
                   <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
-                  <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?></a>
+                  <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?></a>
                 <?php endforeach; ?>
               <?php else: ?>
                 —
@@ -94,6 +108,10 @@ $gestionRepoblar = $gestionRepoblar ?? null;
                     }
                 }
                 $elabOpen = $chkIncluirElab || $elabTieneTexto;
+              ?>
+              <?php
+                $row = ['solicitud' => $s, 'estudiante' => $e ?: null];
+                require __DIR__ . '/solicitar_documento_admin.php';
               ?>
               <form method="post" class="space-y-2 rounded border border-gray-100 bg-gray-50 p-2">
                 <?php if ($respCerrada): ?>
@@ -179,7 +197,7 @@ $gestionRepoblar = $gestionRepoblar ?? null;
           </tr>
         <?php endforeach; ?>
         <?php if (!$items): ?>
-          <tr><td colspan="8" class="px-3 py-8 text-center text-gray-500"><?= h($emptyHint) ?></td></tr>
+          <tr><td colspan="9" class="px-3 py-8 text-center text-gray-500"><?= h($emptyHint) ?></td></tr>
         <?php endif; ?>
       </tbody>
     </table>

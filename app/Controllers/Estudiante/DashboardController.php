@@ -13,7 +13,7 @@ final class DashboardController extends Controller
 
         $idEst = auth_id();
         if (!$idEst) {
-            redirect('/login.php');
+            redirect('/login');
         }
         $yo = repo_estudiante_por_id($idEst);
         $todas = array_values(array_filter(load_data('solicitudes'), static fn ($s) => (int) ($s['id_estudiante'] ?? 0) === $idEst));

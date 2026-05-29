@@ -15,14 +15,12 @@ final class ReportesController extends Controller
         $tipoMsg = 'success';
 
         $estudiantes = load_data('estudiantes');
-        $docentes = load_data('docentes');
 
         $this->render('gestion/reportes.php', [
             'pageTitle' => 'Reportes',
             'mensaje' => $mensaje,
             'tipoMsg' => $tipoMsg,
             'estudiantes' => $estudiantes,
-            'docentes' => $docentes,
         ]);
     }
 }

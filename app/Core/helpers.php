@@ -90,24 +90,6 @@ function solicitud_estudiante_old_desde_post(): array
     ];
 }
 
-function solicitud_docente_old_desde_post(): array
-{
-    return [
-        'id_tipo_solicitud_docente' => post('id_tipo_solicitud_docente', '') ?? '',
-        'asunto' => (string) ($_POST['asunto'] ?? ''),
-        'prioridad' => post('prioridad', '') ?? '',
-        'nrc' => (string) ($_POST['nrc'] ?? ''),
-        'nombre_materia' => (string) ($_POST['nombre_materia'] ?? ''),
-        'horario_impactado' => (string) ($_POST['horario_impactado'] ?? ''),
-        'plan_contingencia' => (string) ($_POST['plan_contingencia'] ?? ''),
-        'descripcion_detallada' => (string) ($_POST['descripcion_detallada'] ?? ''),
-        'sustento_legal' => (string) ($_POST['sustento_legal'] ?? ''),
-        'fecha_inicio' => post('fecha_inicio', '') ?? '',
-        'fecha_fin' => post('fecha_fin', '') ?? '',
-        'consentimiento_responsabilidad' => (isset($_POST['consentimiento_responsabilidad']) && (string) $_POST['consentimiento_responsabilidad'] === '1'),
-    ];
-}
-
 function gestion_formulario_repoblar_desde_post(): ?array
 {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || post('accion', '') !== 'cambiar_estado') {
@@ -141,23 +123,7 @@ function gestion_formulario_repoblar_desde_post(): ?array
 
 function asset_url(string $path): string
 {
-    $p = ltrim($path, '/');
-    if (!defined('ROOT_PATH')) {
-        return '/assets/' . $p;
-    }
-    $rootFs = realpath(ROOT_PATH);
-    $script = $_SERVER['SCRIPT_FILENAME'] ?? '';
-    $scriptDirFs = $script ? realpath(dirname($script)) : false;
-    $depth = 0;
-    if ($rootFs && $scriptDirFs) {
-        $rootFs = str_replace('\\', '/', $rootFs);
-        $scriptDirFs = str_replace('\\', '/', $scriptDirFs);
-        if (strpos($scriptDirFs, $rootFs) === 0) {
-            $rel = trim(substr($scriptDirFs, strlen($rootFs)), '/');
-            $depth = $rel === '' ? 0 : substr_count($rel, '/') + 1;
-        }
-    }
-    return str_repeat('../', $depth) . 'assets/' . $p;
+    return url(ASSETS_URL . '/' . ltrim($path, '/'));
 }
 
 function fecha_hora_colombia(): string

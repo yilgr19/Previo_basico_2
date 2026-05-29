@@ -6,13 +6,13 @@
         <?php if ($error): ?>
           <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><?= h($error) ?></div>
         <?php endif; ?>
-        <form method="post" action="<?= h(url('login.php')) ?>" autocomplete="off" class="space-y-4">
+        <form method="post" action="<?= h(url('login')) ?>" autocomplete="off" class="space-y-4">
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Usuario</label>
             <input type="text" name="usuario" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-              placeholder="Correo (administración) o documento / correo"
+              placeholder="Correo (administración) o documento / correo de estudiante"
               value="<?= h(post('usuario') ?? '') ?>" required>
-            <p class="mt-1 text-xs text-gray-500">Use el correo (administración) o documento / correo registrado en el sistema.</p>
+            <p class="mt-1 text-xs text-gray-500">Administración: correo institucional. Estudiante: documento o correo registrado.</p>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Contraseña</label>
@@ -21,7 +21,7 @@
           <button type="submit" class="mt-2 w-full rounded-lg bg-academic py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-academic-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Entrar</button>
         </form>
         <p class="mt-4 text-center text-sm">
-          <a href="<?= h(url('recuperar.php')) ?>" class="font-medium text-academic hover:underline">¿Olvidó su contraseña?</a>
+          <a href="<?= h(url('recuperar')) ?>" class="font-medium text-academic hover:underline">¿Olvidó su contraseña?</a>
         </p>
       </div>
     </div>

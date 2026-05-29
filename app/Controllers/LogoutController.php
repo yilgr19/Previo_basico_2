@@ -8,6 +8,6 @@ final class LogoutController extends Controller
     public function run(): void
     {
         logout_user();
-        redirect('/login.php');
+        redirect('/login');
     }
 }

@@ -90,7 +90,7 @@ $respondidoEn = solicitud_texto_momento_respuesta($s);
       <?php foreach ($anexos as $i => $m): ?>
         <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
         <li>
-          <a class="text-academic hover:underline" href="<?= h(url('descargar_anexo.php?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?></a>
+          <a class="text-academic hover:underline" href="<?= h(url('descargar_anexo?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?></a>
           <?php if ($cat !== '' && $cat !== 'general'): ?>
             <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span>
           <?php endif; ?>

@@ -1,6 +1,6 @@
 # Sistema de solicitudes académicas (PHP + MySQL)
 
-Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles para **estudiantes**, **docentes** y **gestión administrativa** (solicitudes, reportes, datos maestros). Interfaz con **Tailwind CSS** vía CDN.
+Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles para **estudiantes** y **gestión administrativa** (solicitudes, reportes, registro de estudiantes). Interfaz con **Tailwind CSS** vía CDN.
 
 ---
 
@@ -33,11 +33,14 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 
 1. Abra el **Panel de control de XAMPP**.
 2. Inicie **Apache** y **MySQL**.
+3. Active **`mod_rewrite`** en Apache (en XAMPP suele estar habilitado). El archivo `.htaccess` en la raíz del proyecto envía todas las rutas a `index.php`.
 
 ### 3b. Base de datos (phpMyAdmin)
 
 1. Importe `database/solicitudes_academicas.sql` en phpMyAdmin (crea la base `solicitudes_academicas`, tablas y datos demo).
    - Opcional: ejecute antes `database/00_crear_base.sql` si la base aún no existe.
+   - Si ya tenía una base **anterior con docentes**, ejecute después `database/migracion_sin_docentes_y_plazo.sql` (elimina tablas/columnas docente y añade `plazo` a tipos de solicitud).
+   - Para **plazos por tipo y sede** (días personalizables), ejecute `database/plazo_por_tipo_y_sede.sql`.
 2. Conexión en `config/database.php`: host `127.0.0.1`, base `solicitudes_academicas`, usuario `root`, contraseña vacía (XAMPP por defecto). **`DB_ENABLED` debe estar en `true`.**
 3. **Vaciar solo solicitudes** (conserva usuarios; para cargar trámites manualmente desde la web):
    ```bat
@@ -48,7 +51,7 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 ### 4. Abrir la aplicación
 
 1. En el navegador vaya a `http://localhost/Parcial2DeBa/` o `http://localhost/Parcial2DeBa/index.php`.
-2. Si no hay sesión, se redirige a **Iniciar sesión** (`login.php`).
+2. Si no hay sesión, se redirige a **Iniciar sesión** (`/login`).
 
 ### 5. Credenciales
 
@@ -56,7 +59,7 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 - Ejemplo de administrador por defecto:
   - **Usuario (correo):** `admin@academico.edu`
   - **Contraseña:** `admin123`
-- Docentes y estudiantes pueden iniciar con **documento** o **correo** y su **clave** (p. ej. `demo123` en los registros demo).
+- Los estudiantes pueden iniciar con **documento** o **correo** y su **clave** (p. ej. `demo123` en los registros demo).
 
 > **Nota:** No suba contraseñas reales a repositorios públicos. En producción use contraseñas hasheadas.
 
@@ -73,16 +76,17 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 | Servicios | `app/Services/` (`SolicitudesService`, `GestionAcademicaService`, etc.) |
 | Datos | MySQL (`solicitudes_academicas`) |
 | Adjuntos | `uploads/solicitudes/` |
-| Entradas públicas | `index.php`, `login.php`, `logout.php`, `estudiante/*.php`, `docente/*.php`, `gestion/*.php` |
+| Enrutamiento | `index.php` + `app/Core/Router.php` (front controller; Apache con `mod_rewrite`) |
+| Vistas (solo plantillas) | `views/` — no ejecutan lógica de negocio |
 
-La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, vista y pie.
+Todas las URLs pasan por `index.php`, que despacha al controlador correspondiente. La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, vista y pie.
 
 ---
 
 ## Autenticación
 
-- Tras un login válido, la sesión guarda rol y redirige al **panel correspondiente** (estudiante, docente o gestión).
-- Orden de búsqueda de credenciales: administradores → docentes → estudiantes.
+- Tras un login válido, la sesión guarda rol y redirige al **panel correspondiente** (estudiante o gestión).
+- Orden de búsqueda de credenciales: administradores → estudiantes.
 
 ---
 
@@ -92,7 +96,7 @@ La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, v
 
 ## Datos de demostración
 
-Al importar `database/solicitudes_academicas.sql` se cargan usuarios demo (estudiantes y docentes por sede Cúcuta y Ocaña). Las solicitudes puede crearlas desde la aplicación o vaciar la bandeja con `limpiar_solicitudes.php` y cargarlas manualmente.
+Al importar `database/solicitudes_academicas.sql` se cargan usuarios demo (estudiantes por sede Cúcuta y Ocaña). Las solicitudes las crean los estudiantes desde la aplicación o puede vaciar la bandeja con el script de limpieza y cargarlas manualmente.
 
 ---
 

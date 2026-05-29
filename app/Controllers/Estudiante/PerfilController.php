@@ -14,7 +14,7 @@ final class PerfilController extends Controller
 
         $idEst = auth_id();
         if (!$idEst) {
-            redirect('/login.php');
+            redirect('/login');
         }
 
         $mensaje = '';

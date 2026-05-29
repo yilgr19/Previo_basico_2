@@ -8,7 +8,7 @@ use PDO;
 
 final class MysqlStorage
 {
-    private const ALLOWED = ['estudiantes', 'docentes', 'administradores', 'solicitudes'];
+    private const ALLOWED = ['estudiantes', 'administradores', 'solicitudes'];
 
     public static function load(string $name): array
     {
@@ -18,7 +18,6 @@ final class MysqlStorage
 
         return match ($name) {
             'estudiantes' => self::loadEstudiantes(),
-            'docentes' => self::loadDocentes(),
             'administradores' => self::loadAdministradores(),
             'solicitudes' => self::loadSolicitudes(),
             default => [],
@@ -37,7 +36,6 @@ final class MysqlStorage
             $pdo->beginTransaction();
             $ok = match ($name) {
                 'estudiantes' => self::saveEstudiantes($pdo, $data),
-                'docentes' => self::saveDocentes($pdo, $data),
                 'administradores' => self::saveAdministradores($pdo, $data),
                 'solicitudes' => self::saveSolicitudes($pdo, $data),
                 default => false,
@@ -104,16 +102,17 @@ final class MysqlStorage
         $out = [];
 
         $stDe = $pdo->prepare('SELECT * FROM solicitud_detalle_estudiante WHERE id_solicitud = ? LIMIT 1');
-        $stDd = $pdo->prepare('SELECT * FROM solicitud_detalle_docente WHERE id_solicitud = ? LIMIT 1');
         $stAx = $pdo->prepare('SELECT guardado, original, mime, bytes, categoria FROM solicitud_anexos WHERE id_solicitud = ? ORDER BY id_anexo');
         $stRe = $pdo->prepare('SELECT * FROM solicitud_respuesta_elaborada WHERE id_solicitud = ? LIMIT 1');
+        $stDp = $pdo->prepare(
+            'SELECT id_documento_pendiente AS id, categoria, mensaje, solicitado_en, cumplido_en, notif_pendiente
+             FROM solicitud_documento_pendiente WHERE id_solicitud = ? ORDER BY id_documento_pendiente'
+        );
 
         foreach ($rows as $s) {
             $id = (int) $s['id_solicitud'];
             $s['id_estudiante'] = (int) ($s['id_estudiante'] ?? 0);
-            $s['id_docente_solicitante'] = (int) ($s['id_docente_solicitante'] ?? 0);
             $s['id_tipo_solicitud'] = (int) ($s['id_tipo_solicitud'] ?? 0);
-            $s['id_tipo_solicitud_docente'] = (int) ($s['id_tipo_solicitud_docente'] ?? 0);
             $s['formulario_version'] = (int) ($s['formulario_version'] ?? 2);
             $s['notif_pendiente_est'] = (bool) ($s['notif_pendiente_est'] ?? false);
             $s['notif_pendiente_doc'] = (bool) ($s['notif_pendiente_doc'] ?? false);
@@ -121,15 +120,10 @@ final class MysqlStorage
             $s['fecha_respuesta'] = (string) ($s['fecha_respuesta'] ?? '');
             $s['respondido_en'] = (string) ($s['respondido_en'] ?? '');
             $s['respuesta'] = (string) ($s['respuesta'] ?? '');
-            $s['documento_docente_relacionado'] = (string) ($s['documento_docente_relacionado'] ?? '');
-
             $stDe->execute([$id]);
             $de = $stDe->fetch();
             $s['detalle_estudiante'] = $de ? self::mapDetalleEstudiante($de) : null;
-
-            $stDd->execute([$id]);
-            $dd = $stDd->fetch();
-            $s['detalle_docente'] = $dd ? self::mapDetalleDocente($dd) : null;
+            $s['detalle_docente'] = null;
 
             $stAx->execute([$id]);
             $s['anexos_archivos'] = $stAx->fetchAll();
@@ -137,6 +131,20 @@ final class MysqlStorage
             $stRe->execute([$id]);
             $re = $stRe->fetch();
             $s['respuesta_elaborada'] = $re ? self::mapRespuestaElaborada($re, $id) : null;
+
+            $stDp->execute([$id]);
+            $docsP = [];
+            foreach ($stDp->fetchAll() as $dp) {
+                $docsP[] = [
+                    'id' => (int) ($dp['id'] ?? 0),
+                    'categoria' => (string) ($dp['categoria'] ?? ''),
+                    'mensaje' => (string) ($dp['mensaje'] ?? ''),
+                    'solicitado_en' => (string) ($dp['solicitado_en'] ?? ''),
+                    'cumplido_en' => (string) ($dp['cumplido_en'] ?? ''),
+                    'notif_pendiente' => !empty($dp['notif_pendiente']),
+                ];
+            }
+            $s['docs_pendientes_estudiante'] = $docsP;
 
             $out[] = $s;
         }
@@ -366,24 +374,24 @@ final class MysqlStorage
         $fr = self::normalizarDateTime((string) ($s['fecha_registro'] ?? date('Y-m-d H:i:s')));
 
         $sql = 'INSERT INTO solicitudes (
-            id_solicitud, id_estudiante, id_docente_solicitante, documento_estudiante,
-            id_tipo_solicitud, id_tipo_solicitud_docente, codigo_tipo, fecha_registro, estado,
-            descripcion, documento_docente_relacionado, respuesta, fecha_respuesta, respondido_en,
-            formulario_version, notif_pendiente_est, notif_pendiente_doc, notif_nueva_gestion
+            id_solicitud, id_estudiante, documento_estudiante,
+            id_tipo_solicitud, codigo_tipo, fecha_registro, estado,
+            descripcion, respuesta, fecha_respuesta, respondido_en,
+            formulario_version, notif_pendiente_est, notif_nueva_gestion
         ) VALUES (
-            :id_solicitud, :id_estudiante, :id_docente_solicitante, :documento_estudiante,
-            :id_tipo_solicitud, :id_tipo_solicitud_docente, :codigo_tipo, :fecha_registro, :estado,
-            :descripcion, :documento_docente_relacionado, :respuesta, :fecha_respuesta, :respondido_en,
-            :formulario_version, :notif_pendiente_est, :notif_pendiente_doc, :notif_nueva_gestion
+            :id_solicitud, :id_estudiante, :documento_estudiante,
+            :id_tipo_solicitud, :codigo_tipo, :fecha_registro, :estado,
+            :descripcion, :respuesta, :fecha_respuesta, :respondido_en,
+            :formulario_version, :notif_pendiente_est, :notif_nueva_gestion
         ) ON DUPLICATE KEY UPDATE
-            id_estudiante=VALUES(id_estudiante), id_docente_solicitante=VALUES(id_docente_solicitante),
+            id_estudiante=VALUES(id_estudiante),
             documento_estudiante=VALUES(documento_estudiante), id_tipo_solicitud=VALUES(id_tipo_solicitud),
-            id_tipo_solicitud_docente=VALUES(id_tipo_solicitud_docente), codigo_tipo=VALUES(codigo_tipo),
+            codigo_tipo=VALUES(codigo_tipo),
             fecha_registro=VALUES(fecha_registro), estado=VALUES(estado), descripcion=VALUES(descripcion),
-            documento_docente_relacionado=VALUES(documento_docente_relacionado), respuesta=VALUES(respuesta),
+            respuesta=VALUES(respuesta),
             fecha_respuesta=VALUES(fecha_respuesta), respondido_en=VALUES(respondido_en),
             formulario_version=VALUES(formulario_version), notif_pendiente_est=VALUES(notif_pendiente_est),
-            notif_pendiente_doc=VALUES(notif_pendiente_doc), notif_nueva_gestion=VALUES(notif_nueva_gestion)';
+            notif_nueva_gestion=VALUES(notif_nueva_gestion)';
 
         $respondido = trim((string) ($s['respondido_en'] ?? ''));
         $fechaResp = self::nullIfEmpty($s['fecha_respuesta'] ?? null);
@@ -391,37 +399,28 @@ final class MysqlStorage
         $pdo->prepare($sql)->execute([
             'id_solicitud' => $id,
             'id_estudiante' => self::nullIfZeroInt($s['id_estudiante'] ?? 0),
-            'id_docente_solicitante' => self::nullIfZeroInt($s['id_docente_solicitante'] ?? 0),
             'documento_estudiante' => self::strOrEmpty($s['documento_estudiante'] ?? ''),
             'id_tipo_solicitud' => self::nullIfZeroInt($s['id_tipo_solicitud'] ?? 0),
-            'id_tipo_solicitud_docente' => self::nullIfZeroInt($s['id_tipo_solicitud_docente'] ?? 0),
             'codigo_tipo' => self::strOrEmpty($s['codigo_tipo'] ?? ''),
             'fecha_registro' => $fr,
             'estado' => solicitud_estado_a_codigo((string) ($s['estado'] ?? 'pendiente')),
             'descripcion' => self::strOrEmpty($s['descripcion'] ?? ''),
-            'documento_docente_relacionado' => self::strOrEmpty($s['documento_docente_relacionado'] ?? ''),
             'respuesta' => self::strOrEmpty($s['respuesta'] ?? ''),
             'fecha_respuesta' => $fechaResp !== null && $fechaResp !== '' ? $fechaResp : null,
             'respondido_en' => $respondido !== '' ? self::normalizarDateTime($respondido) : null,
             'formulario_version' => (int) ($s['formulario_version'] ?? 2),
             'notif_pendiente_est' => !empty($s['notif_pendiente_est']) ? 1 : 0,
-            'notif_pendiente_doc' => !empty($s['notif_pendiente_doc']) ? 1 : 0,
             'notif_nueva_gestion' => !empty($s['notif_nueva_gestion']) ? 1 : 0,
         ]);
 
         $pdo->prepare('DELETE FROM solicitud_detalle_estudiante WHERE id_solicitud = ?')->execute([$id]);
-        $pdo->prepare('DELETE FROM solicitud_detalle_docente WHERE id_solicitud = ?')->execute([$id]);
         $pdo->prepare('DELETE FROM solicitud_anexos WHERE id_solicitud = ?')->execute([$id]);
         $pdo->prepare('DELETE FROM solicitud_respuesta_elaborada WHERE id_solicitud = ?')->execute([$id]);
+        $pdo->prepare('DELETE FROM solicitud_documento_pendiente WHERE id_solicitud = ?')->execute([$id]);
 
         $de = $s['detalle_estudiante'] ?? null;
         if (is_array($de)) {
             self::insertDetalleEstudiante($pdo, $id, $de);
-        }
-
-        $dd = $s['detalle_docente'] ?? null;
-        if (is_array($dd)) {
-            self::insertDetalleDocente($pdo, $id, $dd);
         }
 
         $anexos = $s['anexos_archivos'] ?? [];
@@ -432,6 +431,43 @@ final class MysqlStorage
         $re = $s['respuesta_elaborada'] ?? null;
         if (is_array($re) && trim((string) ($re['numero_respuesta'] ?? '')) !== '') {
             self::insertRespuestaElaborada($pdo, $id, $re);
+        }
+
+        $docsP = $s['docs_pendientes_estudiante'] ?? [];
+        if (is_array($docsP)) {
+            self::insertDocsPendientes($pdo, $id, $docsP);
+        }
+    }
+
+    /** @param list<array<string, mixed>> $docs */
+    private static function insertDocsPendientes(PDO $pdo, int $id, array $docs): void
+    {
+        $st = $pdo->prepare(
+            'INSERT INTO solicitud_documento_pendiente (
+                id_documento_pendiente, id_solicitud, categoria, mensaje, solicitado_en, cumplido_en, notif_pendiente
+            ) VALUES (
+                :id_documento_pendiente, :id_solicitud, :categoria, :mensaje, :solicitado_en, :cumplido_en, :notif_pendiente
+            )'
+        );
+        foreach ($docs as $d) {
+            if (!is_array($d)) {
+                continue;
+            }
+            $idDoc = (int) ($d['id'] ?? 0);
+            if ($idDoc <= 0) {
+                continue;
+            }
+            $sol = trim((string) ($d['solicitado_en'] ?? ''));
+            $cum = trim((string) ($d['cumplido_en'] ?? ''));
+            $st->execute([
+                'id_documento_pendiente' => $idDoc,
+                'id_solicitud' => $id,
+                'categoria' => (string) ($d['categoria'] ?? 'general'),
+                'mensaje' => (string) ($d['mensaje'] ?? ''),
+                'solicitado_en' => $sol !== '' ? self::normalizarDateTime($sol) : date('Y-m-d H:i:s'),
+                'cumplido_en' => $cum !== '' ? self::normalizarDateTime($cum) : null,
+                'notif_pendiente' => !empty($d['notif_pendiente']) ? 1 : 0,
+            ]);
         }
     }
 
@@ -686,7 +722,7 @@ final class MysqlStorage
     public static function catalogTiposSolicitudEstudiante(): array
     {
         $rows = Database::pdo()->query(
-            'SELECT id_tipo_solicitud AS id, codigo, nombre FROM tipos_solicitud_estudiante ORDER BY id_tipo_solicitud'
+            'SELECT id_tipo_solicitud AS id, codigo, nombre, plazo FROM tipos_solicitud_estudiante ORDER BY id_tipo_solicitud'
         )->fetchAll();
         foreach ($rows as &$r) {
             $r['id'] = (int) $r['id'];

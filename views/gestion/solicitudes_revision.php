@@ -5,11 +5,11 @@ if (($tipoMsg ?? '') === 'warning' && !$mWarn) {
     $alertClass = 'border-amber-200 bg-amber-50 text-amber-900';
 }
 $emptyHint = 'No hay solicitudes en revisión con los filtros indicados.';
-$revisionScript = $revisionScript ?? 'gestion/solicitudes_revision.php';
+$revisionScript = $revisionScript ?? 'gestion/solicitudes_revision';
 $idSedeBandeja = (int) ($idSedeBandeja ?? 0);
 $uRevision = url($revisionScript);
-$uRevisionCucuta = url('gestion/solicitudes_revision.php');
-$uRevisionOcana = url('gestion/solicitudes_revision_ocana.php');
+$uRevisionCucuta = url('gestion/solicitudes_revision');
+$uRevisionOcana = url('gestion/solicitudes_revision_ocana');
 ?>
 <main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -27,9 +27,9 @@ $uRevisionOcana = url('gestion/solicitudes_revision_ocana.php');
       <?php if ($idSedeBandeja !== 2): ?>
         <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h($uRevisionOcana) ?>">En revisión Ocaña</a>
       <?php endif; ?>
-      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/solicitudes.php')) ?>">Bandeja Cúcuta</a>
-      <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>">Bandeja Ocaña</a>
-      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard.php')) ?>">Volver al panel</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/solicitudes')) ?>">Bandeja Cúcuta</a>
+      <a class="inline-flex items-center rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-900 shadow-sm hover:bg-sky-100" href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>">Bandeja Ocaña</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard')) ?>">Volver al panel</a>
     </div>
   </div>
 
@@ -49,7 +49,6 @@ $uRevisionOcana = url('gestion/solicitudes_revision_ocana.php');
         <select name="radicante" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm">
           <option value="" <?= (($filtroRadicante ?? '') === '') ? 'selected' : '' ?>>Todos</option>
           <option value="estudiantes" <?= (($filtroRadicante ?? '') === 'estudiantes') ? 'selected' : '' ?>>Solo estudiantes</option>
-          <option value="docentes" <?= (($filtroRadicante ?? '') === 'docentes') ? 'selected' : '' ?>>Solo docentes</option>
         </select>
       </div>
       <div>

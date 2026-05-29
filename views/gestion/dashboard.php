@@ -36,39 +36,39 @@ if (count($parts) >= 2) {
             <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Panel de gestión</h1>
             <p class="mt-1 text-base font-medium text-slate-700">Hola, <?= h($primer) ?></p>
             <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-600">
-              Coordine el registro de <strong class="font-semibold text-slate-800">estudiantes</strong> y <strong class="font-semibold text-slate-800">docentes</strong>, y atienda las <strong class="font-semibold text-slate-800">bandejas de solicitudes por sede</strong> (Cúcuta y Ocaña) desde un solo lugar.
+              Coordine el registro de <strong class="font-semibold text-slate-800">estudiantes</strong> y atienda las <strong class="font-semibold text-slate-800">bandejas de solicitudes por sede</strong> (Cúcuta y Ocaña) desde un solo lugar.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
+              <a href="<?= h(url('gestion/solicitudes')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 Bandeja sede Cúcuta
               </a>
-              <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:bg-sky-100">
+              <a href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:bg-sky-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 Bandeja sede Ocaña
               </a>
-              <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100">
+              <a href="<?= h(url('gestion/solicitudes_revision')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                 En revisión Cúcuta
               </a>
-              <a href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-2.5 text-sm font-semibold text-amber-950 shadow-sm transition hover:bg-amber-100">
+              <a href="<?= h(url('gestion/solicitudes_revision_ocana')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-2.5 text-sm font-semibold text-amber-950 shadow-sm transition hover:bg-amber-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                 En revisión Ocaña
               </a>
-              <a href="<?= h(url('gestion/estudiantes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
+              <a href="<?= h(url('gestion/estudiantes')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
                 <svg class="h-4 w-4 text-academic" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
                 Estudiantes
               </a>
-              <a href="<?= h(url('gestion/docentes.php')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
-                <svg class="h-4 w-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                Docentes
+              <a href="<?= h(url('gestion/plazos')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-900 shadow-sm transition hover:bg-teal-100">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                Plazos
               </a>
             </div>
           </div>
         </div>
 
         <div class="grid w-full max-w-2xl grid-cols-2 gap-3 sm:gap-4 lg:w-[min(100%,42rem)] lg:shrink-0">
-          <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
+          <a href="<?= h(url('gestion/solicitudes')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
             </div>
@@ -76,7 +76,7 @@ if (count($parts) >= 2) {
             <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-violet-900/90">Total solicitudes</p>
             <p class="mt-0.5 text-[10px] font-medium leading-tight text-violet-800/80">Sede Cúcuta</p>
           </a>
-          <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
+          <a href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>" class="group rounded-xl border border-violet-100 bg-violet-50/90 px-3 py-4 text-center shadow-sm transition hover:border-violet-200 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
             </div>
@@ -84,7 +84,7 @@ if (count($parts) >= 2) {
             <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-violet-900/90">Total solicitudes</p>
             <p class="mt-0.5 text-[10px] font-medium leading-tight text-violet-800/80">Sede Ocaña</p>
           </a>
-          <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
+          <a href="<?= h(url('gestion/solicitudes')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-amber-600 shadow-sm ring-1 ring-amber-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
@@ -93,7 +93,7 @@ if (count($parts) >= 2) {
             <p class="mt-0.5 text-[10px] leading-tight text-amber-800/75">Por atender o en análisis</p>
             <p class="mt-1 text-[10px] font-medium text-amber-900/80">Sede Cúcuta</p>
           </a>
-          <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
+          <a href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>" class="group rounded-xl border border-amber-200 bg-amber-50/90 px-3 py-4 text-center shadow-sm transition hover:border-amber-300 hover:shadow-md sm:px-4">
             <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-white text-amber-600 shadow-sm ring-1 ring-amber-100">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
@@ -114,7 +114,7 @@ if (count($parts) >= 2) {
       <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:flex">
         <div class="max-w-xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:px-5 sm:py-4">
           <h2 class="text-lg font-bold tracking-tight sm:text-xl">Solicitudes académicas</h2>
-          <p class="mt-1 text-sm text-white/95">Radicación y seguimiento de trámites estudiantiles y docentes.</p>
+          <p class="mt-1 text-sm text-white/95">Radicación y seguimiento de trámites estudiantiles.</p>
         </div>
       </div>
     </div>
@@ -122,54 +122,54 @@ if (count($parts) >= 2) {
 
   <h2 class="mb-4 text-lg font-semibold tracking-tight text-slate-800">Accesos rápidos</h2>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-    <a href="<?= h(url('gestion/solicitudes.php')) ?>" class="group rounded-xl border border-academic/25 bg-gradient-to-b from-blue-50/90 to-white p-6 text-center shadow-sm ring-1 ring-academic/10 transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/solicitudes')) ?>" class="group rounded-xl border border-academic/25 bg-gradient-to-b from-blue-50/90 to-white p-6 text-center shadow-sm ring-1 ring-academic/10 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-academic transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
       <strong class="block text-gray-900">Bandeja de solicitudes sede Cúcuta</strong>
       <span class="mt-1 block text-xs text-gray-600">Filtrar, buscar y responder trámites de esta sede</span>
     </a>
-    <a href="<?= h(url('gestion/solicitudes_sede_ocana.php')) ?>" class="group rounded-xl border border-sky-200/80 bg-gradient-to-b from-sky-50/90 to-white p-6 text-center shadow-sm ring-1 ring-sky-100 transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>" class="group rounded-xl border border-sky-200/80 bg-gradient-to-b from-sky-50/90 to-white p-6 text-center shadow-sm ring-1 ring-sky-100 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-sky-700 transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
       <strong class="block text-gray-900">Bandeja de solicitudes por sedes — Ocaña</strong>
       <span class="mt-1 block text-xs text-gray-600">Mismos filtros que la bandeja de Cúcuta</span>
     </a>
-    <a href="<?= h(url('gestion/solicitudes_revision.php')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/solicitudes_revision')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-amber-600 transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
       </div>
       <strong class="block text-gray-900">En revisión — Cúcuta</strong>
       <span class="mt-1 block text-xs text-gray-600">Solo estado «En revisión», sede Cúcuta</span>
     </a>
-    <a href="<?= h(url('gestion/solicitudes_revision_ocana.php')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/solicitudes_revision_ocana')) ?>" class="group rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-white p-6 text-center shadow-sm ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-amber-700 transition group-hover:scale-105">
         <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
       </div>
       <strong class="block text-gray-900">En revisión — Ocaña</strong>
       <span class="mt-1 block text-xs text-gray-600">Solo estado «En revisión», sede Ocaña</span>
     </a>
-    <a href="<?= h(url('gestion/reportes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/reportes')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-violet-600 transition group-hover:scale-105">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
       </div>
       <strong class="block text-gray-900">Reportes</strong>
       <span class="mt-1 block text-xs text-gray-600">Vista consolidada y enlaces a fichas</span>
     </a>
-    <a href="<?= h(url('gestion/estudiantes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+    <a href="<?= h(url('gestion/estudiantes')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-blue-600 transition group-hover:scale-105">
         <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
       </div>
       <strong class="block text-gray-900">Estudiantes</strong>
       <span class="text-xs text-gray-500">Registro y edición</span>
     </a>
-    <a href="<?= h(url('gestion/docentes.php')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
-      <div class="mb-2 flex justify-center text-emerald-600 transition group-hover:scale-105">
-        <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    <a href="<?= h(url('gestion/plazos')) ?>" class="group rounded-xl border border-teal-100 bg-white p-6 text-center shadow-sm ring-1 ring-teal-100 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-teal-600 transition group-hover:scale-105">
+        <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
       </div>
-      <strong class="block text-gray-900">Docentes</strong>
-      <span class="text-xs text-gray-500">Alta y actualización</span>
+      <strong class="block text-gray-900">Plazos</strong>
+      <span class="text-xs text-gray-500">Días por tipo y sede</span>
     </a>
   </div>
 </main>

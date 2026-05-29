@@ -53,7 +53,6 @@ function next_numeric_id(array $items, string $idKey): int
         $map = [
             'id_solicitud' => ['solicitudes', 'id_solicitud'],
             'id_estudiante' => ['estudiantes', 'id_estudiante'],
-            'id_docente' => ['docentes', 'id_docente'],
             'id_admin' => ['administradores', 'id_admin'],
         ];
         if (isset($map[$idKey])) {

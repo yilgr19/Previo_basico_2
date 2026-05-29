@@ -215,7 +215,7 @@ function jornada_nombre(?int $id): string
 /**
  * Tipos de solicitud (catálogo institucional — 13 tipos).
  *
- * @return array<int, array{id: int, codigo: string, nombre: string}>
+ * @return array<int, array{id: int, codigo: string, nombre: string, plazo: string}>
  */
 function diccionario_tipos_solicitud(): array
 {
@@ -224,19 +224,19 @@ function diccionario_tipos_solicitud(): array
     }
 
     return [
-        ['id' => 1, 'codigo' => 'REQ_CANCEL_SEM', 'nombre' => 'Cancelación de semestre'],
-        ['id' => 2, 'codigo' => 'REQ_CURSO_DIR', 'nombre' => 'Curso dirigido'],
-        ['id' => 3, 'codigo' => 'REQ_CANCEL_ASIG', 'nombre' => 'Cancelación de asignaturas'],
-        ['id' => 4, 'codigo' => 'REQ_CAMBIO_JORNADA', 'nombre' => 'Cambio de jornada'],
-        ['id' => 5, 'codigo' => 'REQ_TRANSFER_INT', 'nombre' => 'Transferencia interna'],
-        ['id' => 6, 'codigo' => 'REQ_EXAMEN_SUF', 'nombre' => 'Examen de validación por suficiencia'],
-        ['id' => 7, 'codigo' => 'REQ_REINGRESO', 'nombre' => 'Reingreso'],
-        ['id' => 8, 'codigo' => 'REQ_MATR_MIN', 'nombre' => 'Matrícula mínima de créditos'],
-        ['id' => 9, 'codigo' => 'REQ_TRASLADO_SEDE', 'nombre' => 'Traslado de sede'],
-        ['id' => 10, 'codigo' => 'REQ_PAGO_CRED', 'nombre' => 'Pago de créditos adicionales'],
-        ['id' => 11, 'codigo' => 'REQ_CONST_EST', 'nombre' => 'Constancia de estudio'],
-        ['id' => 12, 'codigo' => 'REQ_CERT_NOTAS', 'nombre' => 'Certificado de notas'],
-        ['id' => 13, 'codigo' => 'REQ_OTRA', 'nombre' => 'Otra'],
+        ['id' => 1, 'codigo' => 'REQ_CANCEL_SEM', 'nombre' => 'Cancelación de semestre', 'plazo' => '15 días hábiles'],
+        ['id' => 2, 'codigo' => 'REQ_CURSO_DIR', 'nombre' => 'Curso dirigido', 'plazo' => '20 días hábiles'],
+        ['id' => 3, 'codigo' => 'REQ_CANCEL_ASIG', 'nombre' => 'Cancelación de asignaturas', 'plazo' => '10 días hábiles'],
+        ['id' => 4, 'codigo' => 'REQ_CAMBIO_JORNADA', 'nombre' => 'Cambio de jornada', 'plazo' => '15 días hábiles'],
+        ['id' => 5, 'codigo' => 'REQ_TRANSFER_INT', 'nombre' => 'Transferencia interna', 'plazo' => '30 días hábiles'],
+        ['id' => 6, 'codigo' => 'REQ_EXAMEN_SUF', 'nombre' => 'Examen de validación por suficiencia', 'plazo' => '20 días hábiles'],
+        ['id' => 7, 'codigo' => 'REQ_REINGRESO', 'nombre' => 'Reingreso', 'plazo' => '30 días hábiles'],
+        ['id' => 8, 'codigo' => 'REQ_MATR_MIN', 'nombre' => 'Matrícula mínima de créditos', 'plazo' => '10 días hábiles'],
+        ['id' => 9, 'codigo' => 'REQ_TRASLADO_SEDE', 'nombre' => 'Traslado de sede', 'plazo' => '30 días hábiles'],
+        ['id' => 10, 'codigo' => 'REQ_PAGO_CRED', 'nombre' => 'Pago de créditos adicionales', 'plazo' => '10 días hábiles'],
+        ['id' => 11, 'codigo' => 'REQ_CONST_EST', 'nombre' => 'Constancia de estudio', 'plazo' => '5 días hábiles'],
+        ['id' => 12, 'codigo' => 'REQ_CERT_NOTAS', 'nombre' => 'Certificado de notas', 'plazo' => '5 días hábiles'],
+        ['id' => 13, 'codigo' => 'REQ_OTRA', 'nombre' => 'Otra', 'plazo' => '15 días hábiles'],
     ];
 }
 
@@ -254,6 +254,64 @@ function tipo_solicitud_por_id(int $id): ?array
         }
     }
     return null;
+}
+
+function tipo_solicitud_plazo(int $idTipo, int $idSede = 0): string
+{
+    if ($idSede > 0 && class_exists(\App\Services\PlazosSolicitudService::class)) {
+        return \App\Services\PlazosSolicitudService::plazoTexto($idTipo, $idSede);
+    }
+    $t = tipo_solicitud_por_id($idTipo);
+
+    return (string) ($t['plazo'] ?? '');
+}
+
+/**
+ * Clases Tailwind para pintar notificaciones / filas según semáforo de plazo.
+ *
+ * @return array{borde: string, fondo: string, punto: string, badge: string}
+ */
+function semaforo_plazo_clases(string $estado): array
+{
+    return match ($estado) {
+        'rojo' => [
+            'borde' => 'border-l-red-500',
+            'fondo' => 'bg-red-50/95',
+            'punto' => 'bg-red-500',
+            'badge' => 'bg-red-100 text-red-800',
+        ],
+        'amarillo' => [
+            'borde' => 'border-l-amber-500',
+            'fondo' => 'bg-amber-50/95',
+            'punto' => 'bg-amber-500',
+            'badge' => 'bg-amber-100 text-amber-900',
+        ],
+        'verde' => [
+            'borde' => 'border-l-green-500',
+            'fondo' => 'bg-green-50/95',
+            'punto' => 'bg-green-500',
+            'badge' => 'bg-green-100 text-green-800',
+        ],
+        default => [
+            'borde' => 'border-l-gray-200',
+            'fondo' => 'bg-gray-50',
+            'punto' => 'bg-gray-300',
+            'badge' => 'bg-gray-100 text-gray-500',
+        ],
+    };
+}
+
+/** Semáforo activo mientras el estado sea pendiente o en revisión (plazo vigente hasta cierre). */
+function solicitud_pendiente_de_respuesta_institucional(array $s): bool
+{
+    $codEst = solicitud_estado_a_codigo((string) ($s['estado'] ?? ''));
+
+    return in_array($codEst, ['pendiente', 'en_revision'], true);
+}
+
+function semaforo_plazo_activo(array $sem): bool
+{
+    return !empty($sem['activo']) && in_array((string) ($sem['estado'] ?? ''), ['verde', 'amarillo', 'rojo'], true);
 }
 
 function tipo_solicitud_nombre(int $id): string
@@ -571,6 +629,18 @@ function solicitud_resumen_texto(array $s): string
 }
 
 /** Etiqueta legible para la categoría de un adjunto (evidencias). */
+function diccionario_categorias_documento_admin(): array
+{
+    return [
+        ['codigo' => 'soporte_medico', 'nombre' => 'Soporte médico'],
+        ['codigo' => 'carta_aceptacion', 'nombre' => 'Carta de aceptación / orden'],
+        ['codigo' => 'recibo_pago', 'nombre' => 'Recibo de pago'],
+        ['codigo' => 'general', 'nombre' => 'Evidencias generales'],
+        ['codigo' => 'doc_terceros', 'nombre' => 'Documentación de terceros'],
+        ['codigo' => 'formato_institucional', 'nombre' => 'Formato institucional'],
+    ];
+}
+
 function solicitud_etiqueta_categoria_anexo(?string $categoria): string
 {
     $c = strtolower(trim((string) $categoria));
