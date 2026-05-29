@@ -20,8 +20,11 @@
           </div>
           <button type="submit" class="mt-2 w-full rounded-lg bg-academic py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-academic-dark focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Entrar</button>
         </form>
-        <p class="mt-4 text-center text-sm">
+        <p class="mt-4 text-center text-sm space-y-1">
           <a href="<?= h(url('recuperar')) ?>" class="font-medium text-academic hover:underline">¿Olvidó su contraseña?</a>
+          <?php if (defined('REGISTRO_ESTUDIANTE_HABILITADO') && REGISTRO_ESTUDIANTE_HABILITADO): ?>
+          <br><a href="<?= h(url('registro_estudiante')) ?>" class="font-medium text-academic hover:underline">Registrarse como estudiante</a>
+          <?php endif; ?>
         </p>
       </div>
     </div>

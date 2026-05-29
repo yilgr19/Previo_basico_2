@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controllers\Gestion;
 
+require_once dirname(__DIR__) . '/init.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use App\Controllers\Controller;
 use App\Services\GestionAcademicaService;
 
@@ -14,9 +17,13 @@ final class EstudiantesController extends Controller
 
         $mensaje = '';
         $tipoMsg = 'success';
+        $repoblar = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'guardar') {
             [$mensaje, $tipoMsg] = GestionAcademicaService::agregarEstudiante();
+            if ($tipoMsg === 'warning') {
+                $repoblar = gestion_estudiante_old_desde_post();
+            }
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $accion = post('accion', '');
             $estudiantes = load_data('estudiantes');
@@ -30,9 +37,13 @@ final class EstudiantesController extends Controller
 
         $estudiantes = load_data('estudiantes');
         $editar = null;
-        $eid = (int) (get('editar') ?? '0');
-        if ($eid > 0) {
-            $editar = repo_estudiante_por_id($eid);
+        if ($repoblar !== null && (int) ($repoblar['id_estudiante'] ?? 0) > 0) {
+            $editar = $repoblar;
+        } else {
+            $eid = (int) (get('editar') ?? '0');
+            if ($eid > 0) {
+                $editar = repo_estudiante_por_id($eid);
+            }
         }
 
         $this->render('gestion/estudiantes.php', [
@@ -41,6 +52,9 @@ final class EstudiantesController extends Controller
             'tipoMsg' => $tipoMsg,
             'estudiantes' => $estudiantes,
             'editar' => $editar,
+            'repoblar' => $repoblar,
         ]);
     }
 }
+
+\App\Controllers\dispatch_if_direct(__FILE__, EstudiantesController::class);

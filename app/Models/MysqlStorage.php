@@ -442,11 +442,18 @@ final class MysqlStorage
     /** @param list<array<string, mixed>> $docs */
     private static function insertDocsPendientes(PDO $pdo, int $id, array $docs): void
     {
-        $st = $pdo->prepare(
+        $stConId = $pdo->prepare(
             'INSERT INTO solicitud_documento_pendiente (
                 id_documento_pendiente, id_solicitud, categoria, mensaje, solicitado_en, cumplido_en, notif_pendiente
             ) VALUES (
                 :id_documento_pendiente, :id_solicitud, :categoria, :mensaje, :solicitado_en, :cumplido_en, :notif_pendiente
+            )'
+        );
+        $stAutoId = $pdo->prepare(
+            'INSERT INTO solicitud_documento_pendiente (
+                id_solicitud, categoria, mensaje, solicitado_en, cumplido_en, notif_pendiente
+            ) VALUES (
+                :id_solicitud, :categoria, :mensaje, :solicitado_en, :cumplido_en, :notif_pendiente
             )'
         );
         foreach ($docs as $d) {
@@ -454,20 +461,21 @@ final class MysqlStorage
                 continue;
             }
             $idDoc = (int) ($d['id'] ?? 0);
-            if ($idDoc <= 0) {
-                continue;
-            }
             $sol = trim((string) ($d['solicitado_en'] ?? ''));
             $cum = trim((string) ($d['cumplido_en'] ?? ''));
-            $st->execute([
-                'id_documento_pendiente' => $idDoc,
+            $params = [
                 'id_solicitud' => $id,
                 'categoria' => (string) ($d['categoria'] ?? 'general'),
                 'mensaje' => (string) ($d['mensaje'] ?? ''),
                 'solicitado_en' => $sol !== '' ? self::normalizarDateTime($sol) : date('Y-m-d H:i:s'),
                 'cumplido_en' => $cum !== '' ? self::normalizarDateTime($cum) : null,
                 'notif_pendiente' => !empty($d['notif_pendiente']) ? 1 : 0,
-            ]);
+            ];
+            if ($idDoc <= 0) {
+                $stAutoId->execute($params);
+                continue;
+            }
+            $stConId->execute(['id_documento_pendiente' => $idDoc] + $params);
         }
     }
 

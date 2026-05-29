@@ -121,6 +121,59 @@ function gestion_formulario_repoblar_desde_post(): ?array
     ];
 }
 
+/** Datos del formulario de registro/edición de estudiante (sin contraseñas). */
+function gestion_estudiante_old_desde_post(): array
+{
+    $editId = (int) post('id_estudiante', '0');
+    $out = [
+        'tipo_identificacion' => (string) post('tipo_identificacion', 'CC'),
+        'documento' => trim((string) post('documento', '')),
+        'nombre' => trim((string) post('nombre', '')),
+        'apellido' => trim((string) post('apellido', '')),
+        'correo' => trim((string) post('correo', '')),
+        'sexo' => (string) post('sexo', 'M'),
+        'id_programa' => (int) post('id_programa', '0'),
+        'semestre' => (int) post('semestre', '1'),
+        'fecha_nacimiento' => trim((string) post('fecha_nacimiento', '')),
+        'direccion' => trim((string) post('direccion', '')),
+        'barrio' => trim((string) post('barrio', '')),
+        'telefono' => trim((string) post('telefono', '')),
+        'id_sede' => (int) post('id_sede', '1'),
+        'id_jornada' => (int) post('id_jornada', '1'),
+    ];
+    if ($editId > 0) {
+        $out['id_estudiante'] = $editId;
+    }
+
+    return $out;
+}
+
+/** Alias del formulario de autoregistro (mismos campos que gestión). */
+function registro_estudiante_old_desde_post(): array
+{
+    return gestion_estudiante_old_desde_post();
+}
+
+function correo_es_institucional_estudiante(string $correo): bool
+{
+    $correo = strtolower(trim($correo));
+    if ($correo === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+    $dominio = strtolower((string) substr(strrchr($correo, '@') ?: '', 1));
+    if ($dominio === '') {
+        return false;
+    }
+    $permitidos = defined('REGISTRO_DOMINIOS_CORREO') ? REGISTRO_DOMINIOS_CORREO : ['fesc.edu.co'];
+    foreach ($permitidos as $permitido) {
+        if ($dominio === strtolower((string) $permitido)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function asset_url(string $path): string
 {
     return url(ASSETS_URL . '/' . ltrim($path, '/'));

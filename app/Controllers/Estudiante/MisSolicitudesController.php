@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace App\Controllers\Estudiante;
 
+require_once dirname(__DIR__) . '/init.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use App\Controllers\Controller;
-use App\Services\PlazosSolicitudService;
 use App\Services\SolicitudDocumentosService;
 use App\Services\SolicitudesService;
 
-final class SolicitudesController extends Controller
+final class MisSolicitudesController extends Controller
 {
     private const FLASH_KEY = '_flash_est_sol';
 
@@ -21,32 +23,17 @@ final class SolicitudesController extends Controller
             redirect('/login');
         }
 
-        $vista = $this->vistaDesdeScript();
-
         $mensaje = '';
         $tipoMsg = 'success';
 
-        if ($vista === 'lista') {
-            $flash = $_SESSION[self::FLASH_KEY] ?? null;
-            if (is_array($flash)) {
-                unset($_SESSION[self::FLASH_KEY]);
-                $mensaje = (string) ($flash['mensaje'] ?? '');
-                $tipoMsg = (string) ($flash['tipoMsg'] ?? 'success');
-            }
+        $flash = $_SESSION[self::FLASH_KEY] ?? null;
+        if (is_array($flash)) {
+            unset($_SESSION[self::FLASH_KEY]);
+            $mensaje = (string) ($flash['mensaje'] ?? '');
+            $tipoMsg = (string) ($flash['tipoMsg'] ?? 'success');
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud') {
-            if ($vista !== 'nueva') {
-                redirect(url('estudiante/nueva_solicitud'));
-            }
-            [$mensaje, $tipoMsg] = SolicitudesService::registrarDesdeEstudiante($idEst);
-            if ($tipoMsg === 'success') {
-                $_SESSION[self::FLASH_KEY] = ['mensaje' => $mensaje, 'tipoMsg' => $tipoMsg];
-                redirect(url('estudiante/mis_solicitudes'));
-            }
-        }
-
-        if ($vista === 'lista' && $_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'subir_documento_solicitado') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'subir_documento_solicitado') {
             $idSol = (int) post('id_solicitud', '0');
             $cat = (string) post('doc_categoria', '');
             [$mensaje, $tipoMsg] = SolicitudDocumentosService::subirDesdeEstudiante($idEst, $idSol, $cat);
@@ -54,27 +41,6 @@ final class SolicitudesController extends Controller
                 $_SESSION[self::FLASH_KEY] = ['mensaje' => $mensaje, 'tipoMsg' => $tipoMsg];
                 redirect(url('estudiante/mis_solicitudes'));
             }
-        }
-
-        $yo = repo_estudiante_por_id($idEst);
-
-        $old = [];
-        if ($vista === 'nueva' && ($tipoMsg ?? '') === 'warning' && $_SERVER['REQUEST_METHOD'] === 'POST' && post('accion', '') === 'nueva_solicitud') {
-            $old = solicitud_estudiante_old_desde_post();
-        }
-
-        if ($vista === 'nueva') {
-            $this->render('estudiante/solicitud_nueva.php', [
-                'pageTitle' => 'Nueva solicitud',
-                'solNavActiva' => 'nueva',
-                'yo' => $yo,
-                'mensaje' => $mensaje,
-                'tipoMsg' => $tipoMsg,
-                'old' => $old,
-                'matrizPlazos' => PlazosSolicitudService::matrizParaFrontend(),
-            ]);
-
-            return;
         }
 
         SolicitudesService::marcarNotificacionesLeidasParaUsuario(auth_user());
@@ -154,9 +120,6 @@ final class SolicitudesController extends Controller
             'panelDoc' => $panelDoc,
         ]);
     }
-
-    private function vistaDesdeScript(): string
-    {
-        return \App\Core\Router::currentRoute() === 'estudiante/nueva_solicitud' ? 'nueva' : 'lista';
-    }
 }
+
+\App\Controllers\dispatch_if_direct(__FILE__, MisSolicitudesController::class);

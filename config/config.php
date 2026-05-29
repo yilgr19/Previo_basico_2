@@ -39,3 +39,4 @@ require_once MODELS_PATH . '/data_dictionary.php';
 require_once MODELS_PATH . '/storage.php';
 require_once CORE_PATH . '/auth.php';
 require_once MODELS_PATH . '/repository.php';
+require_once dirname(__DIR__) . '/config/registro.php';

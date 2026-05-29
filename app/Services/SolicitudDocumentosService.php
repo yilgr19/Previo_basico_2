@@ -115,15 +115,8 @@ final class SolicitudDocumentosService
                 $s[self::CAMPO_SOLICITUD] = [];
             }
 
-            $nextId = 1;
-            foreach ($s[self::CAMPO_SOLICITUD] as $ex) {
-                if (is_array($ex)) {
-                    $nextId = max($nextId, (int) ($ex['id'] ?? 0) + 1);
-                }
-            }
-
             $s[self::CAMPO_SOLICITUD][] = [
-                'id' => $nextId,
+                'id' => 0,
                 'categoria' => $categoria,
                 'mensaje' => $mensaje,
                 'solicitado_en' => fecha_hora_colombia(),

@@ -33,7 +33,7 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 
 1. Abra el **Panel de control de XAMPP**.
 2. Inicie **Apache** y **MySQL**.
-3. Active **`mod_rewrite`** en Apache (en XAMPP suele estar habilitado). El archivo `.htaccess` en la raíz del proyecto envía todas las rutas a `index.php`.
+3. Active **`mod_rewrite`** en Apache (en XAMPP suele estar habilitado). El `.htaccess` envía cada URL limpia (`/estudiante/dashboard`, `/login`, …) **directamente al controlador** en `app/Controllers/`.
 
 ### 3b. Base de datos (phpMyAdmin)
 
@@ -76,10 +76,23 @@ Aplicación web en PHP con persistencia en **MySQL** (XAMPP). Incluye paneles pa
 | Servicios | `app/Services/` (`SolicitudesService`, `GestionAcademicaService`, etc.) |
 | Datos | MySQL (`solicitudes_academicas`) |
 | Adjuntos | `uploads/solicitudes/` |
-| Enrutamiento | `index.php` + `app/Core/Router.php` (front controller; Apache con `mod_rewrite`) |
-| Vistas (solo plantillas) | `views/` — no ejecutan lógica de negocio |
+| Enrutamiento | `.htaccess` → controlador en `app/Controllers/` (sin archivos puente en la raíz) |
+| Vistas (plantillas HTML) | `views/` — solo presentación; las incluye el controlador con `render()` |
 
-Todas las URLs pasan por `index.php`, que despacha al controlador correspondiente. La clase `App\Controllers\Controller` expone `render()` para incluir cabecera, vista y pie.
+Flujo de una pantalla (ejemplo **Mis solicitudes**):
+
+```
+URL /estudiante/mis_solicitudes
+  → .htaccess
+  → app/Controllers/Estudiante/MisSolicitudesController.php
+       run()  prepara datos
+       render('estudiante/mis_solicitudes.php', $datos)
+  → views/estudiante/mis_solicitudes.php  (solo HTML)
+```
+
+Solo existen **dos capas de código por pantalla**: el **controlador** (lógica + llamada a la vista) y la **vista** (plantilla). No hay archivos intermedios como `estudiante/mis_solicitudes.php` en la raíz del proyecto.
+
+El mapa URL → controlador está en `.htaccess`. La página de inicio usa `index.php`, que arranca `HomeController`.
 
 ---
 

@@ -5,5 +5,28 @@
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    RewriteRule ^ index.php [QSA,L]
+    RewriteRule ^$ index.php [L]
+
+    RewriteRule ^login$ app/Controllers/LoginController.php [L,QSA]
+    RewriteRule ^registro_estudiante$ app/Controllers/RegistroEstudianteController.php [L,QSA]
+    RewriteRule ^verificar_registro$ app/Controllers/VerificarRegistroController.php [L,QSA]
+    RewriteRule ^logout$ app/Controllers/LogoutController.php [L,QSA]
+    RewriteRule ^recuperar$ app/Controllers/RecuperarController.php [L,QSA]
+    RewriteRule ^descargar_anexo$ app/Controllers/DescargarAnexoController.php [L,QSA]
+
+    RewriteRule ^estudiante/dashboard$ app/Controllers/Estudiante/DashboardController.php [L,QSA]
+    RewriteRule ^estudiante/perfil$ app/Controllers/Estudiante/PerfilController.php [L,QSA]
+    RewriteRule ^estudiante/nueva_solicitud$ app/Controllers/Estudiante/NuevaSolicitudController.php [L,QSA]
+    RewriteRule ^estudiante/mis_solicitudes$ app/Controllers/Estudiante/MisSolicitudesController.php [L,QSA]
+
+    RewriteRule ^gestion/dashboard$ app/Controllers/Gestion/DashboardController.php [L,QSA]
+    RewriteRule ^gestion/estudiantes$ app/Controllers/Gestion/EstudiantesController.php [L,QSA]
+    RewriteRule ^gestion/plazos$ app/Controllers/Gestion/PlazosController.php [L,QSA]
+    RewriteRule ^gestion/reportes$ app/Controllers/Gestion/ReportesController.php [L,QSA]
+    RewriteRule ^gestion/solicitudes$ app/Controllers/Gestion/SolicitudesController.php [L,QSA]
+    RewriteRule ^gestion/solicitudes_sede_ocana$ app/Controllers/Gestion/SolicitudesSedeOcanaController.php [L,QSA]
+    RewriteRule ^gestion/solicitudes_revision$ app/Controllers/Gestion/SolicitudesRevisionController.php [L,QSA]
+    RewriteRule ^gestion/solicitudes_revision_ocana$ app/Controllers/Gestion/SolicitudesRevisionOcanaController.php [L,QSA]
+
+    RewriteRule ^admin/dashboard$ app/Controllers/Gestion/DashboardController.php [R=302,L]
 </IfModule>

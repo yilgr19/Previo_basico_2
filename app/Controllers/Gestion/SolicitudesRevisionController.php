@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace App\Controllers\Gestion;
 
+require_once dirname(__DIR__) . '/init.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use App\Controllers\Controller;
 use App\Services\SolicitudDocumentosService;
 use App\Services\SolicitudesService;
 
-final class SolicitudesRevisionController extends Controller
+class SolicitudesRevisionController extends Controller
 {
     public function __construct(
-        private readonly int $idSedeBandeja = 0
+        private readonly int $idSedeBandeja = 1
     ) {
     }
 
@@ -103,3 +106,5 @@ final class SolicitudesRevisionController extends Controller
         ]);
     }
 }
+
+\App\Controllers\dispatch_if_direct(__FILE__, SolicitudesRevisionController::class);

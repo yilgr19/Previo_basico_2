@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controllers\Gestion;
 
+require_once dirname(__DIR__) . '/init.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use App\Controllers\Controller;
 
 final class ReportesController extends Controller
@@ -24,3 +27,5 @@ final class ReportesController extends Controller
         ]);
     }
 }
+
+\App\Controllers\dispatch_if_direct(__FILE__, ReportesController::class);

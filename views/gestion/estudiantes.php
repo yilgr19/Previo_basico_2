@@ -15,7 +15,7 @@ $defaults = [
     'id_sede' => 1,
     'id_jornada' => 1,
 ];
-$ef = array_merge($defaults, $editar ?? []);
+$ef = array_merge($defaults, $editar ?? [], $repoblar ?? []);
 $mWarn = ($mensaje ?? '') !== '' && ($tipoMsg ?? '') === 'warning';
 $alertClass = $mWarn ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-green-200 bg-green-50 text-green-900';
 if (($tipoMsg ?? '') === 'warning' && !$mWarn) {

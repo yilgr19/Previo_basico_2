@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controllers\Estudiante;
 
+require_once dirname(__DIR__) . '/init.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+
 use App\Controllers\Controller;
 use App\Services\GestionAcademicaService;
 
@@ -34,3 +37,5 @@ final class PerfilController extends Controller
         ]);
     }
 }
+
+\App\Controllers\dispatch_if_direct(__FILE__, PerfilController::class);
