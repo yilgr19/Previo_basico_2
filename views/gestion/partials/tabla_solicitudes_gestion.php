@@ -13,8 +13,8 @@ $gestionRepoblar = $gestionRepoblar ?? null;
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Radicante</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Tipo</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Motivo</th>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">Anexos</th>
-          <th class="px-3 py-3 text-left font-semibold text-gray-700">Estado</th>
+          <th class="px-3 py-3 text-center font-semibold text-gray-700">Anexos</th>
+          <th class="px-3 py-3 text-center font-semibold text-gray-700">Estado</th>
           <th class="px-3 py-3 text-left font-semibold text-gray-700">Detalle / gestión</th>
         </tr>
       </thead>
@@ -28,11 +28,19 @@ $gestionRepoblar = $gestionRepoblar ?? null;
             $anexos = $s['anexos_archivos'] ?? [];
             $docsPendEst = \App\Services\SolicitudDocumentosService::listarPendientes($s, true);
             $esperaAnexos = $docsPendEst !== [];
+            $codEst = solicitud_estado_a_codigo((string) ($s['estado'] ?? ''));
+            $estadoPill = match ($codEst) {
+                'pendiente' => 'bg-amber-50 text-amber-800 ring-amber-200/70',
+                'en_revision' => 'bg-sky-50 text-sky-800 ring-sky-200/70',
+                'aprobada' => 'bg-emerald-50 text-emerald-800 ring-emerald-200/70',
+                'rechazada' => 'bg-rose-50 text-rose-800 ring-rose-200/70',
+                default => 'bg-slate-50 text-slate-700 ring-slate-200/70',
+            };
             $sem = \App\Services\PlazosSolicitudService::semaforoSolicitud($s, $e ?: null, $ds ?: null);
             $semActivo = semaforo_plazo_activo($sem);
             $semCls = $semActivo ? semaforo_plazo_clases((string) ($sem['estado'] ?? 'gris')) : semaforo_plazo_clases('ninguno');
             ?>
-          <tr class="align-top<?= $semActivo ? ' ' . h($semCls['fondo']) : '' ?><?= $esperaAnexos ? ' bg-violet-50/40 ring-1 ring-inset ring-violet-200/70' : '' ?>">
+          <tr class="align-top<?= $semActivo ? ' ' . h($semCls['fondo']) : '' ?><?= $esperaAnexos ? ' border-l-2 border-violet-400/80' : '' ?>">
             <td class="px-3 py-2 font-mono"><?= $idSol ?></td>
             <td class="max-w-[7rem] px-3 py-2 text-[11px]">
               <?php if ($semActivo): ?>
@@ -60,33 +68,38 @@ $gestionRepoblar = $gestionRepoblar ?? null;
             </td>
             <td class="max-w-[10rem] px-3 py-2 text-xs"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
             <td class="max-w-[9rem] px-3 py-2 text-xs font-medium text-gray-900"><?= h(solicitud_motivo_admin_etiqueta($s)) ?></td>
-            <td class="max-w-[8rem] px-3 py-2 text-xs">
+            <td class="max-w-[8rem] px-3 py-2 text-xs text-center">
               <?php if ($esperaAnexos): ?>
-                <div class="mb-1.5 rounded-md border border-violet-300 bg-violet-50 px-1.5 py-1" title="El estudiante aún no ha cargado el soporte solicitado">
-                  <span class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-violet-900">
-                    <span class="h-2 w-2 shrink-0 rounded-full bg-violet-600" aria-hidden="true"></span>
-                    Espera anexos
-                  </span>
+                <div class="mx-auto flex max-w-[7rem] flex-col items-center gap-0.5" title="Soporte solicitado al estudiante, pendiente de carga">
                   <?php foreach ($docsPendEst as $dp): ?>
                     <?php $catP = (string) ($dp['categoria'] ?? ''); ?>
-                    <div class="mt-0.5 text-[10px] leading-snug text-violet-800">· <?= h(solicitud_etiqueta_categoria_anexo($catP)) ?></div>
+                    <span class="text-[10px] leading-snug text-violet-600/90"><?= h(solicitud_etiqueta_categoria_anexo($catP)) ?></span>
                   <?php endforeach; ?>
                 </div>
               <?php endif; ?>
               <?php if (is_array($anexos) && $anexos !== []): ?>
+                <div class="<?= $esperaAnexos ? 'mt-1.5 border-t border-violet-100 pt-1.5' : '' ?> space-y-0.5">
                 <?php foreach ($anexos as $i => $m): ?>
                   <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
                   <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?></a>
                 <?php endforeach; ?>
+                </div>
               <?php elseif (!$esperaAnexos): ?>
-                —
+                <span class="text-gray-400">—</span>
               <?php endif; ?>
             </td>
-            <td class="px-3 py-2">
-              <?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?>
-              <?php if ($esperaAnexos): ?>
-                <span class="mt-1 inline-flex items-center rounded-full border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-900" title="Soporte solicitado al estudiante, pendiente de carga">En espera de anexos</span>
-              <?php endif; ?>
+            <td class="px-3 py-2 text-center">
+              <div class="mx-auto flex max-w-[6.5rem] flex-col items-center gap-1">
+                <span class="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 <?= h($estadoPill) ?>">
+                  <?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?>
+                </span>
+                <?php if ($esperaAnexos): ?>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-medium tracking-wide text-violet-600 ring-1 ring-violet-200/60" title="Soporte solicitado al estudiante, pendiente de carga">
+                    <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden="true"></span>
+                    Espera anexos
+                  </span>
+                <?php endif; ?>
+              </div>
             </td>
             <td class="min-w-[14rem] px-3 py-2">
               <details class="mb-2">

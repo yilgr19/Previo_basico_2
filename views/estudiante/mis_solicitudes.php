@@ -95,8 +95,11 @@ $uSolic = h(url('estudiante/mis_solicitudes'));
               <?php $tblAnexos($s); ?>
               <td class="max-w-xs px-3 py-2 text-xs">
                 <?php if ($docsPend !== []): ?>
-                  <div class="mb-2 rounded border border-amber-200 bg-amber-50 px-2 py-1.5">
-                    <p class="text-[10px] font-semibold text-amber-900">Documentos por cargar</p>
+                  <div class="mb-2 rounded-lg border border-violet-200/70 bg-violet-50 px-2 py-1.5 ring-1 ring-violet-100">
+                    <p class="inline-flex items-center gap-1 text-[10px] font-medium text-violet-700">
+                      <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden="true"></span>
+                      Documentos por cargar
+                    </p>
                     <?php foreach ($docsPend as $dp): ?>
                       <?php $cat = (string) ($dp['categoria'] ?? ''); ?>
                       <a class="mt-1 block text-[11px] font-medium text-academic hover:underline" href="<?= h(url('estudiante/mis_solicitudes?solicitud=' . (int) ($s['id_solicitud'] ?? 0) . '&doc=' . rawurlencode($cat) . '#panel-doc-solicitado')) ?>">
