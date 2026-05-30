@@ -36,7 +36,7 @@ if (count($parts) >= 2) {
             <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Panel de gestión</h1>
             <p class="mt-1 text-base font-medium text-slate-700">Hola, <?= h($primer) ?></p>
             <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-600">
-              Atienda las <strong class="font-semibold text-slate-800">bandejas de solicitudes por sede</strong> (Cúcuta y Ocaña) y configure los <strong class="font-semibold text-slate-800">plazos</strong> desde un solo lugar.
+              Registre <strong class="font-semibold text-slate-800">estudiantes</strong>, atienda las <strong class="font-semibold text-slate-800">bandejas de solicitudes por sede</strong> (Cúcuta y Ocaña) y configure los <strong class="font-semibold text-slate-800">plazos</strong> desde un solo lugar.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
               <a href="<?= h(url('gestion/solicitudes')) ?>" class="inline-flex items-center gap-2 rounded-xl bg-academic px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-academic/20 transition hover:bg-academic-dark">
@@ -46,6 +46,10 @@ if (count($parts) >= 2) {
               <a href="<?= h(url('gestion/solicitudes_sede_ocana')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:bg-sky-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 Bandeja sede Ocaña
+              </a>
+              <a href="<?= h(url('gestion/estudiantes')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-academic/40 hover:bg-slate-50">
+                <svg class="h-4 w-4 text-academic" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+                Estudiantes
               </a>
               <a href="<?= h(url('gestion/plazos')) ?>" class="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-900 shadow-sm transition hover:bg-teal-100">
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
@@ -123,6 +127,13 @@ if (count($parts) >= 2) {
       </div>
       <strong class="block text-gray-900">Bandeja de solicitudes sede Ocaña</strong>
       <span class="mt-1 block text-xs text-gray-600">Mismos filtros que la bandeja de Cúcuta</span>
+    </a>
+    <a href="<?= h(url('gestion/estudiantes')) ?>" class="group rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm ring-1 ring-slate-900/[0.03] transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="mb-2 flex justify-center text-blue-600 transition group-hover:scale-105">
+        <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+      </div>
+      <strong class="block text-gray-900">Registrar estudiantes</strong>
+      <span class="text-xs text-gray-500">Alta, edición y listado de estudiantes</span>
     </a>
     <a href="<?= h(url('gestion/plazos')) ?>" class="group rounded-xl border border-teal-100 bg-white p-6 text-center shadow-sm ring-1 ring-teal-100 transition hover:-translate-y-0.5 hover:shadow-md">
       <div class="mb-2 flex justify-center text-teal-600 transition group-hover:scale-105">
