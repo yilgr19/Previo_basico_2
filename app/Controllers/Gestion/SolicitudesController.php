@@ -70,6 +70,7 @@ class SolicitudesController extends Controller
             'aprobacion' => $filtroAprob,
             'radicante' => $filtroRadicante,
             'buscar' => $buscarDoc,
+            'excluir_cerradas' => true,
         ];
         if ($this->idSedeBandeja > 0) {
             $opts['id_sede'] = $this->idSedeBandeja;

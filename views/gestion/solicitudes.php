@@ -16,7 +16,7 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana');
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-semibold text-academic"><?= h($pageTitle ?? 'Solicitudes institucionales') ?></h1>
-      <p class="mt-1 text-sm text-gray-600">Revise solicitudes de estudiantes, filtre y responda según el estado del trámite. La tabla se ordena por <strong class="font-medium text-gray-800">fecha de registro</strong> (más recientes primero). Solo se listan trámites de la sede indicada en el título.</p>
+      <p class="mt-1 text-sm text-gray-600">Revise solicitudes de estudiantes, filtre y responda según el estado del trámite. La tabla se ordena por <strong class="font-medium text-gray-800">fecha de registro</strong> (más recientes primero). Por defecto solo se muestran trámites <strong class="font-medium text-gray-800">pendientes o en revisión</strong>; use los filtros para ver aprobadas o rechazadas.</p>
       <?php if ($idSedeBandeja === 1 || $idSedeBandeja === 2): ?>
         <p class="mt-2 flex flex-wrap gap-2 text-xs">
           <span class="font-medium text-gray-600">Otra sede:</span>
@@ -30,8 +30,8 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana');
       <?php endif; ?>
     </div>
     <div class="flex flex-wrap gap-2">
-      <a class="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision')) ?>">Solo en revisión Cúcuta</a>
-      <a class="inline-flex items-center rounded-lg border border-amber-200/90 bg-amber-50/80 px-3 py-1.5 text-sm font-medium text-amber-950 shadow-sm hover:bg-amber-100" href="<?= h(url('gestion/solicitudes_revision_ocana')) ?>">Solo en revisión Ocaña</a>
+      <a class="inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition <?= $idSedeBandeja === 1 ? 'border-amber-300 bg-amber-100 text-amber-950' : 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100' ?>" href="<?= h($uBandejaCucuta) ?>">Solo Cúcuta</a>
+      <a class="inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition <?= $idSedeBandeja === 2 ? 'border-sky-300 bg-sky-100 text-sky-950' : 'border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100' ?>" href="<?= h($uBandejaOcana) ?>">Solo Ocaña</a>
       <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" href="<?= h(url('gestion/dashboard')) ?>">Volver al panel</a>
     </div>
   </div>
@@ -74,9 +74,10 @@ $uBandejaOcana = url('gestion/solicitudes_sede_ocana');
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">Aprobación</label>
         <select name="aprobacion" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm">
-          <option value="">Todas</option>
+          <option value="">Activas (sin aprobadas/rechazadas)</option>
           <option value="aprobadas" <?= (($filtroAprob ?? '') === 'aprobadas') ? 'selected' : '' ?>>Solo aprobadas</option>
-          <option value="no_aprobadas" <?= (($filtroAprob ?? '') === 'no_aprobadas') ? 'selected' : '' ?>>No aprobadas (incl. pendiente, revisión, rechazada)</option>
+          <option value="rechazadas" <?= (($filtroAprob ?? '') === 'rechazadas') ? 'selected' : '' ?>>Solo rechazadas</option>
+          <option value="no_aprobadas" <?= (($filtroAprob ?? '') === 'no_aprobadas') ? 'selected' : '' ?>>No aprobadas (pendiente, revisión, rechazada)</option>
         </select>
       </div>
     </div>

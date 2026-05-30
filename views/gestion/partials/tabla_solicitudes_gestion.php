@@ -26,11 +26,13 @@ $gestionRepoblar = $gestionRepoblar ?? null;
             $idSol = (int) ($s['id_solicitud'] ?? 0);
             $nomEst = $e ? trim(($e['nombre'] ?? '') . ' ' . ($e['apellido'] ?? '')) : '';
             $anexos = $s['anexos_archivos'] ?? [];
+            $docsPendEst = \App\Services\SolicitudDocumentosService::listarPendientes($s, true);
+            $esperaAnexos = $docsPendEst !== [];
             $sem = \App\Services\PlazosSolicitudService::semaforoSolicitud($s, $e ?: null, $ds ?: null);
             $semActivo = semaforo_plazo_activo($sem);
             $semCls = $semActivo ? semaforo_plazo_clases((string) ($sem['estado'] ?? 'gris')) : semaforo_plazo_clases('ninguno');
             ?>
-          <tr class="align-top<?= $semActivo ? ' ' . h($semCls['fondo']) : '' ?>">
+          <tr class="align-top<?= $semActivo ? ' ' . h($semCls['fondo']) : '' ?><?= $esperaAnexos ? ' bg-violet-50/40 ring-1 ring-inset ring-violet-200/70' : '' ?>">
             <td class="px-3 py-2 font-mono"><?= $idSol ?></td>
             <td class="max-w-[7rem] px-3 py-2 text-[11px]">
               <?php if ($semActivo): ?>
@@ -59,16 +61,33 @@ $gestionRepoblar = $gestionRepoblar ?? null;
             <td class="max-w-[10rem] px-3 py-2 text-xs"><?= h(solicitud_tipo_etiqueta($s)) ?></td>
             <td class="max-w-[9rem] px-3 py-2 text-xs font-medium text-gray-900"><?= h(solicitud_motivo_admin_etiqueta($s)) ?></td>
             <td class="max-w-[8rem] px-3 py-2 text-xs">
+              <?php if ($esperaAnexos): ?>
+                <div class="mb-1.5 rounded-md border border-violet-300 bg-violet-50 px-1.5 py-1" title="El estudiante aún no ha cargado el soporte solicitado">
+                  <span class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-violet-900">
+                    <span class="h-2 w-2 shrink-0 rounded-full bg-violet-600" aria-hidden="true"></span>
+                    Espera anexos
+                  </span>
+                  <?php foreach ($docsPendEst as $dp): ?>
+                    <?php $catP = (string) ($dp['categoria'] ?? ''); ?>
+                    <div class="mt-0.5 text-[10px] leading-snug text-violet-800">· <?= h(solicitud_etiqueta_categoria_anexo($catP)) ?></div>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
               <?php if (is_array($anexos) && $anexos !== []): ?>
                 <?php foreach ($anexos as $i => $m): ?>
                   <?php $cat = (string) ($m['categoria'] ?? 'general'); ?>
                   <a class="block text-academic hover:underline" href="<?= h(url('descargar_anexo?s=' . $idSol . '&f=' . $i)) ?>"><?= h((string) ($m['original'] ?? 'archivo')) ?><?php if ($cat !== '' && $cat !== 'general'): ?> <span class="text-gray-500">(<?= h(solicitud_etiqueta_categoria_anexo($cat)) ?>)</span><?php endif; ?></a>
                 <?php endforeach; ?>
-              <?php else: ?>
+              <?php elseif (!$esperaAnexos): ?>
                 —
               <?php endif; ?>
             </td>
-            <td class="px-3 py-2"><?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?></td>
+            <td class="px-3 py-2">
+              <?= h(solicitud_estado_nombre((string) ($s['estado'] ?? ''))) ?>
+              <?php if ($esperaAnexos): ?>
+                <span class="mt-1 inline-flex items-center rounded-full border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-900" title="Soporte solicitado al estudiante, pendiente de carga">En espera de anexos</span>
+              <?php endif; ?>
+            </td>
             <td class="min-w-[14rem] px-3 py-2">
               <details class="mb-2">
                 <summary class="cursor-pointer select-none text-xs font-semibold text-academic hover:underline">Ver solicitud completa</summary>

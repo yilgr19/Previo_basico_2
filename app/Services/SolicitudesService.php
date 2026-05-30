@@ -194,16 +194,26 @@ final class SolicitudesService
             if ($fh !== '' && $fr !== '' && strcmp($fr, $fh) > 0) {
                 continue;
             }
-            if ($est !== '' && (string) ($s['estado'] ?? '') !== $est) {
+            $cod = solicitud_estado_a_codigo((string) ($s['estado'] ?? ''));
+            $s['estado'] = $cod;
+            if ($est !== '' && $cod !== $est) {
                 continue;
             }
-            $cod = (string) ($s['estado'] ?? '');
             $esAprobada = $cod === 'aprobada';
+            $esRechazada = $cod === 'rechazada';
             if ($aprob === 'aprobadas' && !$esAprobada) {
+                continue;
+            }
+            if ($aprob === 'rechazadas' && !$esRechazada) {
                 continue;
             }
             if ($aprob === 'no_aprobadas' && $esAprobada) {
                 continue;
+            }
+            if (!empty($f['excluir_cerradas']) && $est === '' && $aprob === '') {
+                if ($esAprobada || $esRechazada) {
+                    continue;
+                }
             }
 
             $idEst = (int) ($s['id_estudiante'] ?? 0);
